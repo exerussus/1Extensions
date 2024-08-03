@@ -2,7 +2,7 @@
 using System.Threading.Tasks;
 using Object = UnityEngine.Object;
 
-namespace Exerussus._1Extensions
+namespace Exerussus._1Extensions.Loader
 {
     public interface ILoader
     {

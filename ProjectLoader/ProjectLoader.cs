@@ -1,5 +1,5 @@
 ﻿
-namespace Exerussus._1Extensions
+namespace Exerussus._1Extensions.Loader
 {
     public static class ProjectLoader
     {

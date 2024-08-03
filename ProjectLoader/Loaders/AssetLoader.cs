@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
-namespace Exerussus._1Extensions
+namespace Exerussus._1Extensions.Loader
 {
     public class AssetLoader
     {
