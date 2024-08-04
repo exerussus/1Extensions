@@ -58,6 +58,11 @@ namespace Exerussus._1Extensions.Scripts.Extensions
             if (item != null && !list.Contains(item)) list.Add(item);
             return list;
         }
+
+        public static bool IsNotEmpty<T>(this T[] array)
+        {
+            return array is { Length: > 0 };
+        }
         
         /// <summary>
         /// Rotates vector left on angle in XoY plane
