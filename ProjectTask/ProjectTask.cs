@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Plugins.Exerussus._1Extensions
+namespace Exerussus._1Extensions
 {
     public static class ProjectTask
     {
