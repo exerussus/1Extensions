@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
 
-namespace Exerussus._1Lab.Scripts.Managers.Pools
+namespace Exerussus._1Extensions.Pools
 {
     public class ObjectPool<T> where T : Component
     {
