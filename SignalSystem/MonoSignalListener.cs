@@ -1,5 +1,4 @@
 ﻿
-using Exerussus._1Extensions.Loader;
 using UnityEngine;
 
 namespace Exerussus._1Extensions.SignalSystem
@@ -11,7 +10,7 @@ namespace Exerussus._1Extensions.SignalSystem
 
         protected virtual void OnValidate()
         {
-            if (signalHandler == null) signalHandler =  ProjectLoader.Loader.GetAssetFromResourceByName<SignalHandler>();
+            ConfigLoader.TryGetConfigIfNull(ref signalHandler,"Signals");
         }
     }
     
