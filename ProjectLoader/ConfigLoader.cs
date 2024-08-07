@@ -5,7 +5,7 @@ using Plugins.Exerussus._1Extensions.ProjectLoader.Loaders;
 using UnityEngine;
 
 #if UNITY_EDITOR
-using UnityEditor; 
+using UnityEditor;
 #endif
 
 namespace Exerussus._1Extensions
@@ -90,25 +90,30 @@ namespace Exerussus._1Extensions
 
         public static ConfigHub GetConfigHub()
         {
-            var configHub = Resources.Load<ConfigHub>("ConfigHub"); 
+            ConfigHub configHub;
+            
             
 #if UNITY_EDITOR
+            
+            var assetName = typeof(ConfigHub).Name;
+            var folderPath = Path.Combine("Assets", "Resources");
+            var assetPathAndName = Path.Combine(folderPath, $"{assetName}.asset");
+            configHub = AssetDatabase.LoadAssetAtPath<ConfigHub>(assetPathAndName);
+            
             if (configHub == null)
             {
+                Debug.Log($"ConfigHub isd null");
                 try
                 {
                     var newConfig = ScriptableObject.CreateInstance<ConfigHub>();
-                    var assetName = typeof(ConfigHub).Name;
 
-                    var folderPath = Path.Combine("Assets", "Resources");
 
                     if (!AssetDatabase.IsValidFolder(Path.Combine("Assets", "Resources")))
                         CreateFolder("Assets/", "Resources");
-
-                    var assetPathAndName = Path.Combine(folderPath, $"{assetName}.asset");
-
+                    
                     AssetDatabase.CreateAsset(newConfig, assetPathAndName);
                     AssetDatabase.SaveAssets();
+                    configHub = newConfig;
                 }
                 catch (Exception e)
                 {
@@ -116,9 +121,12 @@ namespace Exerussus._1Extensions
                     throw;
                 }
             }
+#else
+            
+            configHub = Resources.Load<ConfigHub>("ConfigHub"); 
 #endif
 
-            return Resources.Load<ConfigHub>("ConfigHub");
+            return configHub;
         }
         
         private static void CreateFolder(string parent, string target)

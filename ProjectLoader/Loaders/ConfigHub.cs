@@ -1,7 +1,7 @@
 ﻿
 using System.Collections.Generic;
-using Unity.Collections;
 using UnityEngine;
+using UnityEngine.Scripting;
 
 #if UNITY_EDITOR
 using System.IO;
@@ -10,10 +10,10 @@ using UnityEditor;
 
 namespace Plugins.Exerussus._1Extensions.ProjectLoader.Loaders
 {
-    [CreateAssetMenu(menuName = "Data/ConfigHub")]
+    [Preserve]
     public class ConfigHub : ScriptableObject
     {
-        [SerializeField, ReadOnly] private List<ScriptableObject> configs;
+        [SerializeField] private List<ScriptableObject> configs;
 
         public List<ScriptableObject> Configs => configs;
 
@@ -27,8 +27,9 @@ namespace Plugins.Exerussus._1Extensions.ProjectLoader.Loaders
         public void RefreshConfigs()
         {
 #if UNITY_EDITOR
+            EditorUtility.SetDirty(this);
             configs = new List<ScriptableObject>();
-            string configsPath = "Assets/Configs";
+            string configsPath = "Assets/Configs"; 
 
             string[] assetPaths = Directory.GetFiles(configsPath, "*.asset", SearchOption.AllDirectories);
 
