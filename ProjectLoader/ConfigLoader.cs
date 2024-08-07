@@ -3,7 +3,10 @@ using System;
 using System.IO;
 using Plugins.Exerussus._1Extensions.ProjectLoader.Loaders;
 using UnityEngine;
-using UnityEditor;
+
+#if UNITY_EDITOR
+using UnityEditor; 
+#endif
 
 namespace Exerussus._1Extensions
 {
@@ -22,9 +25,12 @@ namespace Exerussus._1Extensions
         
         public static T GetOrCreate<T>(string parentFolder, string configsFolder = ConfigFolder) where T : ScriptableObject
         {
+            T asset = null;
+
+#if UNITY_EDITOR
             
             var assetPath = Path.Combine(AssetsFolder, configsFolder, parentFolder, $"{typeof(T).Name}.asset");
-            var asset = AssetDatabase.LoadAssetAtPath<T>(assetPath);
+            asset = AssetDatabase.LoadAssetAtPath<T>(assetPath);
             
             if (asset == null)
             {
@@ -35,17 +41,26 @@ namespace Exerussus._1Extensions
             var configHub = GetConfigHub();
             configHub.RefreshConfigs();
             
+#endif
             return asset;
         }
 
         public static T Get<T>(string parentFolder, string configsFolder = ConfigFolder) where T : ScriptableObject
         {
+            T asset = null;
+            
+#if UNITY_EDITOR
+            
             var assetPath = Path.Combine(AssetsFolder, configsFolder, parentFolder, $"{typeof(T).Name}.asset");
-            return AssetDatabase.LoadAssetAtPath<T>(assetPath);
+            asset = AssetDatabase.LoadAssetAtPath<T>(assetPath);
+#endif
+            return asset;
         }
 
         public static void CreateAssetFile<T>(string parentFolder, string configsFolder = "Configs") where T : ScriptableObject
         {
+            
+#if UNITY_EDITOR
             var newConfig = ScriptableObject.CreateInstance<T>();
             var assetName = typeof(T).Name;
 
@@ -67,35 +82,50 @@ namespace Exerussus._1Extensions
             }
             catch (Exception e)
             {
+                Debug.LogError(e.Message);
                 throw;
             }
+#endif
         }
 
         public static ConfigHub GetConfigHub()
         {
             var configHub = Resources.Load<ConfigHub>("ConfigHub"); 
             
-            if (configHub == null) 
+#if UNITY_EDITOR
+            if (configHub == null)
             {
-                var newConfig = ScriptableObject.CreateInstance<ConfigHub>();
-                var assetName = typeof(ConfigHub).Name;
+                try
+                {
+                    var newConfig = ScriptableObject.CreateInstance<ConfigHub>();
+                    var assetName = typeof(ConfigHub).Name;
 
-                var folderPath = Path.Combine("Assets", "Resources"); 
-        
-                if (!AssetDatabase.IsValidFolder(Path.Combine("Assets", "Resources"))) CreateFolder("Assets/", "Resources");  
-                
-                var assetPathAndName = Path.Combine(folderPath, $"{assetName}.asset");
+                    var folderPath = Path.Combine("Assets", "Resources");
 
-                AssetDatabase.CreateAsset(newConfig, assetPathAndName);
-                AssetDatabase.SaveAssets(); 
+                    if (!AssetDatabase.IsValidFolder(Path.Combine("Assets", "Resources")))
+                        CreateFolder("Assets/", "Resources");
+
+                    var assetPathAndName = Path.Combine(folderPath, $"{assetName}.asset");
+
+                    AssetDatabase.CreateAsset(newConfig, assetPathAndName);
+                    AssetDatabase.SaveAssets();
+                }
+                catch (Exception e)
+                {
+                    Debug.LogError(e.Message);
+                    throw;
+                }
             }
+#endif
 
             return Resources.Load<ConfigHub>("ConfigHub");
         }
         
         private static void CreateFolder(string parent, string target)
         {
+#if UNITY_EDITOR
             AssetDatabase.CreateFolder(parent.TrimEnd('/'), target.TrimEnd('/'));
+#endif
         }
     }
 }

@@ -1,6 +1,4 @@
 ﻿
-using Exerussus._1Extensions.Loader;
-using Plugins.Exerussus._1Extensions.ProjectLoader.Loaders;
 using UnityEngine;
 
 namespace Exerussus._1Extensions.Scripts.Extensions
@@ -31,9 +29,16 @@ namespace Exerussus._1Extensions.Scripts.Extensions
         {
             if (component == null)
             {
-                var configHub = ConfigLoader.GetConfigHub();
-                configHub.RefreshConfigs();
-                component = configHub.GetConfig<T>();
+                if (Application.isPlaying)
+                {
+                    var configHub = ConfigLoader.GetConfigHub();
+                    configHub.RefreshConfigs();
+                    component = configHub.GetConfig<T>();
+                }
+                else
+                {
+                    component = ConfigLoader.Get<T>(typeof(T).Name);
+                }
             }
 
             return component;
