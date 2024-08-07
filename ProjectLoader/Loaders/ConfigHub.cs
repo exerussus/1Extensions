@@ -1,5 +1,6 @@
 ﻿
 using System.Collections.Generic;
+using Unity.Collections;
 using UnityEngine;
 
 #if UNITY_EDITOR
@@ -12,7 +13,7 @@ namespace Plugins.Exerussus._1Extensions.ProjectLoader.Loaders
     [CreateAssetMenu(menuName = "Data/ConfigHub")]
     public class ConfigHub : ScriptableObject
     {
-        [SerializeField] private List<ScriptableObject> configs;
+        [SerializeField, ReadOnly] private List<ScriptableObject> configs;
 
         public List<ScriptableObject> Configs => configs;
 
