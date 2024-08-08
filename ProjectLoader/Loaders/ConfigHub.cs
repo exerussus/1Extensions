@@ -8,7 +8,7 @@ using System.IO;
 using UnityEditor;
 #endif
 
-namespace Plugins.Exerussus._1Extensions.ProjectLoader.Loaders
+namespace Exerussus._1Extensions.ProjectLoader.Loaders
 {
     [Preserve]
     public class ConfigHub : ScriptableObject

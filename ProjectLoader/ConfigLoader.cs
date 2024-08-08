@@ -1,7 +1,7 @@
 ﻿
 using System;
 using System.IO;
-using Plugins.Exerussus._1Extensions.ProjectLoader.Loaders;
+using Exerussus._1Extensions.ProjectLoader.Loaders;
 using UnityEngine;
 
 #if UNITY_EDITOR
