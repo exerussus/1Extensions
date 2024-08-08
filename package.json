@@ -1,10 +1,10 @@
 {
   "name": "com.exerussus.1extensions",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "displayName": "1Extensions",
   "description": "Удобные рабочие фичи, которые помогают в разработке от мелочи до архитектуры. *** НАХОДИТСЯ В РАННЕЙ СТАДИИ РАЗРАБОТКИ ***",
   "unity": "2020.3",
-  "dependencies": { },
+  "dependencies": {},
   "keywords": [
     "leoecslite",
     "leoecs",

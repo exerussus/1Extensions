@@ -6,7 +6,7 @@ using System.Linq;
 using UnityEditor;
 using UnityEngine;
 
-namespace Plugins.Exerussus._1Extensions.ProjectLoader
+namespace Exerussus._1Extensions.ProjectLoader
 {
     public static class RemoveMissingScriptsEditor
     {
