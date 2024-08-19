@@ -23,6 +23,26 @@ namespace Exerussus._1Extensions
             return component;
         }
         
+        public static T TrySetDataIfNull<T>(ref T component)
+            where T : ScriptableObject
+        {
+            if (component == null)
+            {
+                if (Application.isPlaying)
+                {
+                    var configHub = GetConfigHub();
+                    configHub.RefreshConfigs();
+                    component = configHub.GetConfig<T>();
+                }
+                else
+                {
+                    component = Get<T>(typeof(T).Name);
+                }
+            }
+
+            return component;
+        }
+        
         public static T GetOrCreate<T>(string parentFolder, string configsFolder = ConfigFolder) where T : ScriptableObject
         {
             T asset = null;
