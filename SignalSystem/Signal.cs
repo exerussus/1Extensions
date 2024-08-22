@@ -54,9 +54,4 @@ namespace Exerussus._1Extensions.SignalSystem
             }
         }
     }
-
-    public interface IOneLabSignal
-    {
-        
-    }
 }
