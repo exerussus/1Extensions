@@ -24,26 +24,6 @@ namespace Exerussus._1Extensions.Scripts.Extensions
             return component;
         }
 
-        public static T TrySetDataIfNull<T>(this Object gameObject, ref T component)
-            where T : ScriptableObject
-        {
-            if (component == null)
-            {
-                if (Application.isPlaying)
-                {
-                    var configHub = ConfigLoader.GetConfigHub();
-                    configHub.RefreshConfigs();
-                    component = configHub.GetConfig<T>();
-                }
-                else
-                {
-                    component = ConfigLoader.Get<T>(typeof(T).Name);
-                }
-            }
-
-            return component;
-        }
-
         public static T OrNull<T>(this T obj) 
             where T : Object
         {

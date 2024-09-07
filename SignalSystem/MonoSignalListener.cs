@@ -5,12 +5,12 @@ namespace Exerussus._1Extensions.SignalSystem
 {
     public abstract class MonoSignalListener : MonoBehaviour
     {
-        [SerializeField, HideInInspector] private SignalHandler signalHandler;
+        [SerializeField] private SignalHandler signalHandler;
         public Signal Signal => signalHandler.Signal;
 
         protected virtual void OnValidate()
         {
-            ConfigLoader.TryGetConfigIfNull(ref signalHandler,"Signals");
+            
         }
     }
     
