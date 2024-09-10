@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace Exerussus._1Extensions.Pools
 {
-public class SortedObjectPool<T> where T : Component
+    public class SortedObjectPool<T> where T : Component
     {
         private GameObject _prefab;
         private const int DefaultObjectCount = 5;
