@@ -307,5 +307,45 @@ namespace Exerussus._1Extensions.Scripts.Extensions
 
             return newCollection;
         }
+        
+        /// <summary>
+        /// Проверяет, есть ли у enum указанный битовый флаг
+        /// </summary>
+        public static bool HasFlag<T>(this T enumValue, T value) where T : Enum
+        {        
+            var enumByte = Convert.ToByte(enumValue);
+            var valueByte = Convert.ToByte(value);
+            return (enumByte & valueByte) == valueByte;
+        }
+        
+        /// <summary>
+        /// Проверяет, есть ли в enum хотя бы один указанный битовый флаг
+        /// </summary>
+        public static bool HasAnyFlag<T>(this T enumValue, T[] values) where T : Enum
+        {        
+            var enumByte = Convert.ToByte(enumValue);
+            foreach (var value in values)
+            {
+                var valueByte = Convert.ToByte(value);
+                if ((enumByte & valueByte) == valueByte) return true;
+            }
+
+            return false;
+        }
+        
+        /// <summary>
+        /// Проверяет, есть ли в enum хотя бы один указанный битовый флаг
+        /// </summary>
+        public static bool HasAnyFlag<T>(this T enumValue, List<T> values) where T : Enum
+        {        
+            var enumByte = Convert.ToByte(enumValue);
+            foreach (var value in values)
+            {
+                var valueByte = Convert.ToByte(value);
+                if ((enumByte & valueByte) == valueByte) return true;
+            }
+
+            return false;
+        }
     }
 }
