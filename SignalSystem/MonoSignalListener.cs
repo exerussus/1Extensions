@@ -5,13 +5,7 @@ namespace Exerussus._1Extensions.SignalSystem
 {
     public abstract class MonoSignalListener : MonoBehaviour
     {
-        [SerializeField] private SignalHandler signalHandler;
-        public Signal Signal => signalHandler.Signal;
-
-        protected virtual void OnValidate()
-        {
-            
-        }
+        public abstract Signal Signal { get; }
     }
     
     public abstract class MonoSignalListener<T> : MonoSignalListener where T : struct
