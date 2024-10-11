@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
-using Object = UnityEngine.Object;
 using Random = UnityEngine.Random;
 
 namespace Exerussus._1Extensions.Scripts.Extensions
@@ -19,6 +18,16 @@ namespace Exerussus._1Extensions.Scripts.Extensions
             var item = dictionary[key];
             dictionary.Remove(key);
             return item;
+        }
+        
+        public static T PopRandom<T>(this List<T> list)
+        {
+#if UNITY_EDITOR
+            if (list.Count == 0) Debug.LogError("Пустой лист");
+#endif
+            if (list.Count == 1) return list.PopFirst();
+            var rValue = Random.Range(0, list.Count);
+            return list.Pop(rValue);
         }
         
         /// <summary>
