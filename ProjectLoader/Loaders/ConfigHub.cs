@@ -1,5 +1,4 @@
-﻿
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Scripting;
 
@@ -13,6 +12,7 @@ namespace Exerussus._1Extensions.ProjectLoader.Loaders
     [Preserve]
     public class ConfigHub : ScriptableObject
     {
+        private const string ConfigsPath = "Assets/Configs";
         [SerializeField] private List<ScriptableObject> configs;
 
         public List<ScriptableObject> Configs => configs;
@@ -29,7 +29,7 @@ namespace Exerussus._1Extensions.ProjectLoader.Loaders
 #if UNITY_EDITOR
             EditorUtility.SetDirty(this);
             configs = new List<ScriptableObject>();
-            string configsPath = "Assets/Configs"; 
+            string configsPath = ConfigsPath; 
 
             string[] assetPaths = Directory.GetFiles(configsPath, "*.asset", SearchOption.AllDirectories);
 

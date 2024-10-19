@@ -32,6 +32,23 @@ namespace Exerussus._1Extensions.SignalSystem
                 }
             }
         }
+        /// <summary>
+        /// Вызывает сигнал без создания копии на входе
+        /// </summary>
+        public void RegistryRaise<T>(ref T data) where T : struct
+        {
+            var type = typeof(T);
+            if (IsLogEnabled) Debug.Log($"{type}");
+
+            if (_listeners.TryGetValue(type, out var actionList))
+            {
+                var actions = (List<Action<T>>)actionList;
+                for (var index = actions.Count - 1; index >= 0; index--)
+                {
+                    actions[index].Invoke(data);
+                }
+            }
+        }
 
         public void Subscribe<T>(Action<T> action) where T : struct
         {
