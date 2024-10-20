@@ -1,4 +1,4 @@
-﻿namespace Plugins.Exerussus._1Extensions.SmallFeatures
+﻿namespace Exerussus._1Extensions.SmallFeatures
 {
     public class Counter
     {

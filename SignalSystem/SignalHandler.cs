@@ -1,5 +1,5 @@
 ﻿
-using Plugins.Exerussus._1Extensions.Abstractions;
+using Exerussus._1Extensions.Abstractions;
 using UnityEngine;
 
 namespace Exerussus._1Extensions.SignalSystem

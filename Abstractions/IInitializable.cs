@@ -1,4 +1,4 @@
-﻿namespace Plugins.Exerussus._1Extensions.Abstractions
+﻿namespace Exerussus._1Extensions.Abstractions
 {
     public interface IInitializable
     {
