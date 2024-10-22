@@ -50,6 +50,14 @@ namespace Exerussus._1Extensions.Pools
             }
         }
 
+        public T GetObject(Vector3 position)
+        {
+            var pooledObject = FreeObjects.Count > 0 ? FreeObjects.Dequeue() : CreateNewObject();
+            pooledObject.transform.SetPositionAndRotation(position, Quaternion.identity);
+            pooledObject.gameObject.SetActive(true);
+            return pooledObject;
+        }
+
         public T GetObject(Vector3 position, Quaternion rotation)
         {
             var pooledObject = FreeObjects.Count > 0 ? FreeObjects.Dequeue() : CreateNewObject();
