@@ -30,6 +30,24 @@ namespace Exerussus._1Extensions.Pools
             }
         }
 
+        public void InitPrefab(GameObject prefab, bool dontDestroyOnLoad, Transform parent, int count = DefaultObjectCount)
+        {
+            _parent = new GameObject { name = $"{prefab.name} pool" , transform = { parent = parent}}.transform;
+            
+            if (dontDestroyOnLoad) Object.DontDestroyOnLoad(_parent);
+            
+            _prefab = Object.Instantiate(prefab, _parent);
+            _prefab.SetActive(false);
+            _prefab.name = $"{prefab.name} prefab";
+            _elementName = $"{prefab.name} element";
+            for (int i = 0; i < count; i++)
+            {
+                var element = CreateNewObject();
+                element.gameObject.SetActive(false);
+                FreeObjects.Enqueue(element);
+            }
+        }
+
         public T GetObject(Vector3 position, Quaternion rotation)
         {
             var pooledObject = FreeObjects.Count > 0 ? FreeObjects.Dequeue() : CreateNewObject();
