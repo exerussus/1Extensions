@@ -11,6 +11,8 @@ namespace Exerussus._1Extensions.Pools
         private Transform _parent;
         private string _elementName;
         private int _count;
+
+        public Transform Parent => _parent;
         
         public void InitPrefab(GameObject prefab, bool dontDestroyOnLoad, int count = DefaultObjectCount)
         {
