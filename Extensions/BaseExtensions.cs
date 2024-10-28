@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
@@ -17,6 +18,14 @@ namespace Exerussus._1Extensions.Scripts.Extensions
         {
             var item = dictionary[key];
             dictionary.Remove(key);
+            return item;
+        }        
+        
+        public static TItem PopRandom<TCollection, TItem>(this Dictionary<TCollection, TItem> dictionary, TCollection key)
+        {
+            var keys = dictionary.Keys.ToArray();
+            var rItem = keys.GetRandomItem();
+            var item = dictionary.Pop(rItem);
             return item;
         }
         
