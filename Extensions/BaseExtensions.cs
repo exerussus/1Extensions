@@ -21,7 +21,7 @@ namespace Exerussus._1Extensions.Scripts.Extensions
             return item;
         }        
         
-        public static TItem PopRandom<TCollection, TItem>(this Dictionary<TCollection, TItem> dictionary, TCollection key)
+        public static TItem PopRandom<TCollection, TItem>(this Dictionary<TCollection, TItem> dictionary)
         {
             var keys = dictionary.Keys.ToArray();
             var rItem = keys.GetRandomItem();
