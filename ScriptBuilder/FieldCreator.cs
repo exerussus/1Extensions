@@ -9,6 +9,7 @@ namespace Exerussus._1Extensions.ScriptBuilding
         private string _accessModifier;
         private string _type;
         private string _name;
+        private bool _isStatic;
         private string _value;
         private List<string> _attributes = new();
         private ClassCreator _classCreator;
@@ -24,6 +25,12 @@ namespace Exerussus._1Extensions.ScriptBuilding
         public static FieldCreator Create(ClassCreator classCreator, string accessModifier, string type, string name)
         {
             return new FieldCreator(classCreator, accessModifier, type, name);
+        }
+
+        public FieldCreator SetStatic()
+        {
+            _isStatic = true;
+            return this;
         }
 
         public FieldCreator AddAttribute(string attribute)
@@ -52,8 +59,9 @@ namespace Exerussus._1Extensions.ScriptBuilding
                 fieldBuilder.AppendLine($"        [{attribute}]");
             }
             
+            var staticPart = _isStatic ? "static " : "";
             var value = string.IsNullOrEmpty(_value) ? "" : $" = {_value}";
-            fieldBuilder.AppendLine($"        {_accessModifier} {_type} {_name}{value};");
+            fieldBuilder.AppendLine($"        {_accessModifier} {staticPart}{_type} {_name}{value};");
 
             return fieldBuilder.ToString();
         }

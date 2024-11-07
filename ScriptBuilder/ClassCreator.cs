@@ -6,6 +6,7 @@ namespace Exerussus._1Extensions.ScriptBuilding
     public class ClassCreator
     {
         private string _name;
+        private bool _isStatic;
         private List<string> _inheritances = new();
         private List<string> _attributes = new();
         private List<FieldCreator> _fields = new();
@@ -26,6 +27,12 @@ namespace Exerussus._1Extensions.ScriptBuilding
         public ClassCreator AddInheritance(string inheritance)
         {
             _inheritances.Add(inheritance);
+            return this;
+        }
+
+        public ClassCreator SetStatic()
+        {
+            _isStatic = true;
             return this;
         }
 
@@ -60,8 +67,9 @@ namespace Exerussus._1Extensions.ScriptBuilding
 
             foreach (var attribute in _attributes) classBuilder.AppendLine($"    [{attribute}]");
             
+            var staticPart = _isStatic ? "static " : "";
             var inheritancePart = _inheritances.Count > 0 ? " : " + string.Join(", ", _inheritances) : "";
-            classBuilder.AppendLine($"    public class {_name}{inheritancePart}");
+            classBuilder.AppendLine($"    public {staticPart}class {_name}{inheritancePart}");
             classBuilder.AppendLine("    {");
 
             foreach (var field in _fields) classBuilder.Append(field);

@@ -6,6 +6,7 @@ namespace Exerussus._1Extensions.ScriptBuilding
     public class MethodCreator
     {
         private string _name;
+        private bool _isStatic;
         private ClassCreator _classCreator;
         private List<string> _lines = new();
         private List<string> _params = new();
@@ -25,6 +26,12 @@ namespace Exerussus._1Extensions.ScriptBuilding
         public MethodCreator AddParam(string type, string name)
         {
             _params.Add($"{type} {name}");
+            return this;
+        }
+
+        public MethodCreator SetStatic()
+        {
+            _isStatic = true;
             return this;
         }
 
@@ -60,8 +67,9 @@ namespace Exerussus._1Extensions.ScriptBuilding
                 methodBuilder.AppendLine($"        [{attribute}]");
             }
 
+            var staticPart = _isStatic ? "static " : "";
             var paramsList = _params.Count > 0 ? string.Join(", ", _params) : "";
-            methodBuilder.AppendLine($"        public void {_name}({paramsList})");
+            methodBuilder.AppendLine($"        public {staticPart}void {_name}({paramsList})");
             methodBuilder.AppendLine("        {");
 
             foreach (var line in _lines)
