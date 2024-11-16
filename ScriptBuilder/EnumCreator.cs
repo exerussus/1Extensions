@@ -5,18 +5,17 @@ namespace Exerussus._1Extensions.ScriptBuilding
 {
     public class EnumCreator
     {
-        private string _name;
-        private List<string> _values = new();
-        private List<string> _attributes = new();
-        private ScriptBuilder _scriptCreator;
-
-        public string Name => _name;
-        public List<string> Values => _values;
+        public string Name;
+        public int Spacing;
+        public List<string> Values = new();
+        public List<string> Attributes = new();
+        public ScriptBuilder ScriptCreator;
 
         private EnumCreator(ScriptBuilder scriptCreator, string name)
         {
-            _scriptCreator = scriptCreator;
-            _name = name;
+            ScriptCreator = scriptCreator;
+            Name = name;
+            Spacing = 4;
         }
 
         public static EnumCreator Create(ScriptBuilder scriptCreator, string name)
@@ -26,41 +25,38 @@ namespace Exerussus._1Extensions.ScriptBuilding
 
         public EnumCreator AddAttribute(string attribute)
         {
-            _attributes.Add(attribute);
+            Attributes.Add(attribute);
             return this;
         }
 
         public EnumCreator AddValue(string value)
         {
-            _values.Add(value);
+            Values.Add(value);
             return this;
         }
 
         public ScriptBuilder End()
         {
-            return _scriptCreator;
+            return ScriptCreator;
         }
 
         public override string ToString()
         {
+            var spacing = ScriptBuilder.GetSpacing(Spacing);
+            var elementSpacing = ScriptBuilder.GetSpacing(Spacing + 4);
             var enumBuilder = new StringBuilder();
 
-            foreach (var attribute in _attributes)
+            foreach (var attribute in Attributes)
             {
-                enumBuilder.AppendLine($"    [{attribute}]");
+                enumBuilder.AppendLine($"{spacing}[{attribute}]");
             }
 
-            enumBuilder.AppendLine($"    public enum {_name}");
-            enumBuilder.AppendLine("    {");
+            enumBuilder.AppendLine($"{spacing}public enum {Name}");
+            enumBuilder.AppendLine(spacing + "{");
 
-            for (int i = 0; i < _values.Count; i++)
-            {
-                enumBuilder.AppendLine(i == _values.Count - 1
-                    ? $"        {_values[i]}"
-                    : $"        {_values[i]},");
-            }
-
-            enumBuilder.AppendLine("    }");
+            for (int i = 0; i < Values.Count; i++) enumBuilder.AppendLine($"{elementSpacing}{Values[i]},");
+            
+            enumBuilder.AppendLine(spacing + "}");
 
             return enumBuilder.ToString();
         }
