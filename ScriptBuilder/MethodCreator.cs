@@ -5,17 +5,19 @@ namespace Exerussus._1Extensions.ScriptBuilding
 {
     public class MethodCreator
     {
-        private string _name;
-        private bool _isStatic;
-        private ClassCreator _classCreator;
-        private List<string> _lines = new();
-        private List<string> _params = new();
-        private List<string> _attributes = new();
+        public string Name;
+        public bool IsStatic;
+        public int Spacing;
+        public ClassCreator ClassCreator;
+        public List<string> Lines = new();
+        public List<string> Params = new();
+        public List<string> Attributes = new();
 
         private MethodCreator(ClassCreator classCreator, string name)
         {
-            _classCreator = classCreator;
-            _name = name;
+            ClassCreator = classCreator;
+            Spacing = classCreator.Spacing + 4;
+            Name = name;
         }
 
         public static MethodCreator Create(ClassCreator classCreator, string name)
@@ -25,54 +27,56 @@ namespace Exerussus._1Extensions.ScriptBuilding
 
         public MethodCreator AddParam(string type, string name)
         {
-            _params.Add($"{type} {name}");
+            Params.Add($"{type} {name}");
             return this;
         }
 
         public MethodCreator SetStatic()
         {
-            _isStatic = true;
+            IsStatic = true;
             return this;
         }
 
         public MethodCreator AddAttribute(string attribute)
         {
-            _attributes.Add(attribute);
+            Attributes.Add(attribute);
             return this;
         }
 
         public MethodCreator AddLine(string line)
         {
-            _lines.Add(line);
+            Lines.Add(line);
             return this;
         }
 
         public MethodCreator AddSpace()
         {
-            _lines.Add("");
+            Lines.Add("");
             return this;
         }
 
         public ClassCreator End()
         {
-            return _classCreator;
+            return ClassCreator;
         }
 
         public override string ToString()
         {
+            var spacing = ScriptBuilder.GetSpacing(Spacing);
+            var lineSpacing = ScriptBuilder.GetSpacing(Spacing + 4);
             var methodBuilder = new StringBuilder();
 
-            foreach (var attribute in _attributes)
+            foreach (var attribute in Attributes)
             {
-                methodBuilder.AppendLine($"        [{attribute}]");
+                methodBuilder.AppendLine($"{spacing}[{attribute}]");
             }
 
-            var staticPart = _isStatic ? "static " : "";
-            var paramsList = _params.Count > 0 ? string.Join(", ", _params) : "";
-            methodBuilder.AppendLine($"        public {staticPart}void {_name}({paramsList})");
-            methodBuilder.AppendLine("        {");
+            var staticPart = IsStatic ? "static " : "";
+            var paramsList = Params.Count > 0 ? string.Join(", ", Params) : "";
+            methodBuilder.AppendLine($"{spacing}public {staticPart}void {Name}({paramsList})");
+            methodBuilder.AppendLine(spacing + "{");
 
-            foreach (var line in _lines)
+            foreach (var line in Lines)
             {
                 if (string.IsNullOrWhiteSpace(line))
                 {
@@ -80,11 +84,11 @@ namespace Exerussus._1Extensions.ScriptBuilding
                 }
                 else
                 {
-                    methodBuilder.AppendLine($"            {line}");
+                    methodBuilder.AppendLine($"{lineSpacing}{line}");
                 }
             }
 
-            methodBuilder.AppendLine("        }");
+            methodBuilder.AppendLine(spacing + "}");
 
             return methodBuilder.ToString();
         }
