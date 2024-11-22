@@ -15,6 +15,18 @@ namespace Exerussus._1Extensions.SmallFeatures
         private Dictionary<Type, DataPackByType> _sharedObjectsByType = new();
         private Dictionary<string, DataPackById> _sharedObjectsById = new();
         private Dictionary<Type, Dictionary<Type, DataPackByType>> _subObjects = new();
+
+        [Preserve]
+        private T InjectSharedObject<T>(Type type)
+        {
+            return GetSharedObject<T>(type);
+        }
+        
+        [Preserve]
+        private T InjectSharedSubTypeObject<T>(Type mainType, Type subType)
+        {
+            return GetSharedObject<T>(mainType, subType);
+        }
         
         [Preserve]
         public T GetSharedObject<T>()
@@ -48,10 +60,24 @@ namespace Exerussus._1Extensions.SmallFeatures
         }
         
         [Preserve]
+        public T GetSharedObject<T>(Type type)
+        {
+            var classPack = _sharedObjectsByType[type];
+            return (T)classPack.Object;
+        }
+        
+        [Preserve]
         public void GetSharedObject<T1, T2>(ref T2 sharedObject)
         {
             var classPack = _subObjects[typeof(T1)][typeof(T2)];
             sharedObject = (T2)classPack.Object;
+        }
+        
+        [Preserve]
+        public T GetSharedObject<T>(Type mainType, Type subType)
+        {
+            var classPack = _subObjects[mainType][subType];
+            return (T)classPack.Object;
         }
         
         [Preserve]
