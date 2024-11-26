@@ -34,21 +34,27 @@ namespace Exerussus._1EasyEcs.Scripts.Core
         public static void InjectSharedObjects(object target, GameShare gameShare)
         {
             var targetType = target.GetType();
-            var fields = targetType.GetFields(BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance);
-            var properties = targetType.GetProperties(BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance);
-
-            foreach (var field in fields)
+    
+            while (targetType != null && targetType != typeof(object))
             {
-                ProcessInjection(field, target, gameShare, 
-                    f => f.FieldType, 
-                    sharedObject => field.SetValue(target, sharedObject));
-            }
+                var fields = targetType.GetFields(BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly);
+                var properties = targetType.GetProperties(BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly);
 
-            foreach (var property in properties)
-            {
-                ProcessInjection(property, target, gameShare, 
-                    p => p.PropertyType, 
-                    sharedObject => property.SetValue(target, sharedObject));
+                foreach (var field in fields)
+                {
+                    ProcessInjection(field, target, gameShare, 
+                        f => f.FieldType, 
+                        sharedObject => field.SetValue(target, sharedObject));
+                }
+
+                foreach (var property in properties)
+                {
+                    ProcessInjection(property, target, gameShare, 
+                        p => p.PropertyType, 
+                        sharedObject => property.SetValue(target, sharedObject));
+                }
+
+                targetType = targetType.BaseType;
             }
         }
 
