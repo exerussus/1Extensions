@@ -114,7 +114,38 @@ namespace Exerussus._1Extensions.SmallFeatures
 #endif
             _sharedObjectsByType[type] = new DataPackByType(type, sharedObject);
         }
+        
+        [Preserve]
+        public void AddSharedObjects(IEnumerable<object> addingSharedObjects)
+        {
+            if (addingSharedObjects == null) throw new ArgumentNullException(nameof(addingSharedObjects), "The collection cannot be null.");
+            
+            foreach (var sharedObject in addingSharedObjects)
+            {
+                if (sharedObject == null) throw new ArgumentException("The collection contains a null element, which is not allowed.");
+                var type = sharedObject.GetType();
 
+#if UNITY_EDITOR
+                sharedObjects.Add(type.Name);
+#endif
+                _sharedObjectsByType[type] = new DataPackByType(type, sharedObject);
+            }
+        }
+        
+        [Preserve]
+        public void AddSharedObjects<TKey, TValue>(Dictionary<TKey, TValue> dictionary)
+        {
+            if (dictionary == null) throw new ArgumentNullException(nameof(dictionary), "The dictionary cannot be null.");
+            
+            foreach (var pair in dictionary)
+            {
+                if (pair.Key == null) throw new ArgumentException("The dictionary contains a null key, which is not allowed.");
+                if (pair.Value == null) throw new ArgumentException($"The dictionary contains a null value for key '{pair.Key}', which is not allowed.");
+                if (pair.Key is string id) AddSharedObject(id, pair.Value);
+                else AddSharedObject(pair.Key.GetType(), pair.Value);
+            }
+        }
+        
         [Preserve]
         public void AddSharedObject<T1, T2>(T2 sharedObject)
         {
