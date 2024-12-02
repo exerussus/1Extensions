@@ -11,6 +11,7 @@ namespace Exerussus._1Extensions.ScriptBuilding
         public List<string> Inheritances = new();
         public List<string> Attributes = new();
         public List<ClassFieldCreator> Fields = new();
+        public List<ClassPropertyCreator> Properties = new();
         public List<MethodCreator> Methods = new();
         public List<ClassCreator> SubClasses = new();
         public ScriptBuilder ScriptBuilder;
@@ -73,6 +74,13 @@ namespace Exerussus._1Extensions.ScriptBuilding
             var field = ClassFieldCreator.Create(this, accessModifier, type, name);
             Fields.Add(field);
             return field;
+        }
+
+        public object AddProperty(string accessModifier, string type, string name)
+        {
+            var property = ClassPropertyCreator.Create(this, accessModifier, type, name);
+            Properties.Add(property);
+            return property;
         }
 
         public MethodCreator AddMethod(string name)
