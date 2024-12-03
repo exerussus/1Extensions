@@ -288,8 +288,28 @@ namespace Exerussus._1Extensions.Scripts.Extensions
         /// <returns>true, если исходный массив содержит хотя бы один элемент из целевого массива; иначе false.</returns>
         public static bool ContainsAny(this string[] sourceCollection, string[] targetCollection)
         {
-            if (sourceCollection == null || targetCollection == null) return false;
-            if (sourceCollection.Length == 0 || targetCollection.Length == 0) return false;
+            if (sourceCollection == null) return false;
+            if (targetCollection == null) return true;
+            if (targetCollection.Length == 0) return true;
+            if (sourceCollection.Length == 0) return false;
+
+            var sourceSet = new HashSet<string>(sourceCollection);
+            foreach (var targetItem in targetCollection) if (!sourceSet.Contains(targetItem)) return false;
+            return true;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sourceCollection">Исходный массив.</param>
+        /// <param name="targetCollection">Целевой массив для проверки.</param>
+        /// <returns>true, если исходный массив содержит хотя бы один элемент из целевого массива; иначе false.</returns>
+        public static bool ContainsAny(this List<string> sourceCollection, string[] targetCollection)
+        {
+            if (sourceCollection == null) return false;
+            if (targetCollection == null) return true;
+            if (targetCollection.Length == 0) return true;
+            if (sourceCollection.Count == 0) return false;
 
             var sourceSet = new HashSet<string>(sourceCollection);
             foreach (var targetItem in targetCollection) if (!sourceSet.Contains(targetItem)) return false;
