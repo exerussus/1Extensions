@@ -281,6 +281,23 @@ namespace Exerussus._1Extensions.Scripts.Extensions
         }
 
         /// <summary>
+        /// Проверяет, содержит ли исходный список хотя бы один элемент из целевого списка.
+        /// </summary>
+        /// <param name="originCollection">Исходный список.</param>
+        /// <param name="targetCollection">Целевой список для проверки.</param>
+        /// <returns>true, если исходный список содержит хотя бы один элемент из целевого списка; иначе false.</returns>
+        public static bool ContainsAny<T>(this List<string> originCollection, string[] targetCollection)
+        {
+            if (targetCollection is not { Length: > 0 }) return false;
+            if (originCollection is not { Count: > 0 }) return false;
+
+            var hashSet = new HashSet<string>(originCollection);
+            
+            foreach (var item in targetCollection) if (hashSet.Contains(item)) return true;
+            return false;
+        }
+
+        /// <summary>
         /// 
         /// </summary>
         /// <param name="sourceCollection">Исходный массив.</param>
