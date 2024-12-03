@@ -286,7 +286,7 @@ namespace Exerussus._1Extensions.Scripts.Extensions
         /// <param name="originCollection">Исходный список.</param>
         /// <param name="targetCollection">Целевой список для проверки.</param>
         /// <returns>true, если исходный список содержит хотя бы один элемент из целевого списка; иначе false.</returns>
-        public static bool ContainsAny<T>(this List<string> originCollection, string[] targetCollection)
+        public static bool ContainsAny(this List<string> originCollection, string[] targetCollection)
         {
             if (targetCollection is not { Length: > 0 }) return false;
             if (originCollection is not { Count: > 0 }) return false;
