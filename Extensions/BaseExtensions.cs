@@ -90,6 +90,74 @@ namespace Exerussus._1Extensions.Scripts.Extensions
         }
         
         /// <summary>
+        /// Удаляет все строки из массива source, которые присутствуют в коллекции exclude, и возвращает новый массив.
+        /// </summary>
+        /// <param name="source">Исходный массив строк.</param>
+        /// <param name="exclude">Коллекция строк для исключения.</param>
+        /// <returns>Изменённый массив строк без исключённых элементов.</returns>
+        public static string[] RemoveAll(this string[] source, IEnumerable<string> exclude)
+        {
+            if (source == null) return Array.Empty<string>();
+            if (exclude == null) return source;
+
+            var excludeSet = new HashSet<string>(exclude);
+            return source.Where(item => !excludeSet.Contains(item)).ToArray();
+        }
+        
+        /// <summary>
+        /// Удаляет все строки из массива source, которые присутствуют в коллекции exclude, и возвращает новый массив.
+        /// </summary>
+        /// <param name="source">Исходный массив строк.</param>
+        /// <param name="exclude">Коллекция строк для исключения.</param>
+        /// <returns>Изменённый массив строк без исключённых элементов.</returns>
+        public static string[] RemoveAll(this string[] source, HashSet<string> exclude)
+        {
+            if (source == null) return Array.Empty<string>();
+            if (exclude == null) return source;
+
+            return source.Where(item => !exclude.Contains(item)).ToArray();
+        }
+        
+        /// <summary>
+        /// Удаляет все строки из массива source, которые присутствуют в коллекции exclude, и возвращает source.
+        /// </summary>
+        /// <param name="source">Исходный массив строк.</param>
+        /// <param name="exclude">Коллекция строк для исключения.</param>
+        /// <returns>Изменённый массив строк без исключённых элементов.</returns>
+        public static List<string> RemoveAll(this List<string> source, IEnumerable<string> exclude)
+        {
+            if (source == null) return new();
+            if (exclude == null) return source;
+
+            var excludeSet = new HashSet<string>(exclude);
+            for (int i = source.Count - 1; i >= 0; i--)
+            {
+                var item = source[i];
+                if (excludeSet.Contains(item)) source.RemoveAt(i);
+            }
+            return source;
+        }
+        
+        /// <summary>
+        /// Удаляет все строки из массива source, которые присутствуют в коллекции exclude, и возвращает source.
+        /// </summary>
+        /// <param name="source">Исходный массив строк.</param>
+        /// <param name="exclude">Коллекция строк для исключения.</param>
+        /// <returns>Изменённый массив строк без исключённых элементов.</returns>
+        public static List<string> RemoveAll(this List<string> source, HashSet<string> exclude)
+        {
+            if (source == null) return new();
+            if (exclude == null) return source;
+
+            for (int i = source.Count - 1; i >= 0; i--)
+            {
+                var item = source[i];
+                if (exclude.Contains(item)) source.RemoveAt(i);
+            }
+            return source;
+        }
+        
+        /// <summary>
         /// Получает случайный элемент из списка.
         /// </summary>
         /// <param name="collection">Список, из которого нужно выбрать случайный элемент.</param>
@@ -129,10 +197,14 @@ namespace Exerussus._1Extensions.Scripts.Extensions
         /// </summary>
         /// <param name="array">Массив для проверки.</param>
         /// <returns>true, если массив не пустой; иначе false.</returns>
-        public static bool IsNotEmpty<T>(this T[] array)
-        {
-            return array is { Length: > 0 };
-        }
+        public static bool IsNotEmpty<T>(this T[] array) => array is { Length: > 0 };
+        
+        /// <summary>
+        /// Проверяет, содержит ли массив хотя бы один элемент.
+        /// </summary>
+        /// <param name="collection">Коллекция для проверки.</param>
+        /// <returns>true, если массив не пустой; иначе false.</returns>
+        public static bool IsNotEmpty<T>(this List<T> collection) => collection is { Count: > 0 };
         
         /// <summary>
         /// Поворачивает вектор в плоскости XoY на заданный угол.
