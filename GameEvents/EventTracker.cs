@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using Unity.Plastic.Newtonsoft.Json;
-using UnityEditor;
 using UnityEngine;
 
 namespace Exerussus._1Extensions.GameEvents
@@ -100,107 +98,113 @@ namespace Exerussus._1Extensions.GameEvents
             this.order = order;
         }
 
-        public readonly string name;
-        public readonly string id = GUID.Generate().ToString();
-        public readonly int order;
-        public readonly long timestamp = DateTime.UtcNow.Ticks;
-        public readonly Dictionary<string, object> context = new();
-    }
-    
-    public class DictionaryConverter : JsonConverter<Dictionary<string, object>>
-    {
-        public override void WriteJson(JsonWriter writer, Dictionary<string, object> value, JsonSerializer serializer)
+        [SerializeField] public string name;
+        [SerializeField] public string id = Guid.NewGuid().ToString();
+        [SerializeField] public int order;
+        [SerializeField] public long timestamp = DateTime.UtcNow.Ticks;
+        [SerializeField, HideInInspector] private string serializedContext;
+
+        private Dictionary<string, object> _context = new();
+
+        public Dictionary<string, object> Context
         {
-            writer.WriteStartObject();
-            foreach (var kvp in value)
-            {
-                writer.WritePropertyName(kvp.Key);
-                serializer.Serialize(writer, kvp.Value);
-            }
-            writer.WriteEndObject();
+            get => _context;
+            set => _context = value;
         }
 
-        public override Dictionary<string, object> ReadJson(JsonReader reader, Type objectType, Dictionary<string, object> existingValue, bool hasExistingValue, JsonSerializer serializer)
+        [SerializeField] public List<EventContextPair> contextPairs = new();
+
+        [ContextMenu("Serialize Context")]
+        public string Serialize()
         {
-            var result = new Dictionary<string, object>();
-            while (reader.Read() && reader.TokenType != JsonToken.EndObject)
+            serializedContext = JsonUtility.ToJson(new SerializableDictionary(Context));
+            return JsonUtility.ToJson(this);
+        }
+
+        [ContextMenu("Deserialize Context")]
+        public void DeserializeContext()
+        {
+            if (!string.IsNullOrEmpty(serializedContext))
             {
-                var key = reader.Value.ToString();
-                reader.Read();
-                var value = serializer.Deserialize(reader);
-                result[key] = value;
+                var deserializedDict = JsonUtility.FromJson<SerializableDictionary>(serializedContext);
+                Context = deserializedDict.ToDictionary();
             }
-            return result;
         }
     }
-    
+
+    [Serializable]
+    public class EventContextPair
+    {
+        public string Key;
+        public string Value;
+    }
+
+    [Serializable]
+    public class SerializableDictionary
+    {
+        public List<string> Keys = new();
+        public List<string> Values = new();
+
+        public SerializableDictionary() { }
+
+        public SerializableDictionary(Dictionary<string, object> dictionary)
+        {
+            foreach (var kvp in dictionary)
+            {
+                Keys.Add(kvp.Key);
+                Values.Add(kvp.Value.ToString());
+            }
+        }
+
+        public Dictionary<string, object> ToDictionary()
+        {
+            var dict = new Dictionary<string, object>();
+            for (int i = 0; i < Keys.Count; i++)
+            {
+                dict[Keys[i]] = Values[i];
+            }
+            return dict;
+        }
+    }
+
     public static class EventExtensions
     {
-        
         public static bool HasContext(this Event @event, string key)
         {
-            return @event.context?.ContainsKey(key) ?? false;
+            return @event.Context?.ContainsKey(key) ?? false;
+        }
+
+        public static object GetContext(this Event @event, string key)
+        {
+            if (!@event.Context.TryGetValue(key, out var value))
+            {
+#if UNITY_EDITOR
+                Debug.LogError($"[Event] Context key '{key}' not found.");
+#endif
+                return null;
+            }
+            return value;
         }
 
         public static T GetContext<T>(this Event @event, string key)
         {
-            if (@event.context == null || !@event.context.ContainsKey(key))
+            if (!@event.Context.TryGetValue(key, out var value))
             {
 #if UNITY_EDITOR
                 Debug.LogError($"[Event] Context key '{key}' not found.");
 #endif
                 return default;
             }
-            return (T)@event.context[key];
+            
+            return (T)value;
         }
 
-        public static T GetOrAddContext<T>(this Event @event, string key, T defaultValue = default)
+        public static object GetOrAddContext(this Event @event, string key, object defaultValue = null)
         {
-            if (@event.context.TryGetValue(key, out var value)) return (T)value;
-            @event.context[key] = defaultValue;
+            if (@event.Context.TryGetValue(key, out var value)) return value;
+            
+            @event.Context[key] = defaultValue;
             return defaultValue;
-        }
-        
-        public static bool HasContext(this Dictionary<string, object> context, string key)
-        {
-            return context?.ContainsKey(key) ?? false;
-        }
-
-        public static T GetContext<T>(this Dictionary<string, object> context, string key)
-        {
-            if (context == null || !context.ContainsKey(key))
-            {
-#if UNITY_EDITOR
-                Debug.LogError($"[Event] Context key '{key}' not found.");
-#endif
-                return default;
-            }
-            return (T)context[key];
-        }
-
-        public static T GetOrAddContext<T>(this Dictionary<string, object> context, string key, T defaultValue = default)
-        {
-            if (context.TryGetValue(key, out var value)) return (T)value;
-            context[key] = defaultValue;
-            return defaultValue;
-        }
-        
-        public static string Serialize(this Event @event)
-        {
-            return JsonConvert.SerializeObject(@event, Formatting.Indented, new JsonSerializerSettings
-            {
-                TypeNameHandling = TypeNameHandling.Auto,
-                Converters = new List<JsonConverter> { new DictionaryConverter() }
-            });
-        }
-
-        public static Event Deserialize(this Event @event, string json)
-        {
-            return JsonConvert.DeserializeObject<Event>(json, new JsonSerializerSettings
-            {
-                TypeNameHandling = TypeNameHandling.Auto,
-                Converters = new List<JsonConverter> { new DictionaryConverter() }
-            });
         }
     }
 }
