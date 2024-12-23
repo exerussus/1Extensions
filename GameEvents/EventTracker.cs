@@ -159,10 +159,7 @@ namespace Exerussus._1Extensions.GameEvents
         public Dictionary<string, object> ToDictionary()
         {
             var dict = new Dictionary<string, object>();
-            for (int i = 0; i < Keys.Count; i++)
-            {
-                dict[Keys[i]] = Values[i];
-            }
+            for (int i = 0; i < Keys.Count; i++) dict[Keys[i]] = Values[i];
             return dict;
         }
     }
