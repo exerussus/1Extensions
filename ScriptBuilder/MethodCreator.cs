@@ -8,6 +8,7 @@ namespace Exerussus._1Extensions.ScriptBuilding
         public string Name;
         public bool IsStatic;
         public int Spacing;
+        public string ReturnType;
         public ClassCreator ClassCreator;
         public List<string> Lines = new();
         public List<string> Params = new();
@@ -54,7 +55,13 @@ namespace Exerussus._1Extensions.ScriptBuilding
             Lines.Add("");
             return this;
         }
-
+        
+        public MethodCreator SetReturnType(string returnType)
+        {
+            ReturnType = returnType;
+            return this;
+        }
+        
         public ClassCreator End()
         {
             return ClassCreator;
@@ -73,7 +80,8 @@ namespace Exerussus._1Extensions.ScriptBuilding
 
             var staticPart = IsStatic ? "static " : "";
             var paramsList = Params.Count > 0 ? string.Join(", ", Params) : "";
-            methodBuilder.AppendLine($"{spacing}public {staticPart}void {Name}({paramsList})");
+            var returnType = string.IsNullOrEmpty(ReturnType) ? "void" : ReturnType;
+            methodBuilder.AppendLine($"{spacing}public {staticPart}{returnType} {Name}({paramsList})");
             methodBuilder.AppendLine(spacing + "{");
 
             foreach (var line in Lines)

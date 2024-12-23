@@ -105,30 +105,6 @@ namespace Exerussus._1Extensions.GameEvents
         public readonly int order;
         public readonly long timestamp = DateTime.UtcNow.Ticks;
         public readonly Dictionary<string, object> context = new();
-
-        public bool HasContext(string key)
-        {
-            return context?.ContainsKey(key) ?? false;
-        }
-
-        public T GetContext<T>(string key)
-        {
-            if (context == null || !context.ContainsKey(key))
-            {
-#if UNITY_EDITOR
-                Debug.LogError($"[Event] Context key '{key}' not found.");
-#endif
-                return default;
-            }
-            return (T)context[key];
-        }
-
-        public T GetOrAddContext<T>(string key, T defaultValue = default)
-        {
-            if (context.TryGetValue(key, out var value)) return (T)value;
-            context[key] = defaultValue;
-            return defaultValue;
-        }
     }
     
     public class DictionaryConverter : JsonConverter<Dictionary<string, object>>
@@ -160,6 +136,55 @@ namespace Exerussus._1Extensions.GameEvents
     
     public static class EventExtensions
     {
+        
+        public static bool HasContext(this Event @event, string key)
+        {
+            return @event.context?.ContainsKey(key) ?? false;
+        }
+
+        public static T GetContext<T>(this Event @event, string key)
+        {
+            if (@event.context == null || !@event.context.ContainsKey(key))
+            {
+#if UNITY_EDITOR
+                Debug.LogError($"[Event] Context key '{key}' not found.");
+#endif
+                return default;
+            }
+            return (T)@event.context[key];
+        }
+
+        public static T GetOrAddContext<T>(this Event @event, string key, T defaultValue = default)
+        {
+            if (@event.context.TryGetValue(key, out var value)) return (T)value;
+            @event.context[key] = defaultValue;
+            return defaultValue;
+        }
+        
+        public static bool HasContext(this Dictionary<string, object> context, string key)
+        {
+            return context?.ContainsKey(key) ?? false;
+        }
+
+        public static T GetContext<T>(this Dictionary<string, object> context, string key)
+        {
+            if (context == null || !context.ContainsKey(key))
+            {
+#if UNITY_EDITOR
+                Debug.LogError($"[Event] Context key '{key}' not found.");
+#endif
+                return default;
+            }
+            return (T)context[key];
+        }
+
+        public static T GetOrAddContext<T>(this Dictionary<string, object> context, string key, T defaultValue = default)
+        {
+            if (context.TryGetValue(key, out var value)) return (T)value;
+            context[key] = defaultValue;
+            return defaultValue;
+        }
+        
         public static string Serialize(this Event @event)
         {
             return JsonConvert.SerializeObject(@event, Formatting.Indented, new JsonSerializerSettings
