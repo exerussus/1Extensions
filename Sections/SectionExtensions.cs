@@ -5,14 +5,16 @@ namespace Exerussus._1Extensions.Sections
 {
     public static class SectionExtensions
     {
-        public static void DrawGizmos(this Section section, Color lineColor)
+        public static void DrawGizmos(this Section section, Color lineColor, Transform parent = null)
         {
-            GizmosUtils.DrawQuad(section.minPosition, section.maxPosition, lineColor);
+            var offset = parent == null ? Vector2.zero : (Vector2)parent.position;
+            GizmosUtils.DrawQuad(offset + section.minPosition, offset + section.maxPosition, lineColor);
         }
         
-        public static void DrawGizmos(this Section section, Color lineColor, Color solidColor)
+        public static void DrawGizmos(this Section section, Color lineColor, Color solidColor, Transform parent = null)
         {
-            GizmosUtils.DrawSolidQuad(section.minPosition, section.maxPosition, lineColor, solidColor);
+            var offset = parent == null ? Vector2.zero : (Vector2)parent.position;
+            GizmosUtils.DrawSolidQuad(offset + section.minPosition, offset + section.maxPosition, lineColor, solidColor);
         }
     }
 }
