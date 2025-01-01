@@ -5,7 +5,7 @@ namespace Exerussus._1Extensions.Prefabs
 {
     public static class PrefabUtilityExtensions
     {
-        public static void RevertToPrefab(GameObject gameObject)
+        public static void RevertToPrefab(this GameObject gameObject)
         {
 #if UNITY_EDITOR
 
