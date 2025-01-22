@@ -19,6 +19,26 @@ namespace Exerussus._1Extensions.Scripts.Extensions
             var item = dictionary[key];
             dictionary.Remove(key);
             return item;
+        }  
+        
+        /// <summary>
+        /// Устанавливает newItem по ключу, и возвращает старый, если был.
+        /// </summary>
+        /// <param name="dictionary">Словарь, в котором нужно установить элемент.</param>
+        /// <param name="key">Ключ элемента, который нужно установить.</param>
+        /// <param name="newItem">Новый элемент.</param>
+        /// <param name="oldItem">Старый элемент.</param>
+        /// <returns>True, если старый элемент был установлен.</returns>
+        public static bool TryReplace<TCollection, TItem>(this Dictionary<TCollection, TItem> dictionary, TCollection key, TItem newItem, out TItem oldItem)
+        {
+            if (!dictionary.TryGetValue(key, out oldItem))
+            {
+                dictionary[key] = newItem;
+                return false;
+            }
+            oldItem = dictionary[key];
+            dictionary[key] = newItem;
+            return true;
         }        
         
         public static TItem PopRandom<TCollection, TItem>(this Dictionary<TCollection, TItem> dictionary)
