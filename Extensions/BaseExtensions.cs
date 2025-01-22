@@ -158,6 +158,15 @@ namespace Exerussus._1Extensions.Scripts.Extensions
             return source;
         }
         
+        /// <summary> Возвращает true, если коллекции listA и listB содержат одинаковые уникальные строки. </summary>
+        public static bool Equal(this IEnumerable<string> listA, IEnumerable<string> listB)
+        {
+            var setA = new HashSet<string>(listA);
+            var setB = new HashSet<string>(listB);
+
+            return setA.SetEquals(setB);
+        }
+        
         /// <summary>
         /// Удаляет все строки из массива source, которые присутствуют в коллекции exclude, и возвращает source.
         /// </summary>
