@@ -163,8 +163,15 @@ namespace Exerussus._1Extensions.Scripts.Extensions
         {
             var setA = new HashSet<string>(listA);
             var setB = new HashSet<string>(listB);
-
             return setA.SetEquals(setB);
+        }
+        
+        /// <summary> Возвращает true, если коллекции listA и listB содержат одинаковые уникальные строки. </summary>
+        public static bool Equal(this IEnumerable<string> first, IEnumerable<string> second, out HashSet<string> firstSet, out HashSet<string> secondSet)
+        {
+            firstSet = new HashSet<string>(first);
+            secondSet = new HashSet<string>(second);
+            return firstSet.SetEquals(secondSet);
         }
         
         /// <summary>
