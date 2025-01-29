@@ -7,7 +7,7 @@ namespace Exerussus._1Extensions.SmallFeatures
 {
     public static class AssetSaver
     {
-        private static async Task SaveAsyncTask<T>(T data, string saveName)
+        private static async Task SaveAsync<T>(T data, string saveName)
         {
             var fileName = typeof(T).Name;
             var path = Path.Combine(Application.persistentDataPath, saveName, fileName);
@@ -21,9 +21,8 @@ namespace Exerussus._1Extensions.SmallFeatures
             await using StreamWriter writer = new StreamWriter(resultPath);
             await writer.WriteAsync(json);
         }
-
         
-        private static async Task<(bool result, T asset)> LoadAsyncTask<T>(string saveName)
+        private static async Task<(bool result, T asset)> LoadAsync<T>(string saveName)
         {
             var fileName = typeof(T).Name;
             var path = Path.Combine(Application.persistentDataPath, saveName, fileName);
@@ -46,7 +45,7 @@ namespace Exerussus._1Extensions.SmallFeatures
             }
             catch (Exception e)
             {
-                Debug.LogWarning($"Отсутствует файл {fileName}: {e.Message}");
+                Debug.LogError($"Не удалось загрузить файл {fileName}: {e.Message}");
                 return (false, default);
             }
         }
