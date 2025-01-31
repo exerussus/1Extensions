@@ -19,6 +19,18 @@ namespace Exerussus._1Extensions.Scripts.Extensions
             var item = dictionary[key];
             dictionary.Remove(key);
             return item;
+        }
+
+        /// <summary>
+        /// Извлекает элемент из словаря по указанному ключу и удаляет его из словаря.
+        /// </summary>
+        /// <param name="dictionary">Словарь, из которого нужно извлечь элемент.</param>
+        /// <param name="key">Ключ элемента, который нужно извлечь.</param>
+        /// <param name="item">Возвращаемый элемент.</param>
+        /// <returns>Возвращает true, если элемент был извлечен.</returns>
+        public static bool TryPop<TCollection, TItem>(this Dictionary<TCollection, TItem> dictionary, TCollection key, out TItem item)
+        {
+            return dictionary.Remove(key, out item);
         }  
         
         /// <summary>
