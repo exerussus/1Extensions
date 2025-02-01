@@ -7,7 +7,7 @@ namespace Exerussus._1Extensions.SmallFeatures
 {
     public static class AssetSaver
     {
-        private static async Task SaveAsync<T>(T data, string saveName)
+        public static async Task SaveAsync<T>(T data, string saveName)
         {
             var fileName = typeof(T).Name;
             var path = Path.Combine(Application.persistentDataPath, saveName, fileName);
@@ -22,7 +22,7 @@ namespace Exerussus._1Extensions.SmallFeatures
             await writer.WriteAsync(json);
         }
         
-        private static async Task<(bool result, T asset)> LoadAsync<T>(string saveName)
+        public static async Task<(bool result, T asset)> LoadAsync<T>(string saveName)
         {
             var fileName = typeof(T).Name;
             var path = Path.Combine(Application.persistentDataPath, saveName, fileName);
