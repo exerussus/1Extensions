@@ -16,5 +16,10 @@ namespace Exerussus._1Extensions.Serialization
         {
             dictionary.Add(keyValue.key, keyValue.value);
         }
+        
+        public static void AddSafe<TKey, TValue>(this Dictionary<TKey, TValue> dictionary, KeyValue<TKey, TValue> keyValue)
+        {
+            dictionary[keyValue.key] =  keyValue.value;
+        }
     }
 }
