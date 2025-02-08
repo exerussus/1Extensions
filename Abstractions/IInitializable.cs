@@ -21,4 +21,19 @@ namespace Exerussus._1Extensions.Abstractions
     {
         public void Initialize();
     }
+    
+    public interface IInitializable<in T>
+    {
+        public void Initialize(T reference);
+    }
+
+    public interface IBeforeInitializable<in T>
+    {
+        public void BeforeInitialize(T reference);
+    }
+
+    public interface IPostInitializable<in T>
+    {
+        public void PostInitialize(T reference);
+    }
 }
