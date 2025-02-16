@@ -57,10 +57,48 @@ namespace Exerussus._1Extensions.SignalSystem
                 }
             }
 
-            var startTime = DateTime.Now;
+            var endTime = DateTime.Now.Millisecond + timeout;
             while (data.Context.State == SignalRequestState.Awaiting)
             {
-                if ((DateTime.Now - startTime).TotalMilliseconds > timeout)
+                if (DateTime.Now.Millisecond > endTime)
+                {
+                    data.Context.State = SignalRequestState.Timeout;
+                    break;
+                }
+                await Task.Delay(delay);
+            }
+    
+            return data.Context;
+        }
+        
+        /// <summary> Регистрирует сигнал содержащий контекст для работы в асинхронном режиме. </summary>
+        /// <param name="data"> Структура наследник IAsyncSignal содержащая SignalContext. </param>
+        /// <param name="delay"> Задержка в миллисекундах. </param>
+        /// <param name="timeout"> Таймаут в миллисекундах. </param>
+        /// <returns> Возвращает контекст структуры при изменении в ней SignalRequestState. </returns>
+        public async Task<TContext> RegistryRaiseAsync<TData, TContext>(int delay = 100, int timeout = 10000) 
+            where TData : struct, IAsyncSignal<TContext>
+            where TContext : SignalContext, new()
+        {
+            var type = typeof(TData);
+            var data = new TData();
+            if (data.Context == null) data.Context = new TContext();
+            data.Context.State = SignalRequestState.Awaiting;
+            if (IsLogEnabled) Debug.Log($"{type}");
+
+            if (_listeners.TryGetValue(type, out var actionList))
+            {
+                var actions = (List<Action<TData>>)actionList;
+                for (var index = actions.Count - 1; index >= 0; index--)
+                {
+                    actions[index].Invoke(data);
+                }
+            }
+
+            var endTime = DateTime.Now.Millisecond + timeout;
+            while (data.Context.State == SignalRequestState.Awaiting)
+            {
+                if (DateTime.Now.Millisecond > endTime)
                 {
                     data.Context.State = SignalRequestState.Timeout;
                     break;
