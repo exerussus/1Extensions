@@ -11,24 +11,19 @@ namespace Exerussus._1Extensions.Serialization
         {
             var fileName = typeof(T).Name;
             var path = Path.Combine(Application.persistentDataPath, saveName, fileName);
-            var resultPath = path;
-
-            var directory = Path.GetDirectoryName(resultPath);
+            var directory = Path.GetDirectoryName(path);
             if (!Directory.Exists(directory)) Directory.CreateDirectory(directory);
 
             string json = JsonUtility.ToJson(data, true);
-
-            await using StreamWriter writer = new StreamWriter(resultPath);
-            await writer.WriteAsync(json);
+            await File.WriteAllTextAsync(path, json);
         }
         
-        public static async Task<(bool result, T asset)> LoadPersistantAsync<T>(string saveName)
+        public static async Task<(bool result, T asset)> LoadPersistentAsync<T>(string saveName)
         {
             var fileName = typeof(T).Name;
             var path = Path.Combine(Application.persistentDataPath, saveName, fileName);
-            var resultPath = path;
-
-            if (!File.Exists(resultPath))
+            
+            if (!File.Exists(path))
             {
                 Debug.LogWarning($"Файл {fileName} не найден в файлах сохранения {saveName}.");
                 return (false, default);
@@ -36,12 +31,44 @@ namespace Exerussus._1Extensions.Serialization
 
             try
             {
-                using (StreamReader reader = new StreamReader(resultPath))
-                {
-                    string json = await reader.ReadToEndAsync();
-                    T asset = JsonUtility.FromJson<T>(json);
-                    return (true, asset);
-                }
+                string json = await File.ReadAllTextAsync(path);
+                T asset = JsonUtility.FromJson<T>(json);
+                return (true, asset);
+            }
+            catch (Exception e)
+            {
+                Debug.LogError($"Не удалось загрузить файл {fileName}: {e.Message}");
+                return (false, default);
+            }
+        }
+        
+        public static void SavePersistent<T>(T data, string saveName)
+        {
+            var fileName = typeof(T).Name;
+            var path = Path.Combine(Application.persistentDataPath, saveName, fileName);
+            var directory = Path.GetDirectoryName(path);
+            if (!Directory.Exists(directory)) Directory.CreateDirectory(directory);
+
+            string json = JsonUtility.ToJson(data, true);
+            File.WriteAllText(path, json);
+        }
+        
+        public static (bool result, T asset) LoadPersistent<T>(string saveName)
+        {
+            var fileName = typeof(T).Name;
+            var path = Path.Combine(Application.persistentDataPath, saveName, fileName);
+            
+            if (!File.Exists(path))
+            {
+                Debug.LogWarning($"Файл {fileName} не найден в файлах сохранения {saveName}.");
+                return (false, default);
+            }
+
+            try
+            {
+                string json = File.ReadAllText(path);
+                T asset = JsonUtility.FromJson<T>(json);
+                return (true, asset);
             }
             catch (Exception e)
             {
@@ -54,24 +81,19 @@ namespace Exerussus._1Extensions.Serialization
         {
             var fileName = typeof(T).Name;
             var path = Path.Combine(Application.streamingAssetsPath, saveName, fileName);
-            var resultPath = path;
-
-            var directory = Path.GetDirectoryName(resultPath);
+            var directory = Path.GetDirectoryName(path);
             if (!Directory.Exists(directory)) Directory.CreateDirectory(directory);
 
             string json = JsonUtility.ToJson(data, true);
-
-            await using StreamWriter writer = new StreamWriter(resultPath);
-            await writer.WriteAsync(json);
+            await File.WriteAllTextAsync(path, json);
         }
         
         public static async Task<(bool result, T asset)> LoadStreamingAsync<T>(string saveName)
         {
             var fileName = typeof(T).Name;
             var path = Path.Combine(Application.streamingAssetsPath, saveName, fileName);
-            var resultPath = path;
-
-            if (!File.Exists(resultPath))
+            
+            if (!File.Exists(path))
             {
                 Debug.LogWarning($"Файл {fileName} не найден в файлах сохранения {saveName}.");
                 return (false, default);
@@ -79,12 +101,44 @@ namespace Exerussus._1Extensions.Serialization
 
             try
             {
-                using (StreamReader reader = new StreamReader(resultPath))
-                {
-                    string json = await reader.ReadToEndAsync();
-                    T asset = JsonUtility.FromJson<T>(json);
-                    return (true, asset);
-                }
+                string json = await File.ReadAllTextAsync(path);
+                T asset = JsonUtility.FromJson<T>(json);
+                return (true, asset);
+            }
+            catch (Exception e)
+            {
+                Debug.LogError($"Не удалось загрузить файл {fileName}: {e.Message}");
+                return (false, default);
+            }
+        }
+        
+        public static void SaveStreaming<T>(T data, string saveName)
+        {
+            var fileName = typeof(T).Name;
+            var path = Path.Combine(Application.streamingAssetsPath, saveName, fileName);
+            var directory = Path.GetDirectoryName(path);
+            if (!Directory.Exists(directory)) Directory.CreateDirectory(directory);
+
+            string json = JsonUtility.ToJson(data, true);
+            File.WriteAllText(path, json);
+        }
+        
+        public static (bool result, T asset) LoadStreaming<T>(string saveName)
+        {
+            var fileName = typeof(T).Name;
+            var path = Path.Combine(Application.streamingAssetsPath, saveName, fileName);
+            
+            if (!File.Exists(path))
+            {
+                Debug.LogWarning($"Файл {fileName} не найден в файлах сохранения {saveName}.");
+                return (false, default);
+            }
+
+            try
+            {
+                string json = File.ReadAllText(path);
+                T asset = JsonUtility.FromJson<T>(json);
+                return (true, asset);
             }
             catch (Exception e)
             {
