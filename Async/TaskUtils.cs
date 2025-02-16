@@ -7,7 +7,17 @@ namespace Exerussus._1Extensions.Async
 {
     public static class TaskUtils
     {
-        public static async Task WaitUntilAsync(Func<bool> condition, int checkInterval = 100)
+        private const int DefaultCheckInterval = 100;
+        
+        public static async Task WaitUntilAsync(Func<bool> condition)
+        {
+            while (!condition())
+            {
+                await Task.Delay(DefaultCheckInterval);
+            }
+        }
+        
+        public static async Task WaitUntilAsync(Func<bool> condition, int checkInterval)
         {
             while (!condition())
             {
@@ -15,19 +25,29 @@ namespace Exerussus._1Extensions.Async
             }
         }
         
-        public static async Task WaitUntilAsync(Func<bool>[] conditions, int checkInterval = 100)
+        public static async Task WaitUntilAsync(Func<bool> condition, int checkInterval, int timeout)
         {
-            while (!conditions.All(c => c()))
+            while (!condition())
             {
+                if (timeout <= 0) return;
                 await Task.Delay(checkInterval);
+                timeout -= checkInterval;
             }
         }
         
-        public static async Task WaitUntilAsync(List<Func<bool>> conditions, int checkInterval = 100)
+        public static async Task WaitUntilAsync(Func<bool>[] conditions)
         {
             while (!conditions.All(c => c()))
             {
-                await Task.Delay(checkInterval);
+                await Task.Delay(DefaultCheckInterval);
+            }
+        }
+        
+        public static async Task WaitUntilAsync(List<Func<bool>> conditions)
+        {
+            while (!conditions.All(c => c()))
+            {
+                await Task.Delay(DefaultCheckInterval);
             }
         }
     }
