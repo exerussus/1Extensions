@@ -27,6 +27,7 @@ namespace Exerussus._1Extensions.SmallFeatures
             gameShares.Remove(gameShare);
             _gameShares.Remove(id);
         }
+#if UNITY_EDITOR
         
         [UnityEditor.InitializeOnLoad]
         private class StaticCleaner
@@ -56,5 +57,6 @@ namespace Exerussus._1Extensions.SmallFeatures
                 }
             }
         }
+#endif
     }
 }
