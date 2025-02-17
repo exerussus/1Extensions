@@ -253,7 +253,7 @@ namespace Exerussus._1Extensions.SignalSystem
     public class ResultContext : SignalContext
     {
         public Dictionary<string, object> InputParameters { get; private set; } = new();
-        public Dictionary<string, object> ResultParameters { get; private set; } = new();
+        public Dictionary<string, object> OutputParameters { get; private set; } = new();
         
         private static Queue<ResultContext> _pool = new();
 
@@ -275,7 +275,7 @@ namespace Exerussus._1Extensions.SignalSystem
         public static void ReleaseInstance(ResultContext instance)
         {
             instance.InputParameters.Clear();
-            instance.ResultParameters.Clear();
+            instance.OutputParameters.Clear();
             instance.State = SignalRequestState.Awaiting;
             _pool.Enqueue(instance);
         }
