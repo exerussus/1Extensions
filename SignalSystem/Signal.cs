@@ -252,8 +252,8 @@ namespace Exerussus._1Extensions.SignalSystem
 
     public class ResultContext : SignalContext
     {
-        public Dictionary<string, string> InputParameters { get; private set; } = new();
-        public Dictionary<string, string> ResultParameters { get; private set; } = new();
+        public Dictionary<string, object> InputParameters { get; private set; } = new();
+        public Dictionary<string, object> ResultParameters { get; private set; } = new();
         
         private static Queue<ResultContext> _pool = new();
 
