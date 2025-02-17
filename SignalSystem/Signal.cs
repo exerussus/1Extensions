@@ -95,7 +95,7 @@ namespace Exerussus._1Extensions.SignalSystem
             where TData : struct, IAsyncSignal<ResultContext>
         {
             var type = typeof(TData);
-            if (data.Context == null) data.Context = new ResultContext();
+            if (data.Context == null) data.Context = ResultContext.GetInstance();
             data.Context.State = SignalRequestState.Awaiting;
             if (IsLogEnabled) Debug.Log($"{type}");
 
@@ -252,7 +252,33 @@ namespace Exerussus._1Extensions.SignalSystem
 
     public class ResultContext : SignalContext
     {
+        public Dictionary<string, string> InputParameters { get; private set; } = new();
+        public Dictionary<string, string> ResultParameters { get; private set; } = new();
         
+        private static Queue<ResultContext> _pool = new();
+
+        public void Release()
+        {
+            ReleaseInstance(this);
+        }
+        
+        public static ResultContext GetInstance()
+        {
+            if (!_pool.TryDequeue(out var instance))
+            {
+                instance = new ResultContext();
+            }
+            
+            return instance;
+        }
+        
+        public static void ReleaseInstance(ResultContext instance)
+        {
+            instance.InputParameters.Clear();
+            instance.ResultParameters.Clear();
+            instance.State = SignalRequestState.Awaiting;
+            _pool.Enqueue(instance);
+        }
     }
 
     public interface IAsyncSignal<T> where T : SignalContext
