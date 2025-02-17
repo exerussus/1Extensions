@@ -170,7 +170,7 @@ namespace Exerussus._1Extensions.SignalSystem
         {
             var type = typeof(TData);
             var data = new TData();
-            if (data.Context == null) data.Context = new ResultContext();
+            if (data.Context == null) data.Context = ResultContext.GetInstance();
             data.Context.State = SignalRequestState.Awaiting;
             if (IsLogEnabled) Debug.Log($"{type}");
 
