@@ -83,5 +83,14 @@ namespace Exerussus._1Extensions.SignalSystem
             
             return result;
         }
+
+        public static async Task<ResultContext> Invoke<T>(this AsyncSignalBuilder<T> instance, int delay, int timeout) where T : struct, IAsyncSignal<ResultContext>
+        {
+            var result = await instance.Signal.RegistryRaiseAsync(instance.Data, delay, timeout);
+
+            Release(instance);
+            
+            return result;
+        }
     }
 }
