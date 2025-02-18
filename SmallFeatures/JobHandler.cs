@@ -35,7 +35,7 @@ namespace Exerussus._1Extensions.SmallFeatures
             
         }
 
-        public async Task AddJobAsync(Action action, string comment, float delay = 0)
+        public async Task AddJobAsync(Action action, string comment, float delay = 0, int timeoutMs = 10000)
         {
 #if UNITY_EDITOR
             if (_logLevel > 1) Debug.Log($"{_prefix} | JobHandler | Принято в работу : {comment}");
@@ -49,7 +49,7 @@ namespace Exerussus._1Extensions.SmallFeatures
             
             _asyncJobQueue.Add(job);
 
-            await TaskUtils.WaitUntilAsync(() => job.IsDone);
+            await TaskUtils.WaitUntilAsync(() => job.IsDone, 100, timeoutMs);
             
             _asyncJobDone.Remove(job);
         }
