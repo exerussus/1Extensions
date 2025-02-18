@@ -250,7 +250,7 @@ namespace Exerussus._1Extensions.SignalSystem
         public SignalRequestState State { get; set; }
     }
 
-    public class ResultContext : SignalContext
+    public class ResultContext : SignalContext, IDisposable
     {
         public Dictionary<string, object> InputParameters { get; private set; } = new();
         public Dictionary<string, object> OutputParameters { get; private set; } = new();
@@ -278,6 +278,11 @@ namespace Exerussus._1Extensions.SignalSystem
             instance.OutputParameters.Clear();
             instance.State = SignalRequestState.Awaiting;
             _pool.Enqueue(instance);
+        }
+
+        public void Dispose()
+        {
+            ReleaseInstance(this);
         }
     }
 
