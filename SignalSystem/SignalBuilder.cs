@@ -9,7 +9,6 @@ namespace Exerussus._1Extensions.SignalSystem
     {
         public Signal Signal;
         public T Data;
-        public ResultContext Context = new();
     }
     
     public static class SignalBuilderExtension
@@ -39,7 +38,7 @@ namespace Exerussus._1Extensions.SignalSystem
 #if UNITY_EDITOR
             if (result == null) throw new NullReferenceException();
 #endif
-            result.Context = ResultContext.GetInstance();
+            result.Data.Context = ResultContext.GetInstance();
             return result;
         }
 
@@ -52,7 +51,7 @@ namespace Exerussus._1Extensions.SignalSystem
                 _builders[type] = resultList;
             }
             
-            instance.Context.Release();
+            instance.Data.Context.Release();
             resultList.Add(instance);
         }
         
@@ -65,13 +64,13 @@ namespace Exerussus._1Extensions.SignalSystem
 
         public static AsyncSignalBuilder<T> AddInputParam<T>(this AsyncSignalBuilder<T> instance, string paramKey, object value) where T : struct, IAsyncSignal<ResultContext>
         {
-            instance.Context.InputParameters[paramKey] = value;
+            instance.Data.Context.InputParameters[paramKey] = value;
             return instance;
         }
 
         public static AsyncSignalBuilder<T> AddOutputParam<T>(this AsyncSignalBuilder<T> instance, string paramKey, object value) where T : struct, IAsyncSignal<ResultContext>
         {
-            instance.Context.OutputParameters[paramKey] = value;
+            instance.Data.Context.OutputParameters[paramKey] = value;
             return instance;
         }
 
