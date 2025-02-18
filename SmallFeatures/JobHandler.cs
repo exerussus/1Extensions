@@ -67,9 +67,8 @@ namespace Exerussus._1Extensions.SmallFeatures
             for (int i = 0; i < _asyncJobQueue.Count; i++)
             {
                 var job = _asyncJobQueue[i];
-                job.TimeRemaining -= Time.deltaTime;
 
-                if (job.TimeRemaining <= 0)
+                if (job.EndTime <= Time.time)
                 {
                     ExecuteAsyncJob(i);
                     i--;
@@ -84,9 +83,8 @@ namespace Exerussus._1Extensions.SmallFeatures
             for (int i = 0; i < _jobQueue.Count; i++)
             {
                 var job = _jobQueue[i];
-                job.TimeRemaining -= Time.deltaTime;
 
-                if (job.TimeRemaining <= 0)
+                if (job.EndTime <= Time.time)
                 {
                     ExecuteJob(i);
                     i--;
@@ -154,7 +152,7 @@ namespace Exerussus._1Extensions.SmallFeatures
 #endif
             )
         {
-            TimeRemaining = delay;
+            EndTime = delay + Time.time;
             Action = action;
 #if UNITY_EDITOR
             Comment = comment;
@@ -164,7 +162,7 @@ namespace Exerussus._1Extensions.SmallFeatures
 #if UNITY_EDITOR
         public string Comment { get; set; }
 #endif
-        public float TimeRemaining { get; set; }
+        public float EndTime { get; set; }
         public Action Action { get; set; }
     }
     
@@ -176,7 +174,7 @@ namespace Exerussus._1Extensions.SmallFeatures
 #endif
             )
         {
-            TimeRemaining = delay;
+            EndTime = delay + Time.time;
             Action = action;
 #if UNITY_EDITOR
             Comment = comment;
@@ -186,7 +184,7 @@ namespace Exerussus._1Extensions.SmallFeatures
 #if UNITY_EDITOR
         public string Comment { get; set; }
 #endif
-        public float TimeRemaining { get; set; }
+        public float EndTime { get; set; }
         public Action Action { get; set; }
         public bool IsDone { get; set; }
     }
