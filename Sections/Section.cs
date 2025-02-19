@@ -8,6 +8,8 @@ namespace Exerussus._1Extensions.Sections
     [Serializable]
     public class Section
     {
+        public Section() { }
+
         public Section(Vector2 leftBottom, Vector2 rightTop)
         {
             this.leftBottom = leftBottom;
