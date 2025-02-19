@@ -20,10 +20,16 @@ namespace Exerussus._1Extensions.Sections
         [FormerlySerializedAs("maxPosition")] [SerializeField, ReadOnly] private Vector2 rightTop;
         [SerializeField, ReadOnly] private Vector2 centerPosition;
         
-        public Vector2 BottomCenter { get; private set; }
-        public Vector2 TopCenter { get; private set; }
-        public Vector2 LeftCenter { get; private set; }
-        public Vector2 RightCenter { get; private set; }
+        [SerializeField, ReadOnly] private Vector2 bottomCenter;
+        [SerializeField, ReadOnly] private Vector2 topCenter;
+        [SerializeField, ReadOnly] private Vector2 leftCenter;
+        [SerializeField, ReadOnly] private Vector2 rightCenter;
+        
+        public Vector2 CenterPosition => centerPosition;
+        public Vector2 BottomCenter => bottomCenter;
+        public Vector2 TopCenter => topCenter;
+        public Vector2 LeftCenter => leftCenter;
+        public Vector2 RightCenter => rightCenter;
         
         public Vector2 LeftBottom
         {
@@ -46,8 +52,6 @@ namespace Exerussus._1Extensions.Sections
                 Recalculate();
             }
         }
-
-        public Vector2 CenterPosition => centerPosition;
         
 #if UNITY_EDITOR
         [Button]
@@ -58,14 +62,17 @@ namespace Exerussus._1Extensions.Sections
             rightTop = rightTopPint;
             Recalculate();
         }
-        
+             
+#if UNITY_EDITOR
+        [Button]
+#endif
         private void Recalculate()
         {
             centerPosition = leftBottom + (rightTop - leftBottom) / 2f;
-            BottomCenter = new Vector2(centerPosition.x, leftBottom.y);
-            TopCenter = new Vector2(centerPosition.x, rightTop.y);
-            LeftCenter = new Vector2(leftBottom.x, centerPosition.y);
-            RightCenter = new Vector2(rightTop.x, centerPosition.y);
+            bottomCenter = new Vector2(centerPosition.x, leftBottom.y);
+            topCenter = new Vector2(centerPosition.x, rightTop.y);
+            leftCenter = new Vector2(leftBottom.x, centerPosition.y);
+            rightCenter = new Vector2(rightTop.x, centerPosition.y);
         }
     }
 }
