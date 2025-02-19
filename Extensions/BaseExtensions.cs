@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using JetBrains.Annotations;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
@@ -515,6 +516,21 @@ namespace Exerussus._1Extensions.Scripts.Extensions
             }
 
             return false;
+        }
+
+        /// <summary> Копирует все значения из другой коллекции. После копирования origin имеет тот же размер элементов, что и target. </summary>
+        public static HashSet<T> CopyValues<T>(this HashSet<T> origin, [NotNull, InstantHandle] IEnumerable<T> target)
+        {
+            origin.Clear();
+            origin.UnionWith(target);
+            return origin;
+        }
+
+        /// <summary> Исключает все элементы, которые присутствуют в другой коллекции. </summary>
+        public static HashSet<T> ExceptValues<T>(this HashSet<T> origin, [NotNull, InstantHandle] IEnumerable<T> target)
+        {
+            origin.ExceptWith(target);
+            return origin;
         }
     }
 }
