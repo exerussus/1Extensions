@@ -1,9 +1,26 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 
 namespace Exerussus._1Extensions.GizmosExtensions
 {
     public static class GizmosUtils
     {
+        private static Color[] _colors = new[]
+        {
+            new Color(1, 0, 0, 1),
+            new Color(1, 1, 0, 1),
+            new Color(0, 1, 0, 1),
+            new Color(0, 1, 1, 1),
+            new Color(0, 0, 1, 1),
+            new Color(1, 0, 1, 1),
+            new Color(0.5f, 1, 0.5f, 1),
+            new Color(1, 0.5f, 0.5f, 1),
+            new Color(0.5f, 0.5f, 1, 1),
+            new Color(1, 0.5f, 0, 1),
+            new Color(0.5f, 1, 0, 1),
+            new Color(1, 0.5f, 1, 1),
+        };
+        
         public static void DrawLine(Vector3 start, Vector3 end, Color color)
         {
             var prevColor = Gizmos.color;
@@ -47,6 +64,24 @@ namespace Exerussus._1Extensions.GizmosExtensions
             Gizmos.DrawLine(bottomRight, maxPosition);
             Gizmos.DrawLine(bottomRight, minPosition);
             Gizmos.color = prevColor;
+        }
+        
+        public static void DrawCircle(Vector2 center, float radius, Color color)
+        {
+            var prevColor = Gizmos.color;
+            Gizmos.color = color;
+            Gizmos.DrawSphere(center, radius);
+            Gizmos.color = prevColor;
+        }
+        
+        public static Color GetColor(int index)
+        {
+            return _colors[GetIndexInSize(index, _colors.Length)];
+        }
+
+        private static int GetIndexInSize(int index, int size)
+        {
+            return (index % size + size) % size;
         }
     }
 }
