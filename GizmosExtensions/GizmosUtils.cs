@@ -81,7 +81,8 @@ namespace Exerussus._1Extensions.GizmosExtensions
 
         private static int GetIndexInSize(int index, int size)
         {
-            return (index % size + size) % size;
+            if (index >= size) return index % size;
+            return index;
         }
     }
 }
