@@ -70,7 +70,7 @@ namespace Exerussus._1Extensions.GizmosExtensions
         {
             var prevColor = Gizmos.color;
             Gizmos.color = color;
-            Gizmos.DrawSphere(center, radius);
+            Gizmos.DrawWireSphere(center, radius);
             Gizmos.color = prevColor;
         }
         
