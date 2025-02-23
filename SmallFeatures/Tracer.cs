@@ -20,6 +20,16 @@ namespace Exerussus._1Extensions.SmallFeatures
             return trace;
         }
 
+        public static Trace StartIf(bool isEnabled, string prefix = Tracer.DefaultPrefix)
+        {
+            if (!Traces.TryDequeue(out var trace)) trace = new Trace();
+            
+            trace.Prefix = prefix;
+            trace.BlockLogs = !isEnabled;
+            if (!trace.BlockLogs) Debug.Log($"{trace.Prefix} | Tracing started.");
+            return trace;
+        }
+
         public static void Ping(int message)
         {
             Debug.Log($"{DefaultPrefix}{message}");
@@ -33,12 +43,14 @@ namespace Exerussus._1Extensions.SmallFeatures
         public class Trace : IDisposable
         {
             public string Prefix;
+            public bool BlockLogs;
             private int _count;
             private bool _disableLog;
-        
+            
+
             public Trace Ping(string message = "")
             {
-                if (_disableLog) return this;
+                if (_disableLog || BlockLogs) return this;
                 _count++;
                 Debug.Log($"{Prefix} | {_count}. {message}");
                 return this;
@@ -52,9 +64,10 @@ namespace Exerussus._1Extensions.SmallFeatures
 
             public void End()
             {
-                Debug.Log($"{Prefix} | Tracing end.");
+                if (!BlockLogs) Debug.Log($"{Prefix} | Tracing end.");
                 _count = 0;
                 _disableLog = false;
+                BlockLogs = false;
                 Traces.Enqueue(this);
             }
         
