@@ -34,11 +34,19 @@ namespace Exerussus._1Extensions.SmallFeatures
         {
             public string Prefix;
             private int _count;
+            private bool _disableLog;
         
             public Trace Ping(string message = "")
             {
+                if (_disableLog) return this;
                 _count++;
                 Debug.Log($"{Prefix} | {_count}. {message}");
+                return this;
+            }
+
+            public Trace SetEnableLogs(bool isEnabled)
+            {
+                _disableLog = !isEnabled;
                 return this;
             }
 
@@ -46,6 +54,7 @@ namespace Exerussus._1Extensions.SmallFeatures
             {
                 Debug.Log($"{Prefix} | Tracing end.");
                 _count = 0;
+                _disableLog = false;
                 Traces.Enqueue(this);
             }
         
