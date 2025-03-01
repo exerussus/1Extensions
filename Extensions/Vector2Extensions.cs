@@ -43,7 +43,7 @@ namespace Exerussus._1Extensions.Scripts.Extensions
         /// <param name="radius">Радиус круга. Должен быть неотрицательным.</param>
         /// <returns>Случайная точка в пределах заданного радиуса.</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static Vector2 RandomPointInRadius(this Vector2 origin, float radius)
+        public static Vector2 GetRandomPointInRadius(this Vector2 origin, float radius)
         {
             var angle = Random.value * TwoPI;
             var dist = Mathf.Sqrt(Random.value) * radius;
@@ -77,7 +77,7 @@ namespace Exerussus._1Extensions.Scripts.Extensions
         /// <param name="length">Половина длины стороны квадрата. Должен быть неотрицательным.</param>
         /// <returns>Случайная точка внутри квадрата.</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static Vector2 RandomPointInQuad(this Vector2 origin, float length)
+        public static Vector2 GetRandomPointInQuad(this Vector2 origin, float length)
         {
             var x = origin.x + (Random.value * 2f - 1f) * length;
             var y = origin.y + (Random.value * 2f - 1f) * length;
