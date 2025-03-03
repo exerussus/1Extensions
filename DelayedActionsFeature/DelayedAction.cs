@@ -12,6 +12,8 @@ namespace Exerussus._1Extensions.DelayedActionsFeature
         private float _checkTime;
         private float _timeout;
         private float _delay;
+        private float _cycleDelay;
+        private bool _isCycle;
         private string _id;
         private Func<bool> _validationFunc;
         private Func<bool> _conditionFunc;
@@ -45,6 +47,37 @@ namespace Exerussus._1Extensions.DelayedActionsFeature
             instance._id = id;
             instance._timeout = Time.time + timeoutDelay;
             instance._delay = checkDelay;
+            instance._isCycle = false;
+            instance._checkTime = Time.time + checkDelay;
+            instance._conditionFunc = conditionFunc;
+            instance._validationFunc = validationFunc;
+            instance._action = action;
+            
+            DictInWork[id] = instance;
+            KeysInWork.Add(id);
+        }
+
+        /// <summary> Создает отложенное действие, которое вызовется как только все условия будут выполнены, а затем повторится после задержки. </summary>
+        /// <param name="id">Уникальный номер операции, с помощью которого можно регулировать дублирование операций, а так же досрочно отменять их.</param>
+        /// <param name="checkDelay">Задержка между вызовов проверок.</param>
+        /// <param name="timeoutDelay">Сколько в секундах данная операция остается валидной.</param>
+        /// <param name="validationFunc">Валидация операции на возможность, или актуальность выполнения. В случае непрохождения - операция удаляется.</param>
+        /// <param name="conditionFunc">Условие, при котором выполняется операция.</param>
+        /// <param name="action">Сама операция.</param>
+        /// <param name="cycleDelay">Задержка после успешного выполнения действия.</param>
+        public static void CreateCycle(string id, float checkDelay, float timeoutDelay, Func<bool> validationFunc, Func<bool> conditionFunc, Action action, float cycleDelay)
+        {
+            if (DictInWork.ContainsKey(id)) Release(id);
+            
+            if (!validationFunc()) return;
+            
+            var instance = GetFromPool();
+            
+            instance._id = id;
+            instance._timeout = Time.time + timeoutDelay;
+            instance._delay = checkDelay;
+            instance._isCycle = true;
+            instance._cycleDelay = cycleDelay;
             instance._checkTime = Time.time + checkDelay;
             instance._conditionFunc = conditionFunc;
             instance._validationFunc = validationFunc;
@@ -90,7 +123,9 @@ namespace Exerussus._1Extensions.DelayedActionsFeature
                 if (delayedAction._conditionFunc())
                 {
                     delayedAction._action?.Invoke();
-                    Release(delayedAction);
+                    
+                    if (delayedAction._isCycle) delayedAction._checkTime = Time.time + delayedAction._cycleDelay;
+                    else Release(delayedAction);
                 }
                 else delayedAction._checkTime = Time.time + delayedAction._delay;
             }
