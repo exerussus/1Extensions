@@ -87,7 +87,11 @@ namespace Exerussus._1Extensions.DelayedActionsFeature
                     continue;
                 }
 
-                if (delayedAction._conditionFunc()) delayedAction._action?.Invoke();
+                if (delayedAction._conditionFunc())
+                {
+                    delayedAction._action?.Invoke();
+                    Release(delayedAction);
+                }
                 else delayedAction._checkTime = Time.time + delayedAction._delay;
             }
         }
