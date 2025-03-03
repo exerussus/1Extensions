@@ -27,6 +27,13 @@ namespace Exerussus._1Extensions.DelayedActionsFeature
 
         #region PUBLIC METHODS
 
+        /// <summary> Создает отложенное действие, которое вызовется как только все условия будут выполнены. </summary>
+        /// <param name="id">Уникальный номер операции, с помощью которого можно регулировать дублирование операций, а так же досрочно отменять их.</param>
+        /// <param name="checkDelay">Задержка между вызовов проверок.</param>
+        /// <param name="timeoutDelay">Сколько в секундах данная операция остается валидной.</param>
+        /// <param name="validationFunc">Валидация операции на возможность, или актуальность выполнения. В случае непрохождения - операция удаляется.</param>
+        /// <param name="conditionFunc">Условие, при котором выполняется операция.</param>
+        /// <param name="action">Сама операция.</param>
         public static void Create(string id, float checkDelay, float timeoutDelay, Func<bool> validationFunc, Func<bool> conditionFunc, Action action)
         {
             if (DictInWork.ContainsKey(id)) Release(id);
@@ -47,11 +54,16 @@ namespace Exerussus._1Extensions.DelayedActionsFeature
             KeysInWork.Add(id);
         }
         
+        /// <summary>
+        /// Отменяет запущенную операцию, если такая будет найдена по id, иначе ничего не произойдет.
+        /// </summary>
+        /// <param name="id">Уникальный номер операции.</param>
         public static void Cancel(string id)
         {
             Release(id);
         }
 
+        /// <summary> Обновление отложенных действий. Необходимо подключать в любом MonoBehavior. Задержка между вызовами не важна. </summary>
         public static void Update()
         {
             if (DictInWork.Count == 0) return;
