@@ -21,13 +21,14 @@ namespace Exerussus._1Extensions.SmallFeatures
         private readonly List<Job> _jobQueue = new();
         private readonly List<AsyncJob> _asyncJobQueue = new();
         private readonly List<AsyncJob> _asyncJobDone = new();
+        private float _time;
         
         public void AddJob(Action action, string comment, float delay = 0)
         {
 #if UNITY_EDITOR
             if (_logLevel > 1) Debug.Log($"{_prefix} | JobHandler | Принято в работу : {comment}");
 #endif
-            _jobQueue.Add(new Job(action, delay
+            _jobQueue.Add(new Job(action, _time + delay
 #if UNITY_EDITOR
                 , comment: comment
 #endif
@@ -41,7 +42,7 @@ namespace Exerussus._1Extensions.SmallFeatures
             if (_logLevel > 1) Debug.Log($"{_prefix} | JobHandler | Принято в работу : {comment}");
 #endif
 
-            var job = new AsyncJob(action, delay
+            var job = new AsyncJob(action, _time + delay
 #if UNITY_EDITOR
                 , comment: comment
 #endif
@@ -56,6 +57,7 @@ namespace Exerussus._1Extensions.SmallFeatures
 
         public void Update()
         {
+            _time = Time.time;
             UpdateJobQueue();
             UpdateAsyncJobQueue();
         }
@@ -146,13 +148,13 @@ namespace Exerussus._1Extensions.SmallFeatures
     
     public class Job
     {
-        public Job(Action action, float delay = 0
+        public Job(Action action, float endTime
 #if UNITY_EDITOR
             , string comment = null
 #endif
             )
         {
-            EndTime = delay + Time.time;
+            EndTime = endTime;
             Action = action;
 #if UNITY_EDITOR
             Comment = comment;
@@ -168,13 +170,13 @@ namespace Exerussus._1Extensions.SmallFeatures
     
     public class AsyncJob
     {
-        public AsyncJob(Action action, float delay = 0
+        public AsyncJob(Action action, float endTime
 #if UNITY_EDITOR
             , string comment = null
 #endif
             )
         {
-            EndTime = delay + Time.time;
+            EndTime = endTime;
             Action = action;
 #if UNITY_EDITOR
             Comment = comment;
