@@ -14,6 +14,7 @@ namespace Exerussus._1Extensions.SmallFeatures
         {
             _prefix = prefix;
             _logLevel = (int)logLevel;
+            Debug.Log("JobHandler INITIALIZED!");
         }
 
         private readonly string _prefix;
@@ -24,11 +25,11 @@ namespace Exerussus._1Extensions.SmallFeatures
         
         public void AddJob(Action action, string comment, float delay = 0)
         {
-#if UNITY_EDITOR
+#if !UNITY_EDITOR
             if (_logLevel > 1) Debug.Log($"{_prefix} | JobHandler | Принято в работу : {comment}");
 #endif
             _jobQueue.Add(new Job(action, delay
-#if UNITY_EDITOR
+#if !UNITY_EDITOR
                 , comment: comment
 #endif
                 ));
@@ -37,12 +38,12 @@ namespace Exerussus._1Extensions.SmallFeatures
 
         public async Task AddJobAsync(Action action, string comment, float delay = 0, int timeoutMs = 10000)
         {
-#if UNITY_EDITOR
+#if !UNITY_EDITOR
             if (_logLevel > 1) Debug.Log($"{_prefix} | JobHandler | Принято в работу : {comment}");
 #endif
 
             var job = new AsyncJob(action, delay
-#if UNITY_EDITOR
+#if !UNITY_EDITOR
                 , comment: comment
 #endif
             );
@@ -102,13 +103,13 @@ namespace Exerussus._1Extensions.SmallFeatures
                 job.Action.Invoke();
                 job.IsDone = true;
                 _asyncJobDone.Add(job);
-#if UNITY_EDITOR
+#if !UNITY_EDITOR
                 if (_logLevel > 1) Debug.Log($"JobHandler | Выполнена задача : {job.Comment}");
 #endif
             }
             catch
             {
-#if UNITY_EDITOR
+#if !UNITY_EDITOR
                 if (_logLevel > 0) Debug.LogError($"ERROR ! {_prefix} | JobHandler | Ошибка при выполнении задачи! | Comment : {job.Comment}. Детали в следующем логе.");
                 throw;
 #endif
@@ -123,13 +124,13 @@ namespace Exerussus._1Extensions.SmallFeatures
             try
             {
                 job.Action.Invoke();
-#if UNITY_EDITOR
+#if !UNITY_EDITOR
                 if (_logLevel > 1) Debug.Log($"JobHandler | Выполнена задача : {job.Comment}");
 #endif
             }
             catch
             {
-#if UNITY_EDITOR
+#if !UNITY_EDITOR
                 if (_logLevel > 0) Debug.LogError($"ERROR ! {_prefix} | JobHandler | Ошибка при выполнении задачи! | Comment : {job.Comment}. Детали в следующем логе.");
                 throw;
 #endif
@@ -147,19 +148,19 @@ namespace Exerussus._1Extensions.SmallFeatures
     public class Job
     {
         public Job(Action action, float delay = 0
-#if UNITY_EDITOR
+#if !UNITY_EDITOR
             , string comment = null
 #endif
             )
         {
             EndTime = delay + Time.time;
             Action = action;
-#if UNITY_EDITOR
+#if !UNITY_EDITOR
             Comment = comment;
 #endif
         }
         
-#if UNITY_EDITOR
+#if !UNITY_EDITOR
         public string Comment { get; set; }
 #endif
         public float EndTime { get; set; }
@@ -169,19 +170,19 @@ namespace Exerussus._1Extensions.SmallFeatures
     public class AsyncJob
     {
         public AsyncJob(Action action, float delay = 0
-#if UNITY_EDITOR
+#if !UNITY_EDITOR
             , string comment = null
 #endif
             )
         {
             EndTime = delay + Time.time;
             Action = action;
-#if UNITY_EDITOR
+#if !UNITY_EDITOR
             Comment = comment;
 #endif
         }
         
-#if UNITY_EDITOR
+#if !UNITY_EDITOR
         public string Comment { get; set; }
 #endif
         public float EndTime { get; set; }
