@@ -98,22 +98,22 @@ namespace Exerussus._1Extensions.SmallFeatures
         {
             var job = _asyncJobQueue[index];
             _asyncJobQueue.RemoveAt(index);
-            
+
             try
             {
                 job.Action.Invoke();
-                job.IsDone = true;
-                _asyncJobDone.Add(job);
 #if UNITY_EDITOR
                 if (_logLevel > 1) Debug.Log($"JobHandler | Выполнена задача : {job.Comment}");
 #endif
             }
-            catch
+            catch (Exception e)
             {
-#if UNITY_EDITOR
-                if (_logLevel > 0) Debug.LogError($"ERROR ! {_prefix} | JobHandler | Ошибка при выполнении задачи! | Comment : {job.Comment}. Детали в следующем логе.");
-                throw;
-#endif
+                if (_logLevel > 0) Debug.LogError($"ERROR ! {_prefix} | JobHandler | Ошибка при выполнении асинхронной задачи! | Comment : {job.Comment}. Детали:\n{e}");
+            }
+            finally
+            {
+                job.IsDone = true;
+                _asyncJobDone.Add(job);
             }
         }
 
@@ -129,12 +129,9 @@ namespace Exerussus._1Extensions.SmallFeatures
                 if (_logLevel > 1) Debug.Log($"JobHandler | Выполнена задача : {job.Comment}");
 #endif
             }
-            catch
+            catch (Exception e)
             {
-#if UNITY_EDITOR
-                if (_logLevel > 0) Debug.LogError($"ERROR ! {_prefix} | JobHandler | Ошибка при выполнении задачи! | Comment : {job.Comment}. Детали в следующем логе.");
-                throw;
-#endif
+                if (_logLevel > 0) Debug.LogError($"ERROR ! {_prefix} | JobHandler | Ошибка при выполнении задачи! | Comment : {job.Comment}. Детали:\n{e}");
             }
         }
         
