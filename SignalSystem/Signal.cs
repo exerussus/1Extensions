@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Exerussus._1Extensions.Scripts.Extensions;
+using Exerussus._1Extensions.SmallFeatures;
 using UnityEngine;
 
 namespace Exerussus._1Extensions.SignalSystem
@@ -160,12 +161,12 @@ namespace Exerussus._1Extensions.SignalSystem
         /// <param name="delay"> Задержка в миллисекундах. </param>
         /// <param name="timeout"> Таймаут в миллисекундах. </param>
         /// <returns> Возвращает контекст структуры при изменении в ней SignalRequestState. </returns>
-        public async Task<ResultContext> RegistryRaiseAsync<TData>(int delay = 100, int timeout = 10000) 
-            where TData : struct, IAsyncSignal<ResultContext>
+        public async Task<ResultContext> RegistryRaiseAsync<TData>(int delay = 100, int timeout = 10000) where TData : struct, IAsyncSignal<ResultContext>
         {
             var type = typeof(TData);
             var data = new TData();
             if (data.Context == null) data.Context = ResultContext.GetInstance();
+            Tracer.Ping($"Created new context for {typeof(TData).Name} | hash : {data.Context.GetHashCode()}");
             data.Context.State = SignalRequestState.Awaiting;
             if (IsLogEnabled) Debug.Log($"{type}");
             
@@ -179,6 +180,18 @@ namespace Exerussus._1Extensions.SignalSystem
                     data.Context.State = SignalRequestState.Timeout;
                     break;
                 }
+                
+                #if UNITY_EDITOR
+                
+                if (!UnityEditor.EditorApplication.isPlaying)
+                {
+                    data.Context.State = SignalRequestState.Timeout;
+                    break;
+                }
+                
+                #endif
+                
+                Tracer.Ping($"{typeof(TData).Name} not ready. State : {data.Context.State.ToString()}");
                 await Task.Delay(delay);
             }
     
@@ -238,7 +251,26 @@ namespace Exerussus._1Extensions.SignalSystem
 
     public abstract class SignalContext
     {
-        public SignalRequestState State { get; set; }
+        private SignalRequestState _state = SignalRequestState.Awaiting;
+
+        public SignalRequestState State
+        {
+            get => _state;
+            set
+            {
+                //Tracer.Ping($"{GetType().Name} CONTEXT STATE CHANGED : {_state} => {value}");
+                _state = value;
+            }
+        }
+
+        public void Done()
+        {
+            lock (this)
+            {
+                State = SignalRequestState.Success;
+                //Tracer.Ping($"{GetType().Name} CONTEXT DONE");
+            }
+        }
     }
 
     public class ResultContext : SignalContext, IDisposable
@@ -267,7 +299,6 @@ namespace Exerussus._1Extensions.SignalSystem
         {
             instance.InputParameters.Clear();
             instance.OutputParameters.Clear();
-            instance.State = SignalRequestState.Awaiting;
             _pool.Enqueue(instance);
         }
 
