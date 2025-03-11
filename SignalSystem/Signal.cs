@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Exerussus._1Extensions.Scripts.Extensions;
 using UnityEngine;
 
 namespace Exerussus._1Extensions.SignalSystem
@@ -15,13 +16,29 @@ namespace Exerussus._1Extensions.SignalSystem
         private bool IsLogEnabled { get; set; }
 
         private Dictionary<Type, object> _listeners = new Dictionary<Type, object>();
-
+        private Dictionary<Type, object> _shotListeners = new Dictionary<Type, object>();
+        
         /// <summary> Вызывает сигнал. </summary>
         public void RegistryRaise<T>(T data) where T : struct
         {
             var type = typeof(T);
             if (IsLogEnabled) Debug.Log($"{type}");
 
+            FindAndInvokeAction(ref data, type);
+        }
+
+        /// <summary> Вызывает сигнал без аргументов. </summary>
+        public void RegistryRaise<T>() where T : struct
+        {
+            var type = typeof(T);
+            var data = new T();
+            if (IsLogEnabled) Debug.Log($"{type}");
+
+            FindAndInvokeAction(ref data, type);
+        }
+
+        private void FindAndInvokeAction<T>(ref T data, Type type) where T : struct
+        {
             if (_listeners.TryGetValue(type, out var actionList))
             {
                 var actions = (List<Action<T>>)actionList;
@@ -30,18 +47,10 @@ namespace Exerussus._1Extensions.SignalSystem
                     actions[index].Invoke(data);
                 }
             }
-        }
-        
-        /// <summary> Вызывает сигнал без аргументов. </summary>
-        public void RegistryRaise<T>() where T : struct
-        {
-            var type = typeof(T);
-            var data = new T();
-            if (IsLogEnabled) Debug.Log($"{type}");
 
-            if (_listeners.TryGetValue(type, out var actionList))
+            if (_shotListeners.TryPop(type, out var shotActionList))
             {
-                var actions = (List<Action<T>>)actionList;
+                var actions = (List<Action<T>>)shotActionList;
                 for (var index = actions.Count - 1; index >= 0; index--)
                 {
                     actions[index].Invoke(data);
@@ -62,15 +71,8 @@ namespace Exerussus._1Extensions.SignalSystem
             if (data.Context == null) data.Context = new TContext();
             data.Context.State = SignalRequestState.Awaiting;
             if (IsLogEnabled) Debug.Log($"{type}");
-
-            if (_listeners.TryGetValue(type, out var actionList))
-            {
-                var actions = (List<Action<TData>>)actionList;
-                for (var index = actions.Count - 1; index >= 0; index--)
-                {
-                    actions[index].Invoke(data);
-                }
-            }
+            
+            FindAndInvokeAction(ref data, type);
 
             var endTime = DateTime.Now.Millisecond + timeout;
             while (data.Context.State == SignalRequestState.Awaiting)
@@ -98,15 +100,8 @@ namespace Exerussus._1Extensions.SignalSystem
             if (data.Context == null) data.Context = ResultContext.GetInstance();
             data.Context.State = SignalRequestState.Awaiting;
             if (IsLogEnabled) Debug.Log($"{type}");
-
-            if (_listeners.TryGetValue(type, out var actionList))
-            {
-                var actions = (List<Action<TData>>)actionList;
-                for (var index = actions.Count - 1; index >= 0; index--)
-                {
-                    actions[index].Invoke(data);
-                }
-            }
+            
+            FindAndInvokeAction(ref data, type);
 
             var endTime = DateTime.Now.Millisecond + timeout;
             while (data.Context.State == SignalRequestState.Awaiting)
@@ -136,15 +131,8 @@ namespace Exerussus._1Extensions.SignalSystem
             if (data.Context == null) data.Context = new TContext();
             data.Context.State = SignalRequestState.Awaiting;
             if (IsLogEnabled) Debug.Log($"{type}");
-
-            if (_listeners.TryGetValue(type, out var actionList))
-            {
-                var actions = (List<Action<TData>>)actionList;
-                for (var index = actions.Count - 1; index >= 0; index--)
-                {
-                    actions[index].Invoke(data);
-                }
-            }
+            
+            FindAndInvokeAction(ref data, type);
 
             var endTime = DateTime.Now.Millisecond + timeout;
             while (data.Context.State == SignalRequestState.Awaiting)
@@ -173,15 +161,8 @@ namespace Exerussus._1Extensions.SignalSystem
             if (data.Context == null) data.Context = ResultContext.GetInstance();
             data.Context.State = SignalRequestState.Awaiting;
             if (IsLogEnabled) Debug.Log($"{type}");
-
-            if (_listeners.TryGetValue(type, out var actionList))
-            {
-                var actions = (List<Action<TData>>)actionList;
-                for (var index = actions.Count - 1; index >= 0; index--)
-                {
-                    actions[index].Invoke(data);
-                }
-            }
+            
+            FindAndInvokeAction(ref data, type);
 
             var endTime = DateTime.Now.Millisecond + timeout;
             while (data.Context.State == SignalRequestState.Awaiting)
@@ -204,15 +185,8 @@ namespace Exerussus._1Extensions.SignalSystem
         {
             var type = typeof(T);
             if (IsLogEnabled) Debug.Log($"{type}");
-
-            if (_listeners.TryGetValue(type, out var actionList))
-            {
-                var actions = (List<Action<T>>)actionList;
-                for (var index = actions.Count - 1; index >= 0; index--)
-                {
-                    actions[index].Invoke(data);
-                }
-            }
+            
+            FindAndInvokeAction(ref data, type);
         }
 
         public void Subscribe<T>(Action<T> action) where T : struct
@@ -222,6 +196,17 @@ namespace Exerussus._1Extensions.SignalSystem
             {
                 actionList = new List<Action<T>>();
                 _listeners[type] = actionList;
+            }
+            ((List<Action<T>>)actionList).Add(action);
+        }
+
+        public void SubscribeShot<T>(Action<T> action) where T : struct
+        {
+            var type = typeof(T);
+            if (!_shotListeners.TryGetValue(type, out var actionList))
+            {
+                actionList = new List<Action<T>>();
+                _shotListeners[type] = actionList;
             }
             ((List<Action<T>>)actionList).Add(action);
         }
