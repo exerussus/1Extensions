@@ -17,6 +17,7 @@ namespace Exerussus._1Extensions.SignalSystem
 
         private Dictionary<Type, object> _listeners = new Dictionary<Type, object>();
         private Dictionary<Type, object> _shotListeners = new Dictionary<Type, object>();
+        private Dictionary<Type, object> _shotLstnrWithIds = new Dictionary<Type, object>();
         
         /// <summary> Вызывает сигнал. </summary>
         public void RegistryRaise<T>(T data) where T : struct
@@ -55,6 +56,12 @@ namespace Exerussus._1Extensions.SignalSystem
                 {
                     actions[index].Invoke(data);
                 }
+            }
+
+            if (_shotLstnrWithIds.TryPop(type, out var shotActionIdList))
+            {
+                var actions = (Dictionary<string, Action<T>>)shotActionIdList;
+                foreach (var action in actions.Values) action.Invoke(data);
             }
         }
         
@@ -192,23 +199,22 @@ namespace Exerussus._1Extensions.SignalSystem
         public void Subscribe<T>(Action<T> action) where T : struct
         {
             var type = typeof(T);
-            if (!_listeners.TryGetValue(type, out var actionList))
-            {
-                actionList = new List<Action<T>>();
-                _listeners[type] = actionList;
-            }
-            ((List<Action<T>>)actionList).Add(action);
+            if (!_listeners.TryGetValue(type, out var actionList) || actionList is not List<Action<T>> list) _listeners[type] = list = new List<Action<T>>();
+            list.Add(action);
         }
 
         public void SubscribeShot<T>(Action<T> action) where T : struct
         {
             var type = typeof(T);
-            if (!_shotListeners.TryGetValue(type, out var actionList))
-            {
-                actionList = new List<Action<T>>();
-                _shotListeners[type] = actionList;
-            }
-            ((List<Action<T>>)actionList).Add(action);
+            if (!_shotListeners.TryGetValue(type, out var actionList) || actionList is not List<Action<T>> list) _shotListeners[type] = list = new List<Action<T>>();
+            list.Add(action);
+        }
+
+        public void SubscribeShot<T>(string id, Action<T> action) where T : struct
+        {
+            var type = typeof(T);
+            if (!_shotLstnrWithIds.TryGetValue(type, out var actionDict) || actionDict is not Dictionary<string, Action<T>> dict) _shotLstnrWithIds[type] = dict = new Dictionary<string, Action<T>>();
+            dict[id] = action;
         }
 
         public void Unsubscribe<T>(Action<T> action) where T : struct
