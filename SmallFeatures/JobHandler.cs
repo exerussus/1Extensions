@@ -108,7 +108,13 @@ namespace Exerussus._1Extensions.SmallFeatures
             }
             catch (Exception e)
             {
-                if (_logLevel > 0) Debug.LogError($"ERROR ! {_prefix} | JobHandler | Ошибка при выполнении асинхронной задачи! | Comment : {job.Comment}. Детали:\n{e}");
+                if (_logLevel > 0) Debug.LogError($"ERROR ! {_prefix} | JobHandler | Ошибка при выполнении асинхронной задачи! |" +
+                                                          
+#if UNITY_EDITOR
+                                                  $" Comment : {job.Comment}." +
+#endif
+                                                  
+                                                  $" Детали:\n{e}");
             }
             finally
             {
@@ -131,7 +137,13 @@ namespace Exerussus._1Extensions.SmallFeatures
             }
             catch (Exception e)
             {
-                if (_logLevel > 0) Debug.LogError($"ERROR ! {_prefix} | JobHandler | Ошибка при выполнении задачи! | Comment : {job.Comment}. Детали:\n{e}");
+                if (_logLevel > 0) Debug.LogError($"ERROR ! {_prefix} | JobHandler | Ошибка при выполнении задачи! |" +
+                                                  
+#if UNITY_EDITOR
+                                                  $" Comment : {job.Comment}." +
+#endif
+                                                  
+                                                  $" Детали:\n{e}");
             }
         }
         
