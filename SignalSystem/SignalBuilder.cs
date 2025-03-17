@@ -38,7 +38,7 @@ namespace Exerussus._1Extensions.SignalSystem
 #if UNITY_EDITOR
             if (result == null) throw new NullReferenceException();
 #endif
-            result.Data.Context = ResultContext.GetInstance();
+            result.Data.Context = new ResultContext();
             return result;
         }
 
@@ -51,7 +51,6 @@ namespace Exerussus._1Extensions.SignalSystem
                 _builders[type] = resultList;
             }
             
-            instance.Data.Context.Release();
             resultList.Add(instance);
         }
         

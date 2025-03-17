@@ -105,7 +105,7 @@ namespace Exerussus._1Extensions.SignalSystem
             where TData : struct, IAsyncSignal<ResultContext>
         {
             var type = typeof(TData);
-            if (data.Context == null) data.Context = ResultContext.GetInstance();
+            if (data.Context == null) data.Context = new ResultContext();
             data.Context.State = SignalRequestState.Awaiting;
             if (IsLogEnabled) Debug.Log($"{type}");
             
@@ -165,7 +165,7 @@ namespace Exerussus._1Extensions.SignalSystem
         {
             var type = typeof(TData);
             var data = new TData();
-            if (data.Context == null) data.Context = ResultContext.GetInstance();
+            if (data.Context == null) data.Context = new ResultContext();
             Tracer.Ping($"Created new context for {typeof(TData).Name} | hash : {data.Context.GetHashCode()}");
             data.Context.State = SignalRequestState.Awaiting;
             if (IsLogEnabled) Debug.Log($"{type}");
@@ -273,39 +273,10 @@ namespace Exerussus._1Extensions.SignalSystem
         }
     }
 
-    public class ResultContext : SignalContext, IDisposable
+    public class ResultContext : SignalContext
     {
         public Dictionary<string, object> InputParameters { get; private set; } = new();
         public Dictionary<string, object> OutputParameters { get; private set; } = new();
-        
-        private static Queue<ResultContext> _pool = new();
-
-        public void Release()
-        {
-            ReleaseInstance(this);
-        }
-        
-        public static ResultContext GetInstance()
-        {
-            if (!_pool.TryDequeue(out var instance))
-            {
-                instance = new ResultContext();
-            }
-            
-            return instance;
-        }
-        
-        public static void ReleaseInstance(ResultContext instance)
-        {
-            instance.InputParameters.Clear();
-            instance.OutputParameters.Clear();
-            _pool.Enqueue(instance);
-        }
-
-        public void Dispose()
-        {
-            ReleaseInstance(this);
-        }
     }
 
     public interface IAsyncSignal<T> where T : SignalContext
