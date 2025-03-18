@@ -48,7 +48,7 @@ namespace Exerussus._1Extensions.Serialization
             }
             else
             {
-                data.jsonData = JsonConvert.SerializeObject(value, Formatting.None);
+                data.jsonData = JsonConvert.SerializeObject(value, Formatting.Indented);
             }
 
             return data;
