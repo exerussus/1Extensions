@@ -4,6 +4,7 @@ using System.IO;
 using System.Runtime.Serialization.Formatters.Binary;
 using Unity.Plastic.Newtonsoft.Json;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace Exerussus._1Extensions.Serialization
 {
@@ -42,12 +43,12 @@ namespace Exerussus._1Extensions.Serialization
                 {
                     var formatter = new BinaryFormatter();
                     formatter.Serialize(stream, value);
-                    data.BinaryData = stream.ToArray();
+                    data.binaryData = stream.ToArray();
                 }
             }
             else
             {
-                data.JsonData = JsonConvert.SerializeObject(value, Formatting.None);
+                data.jsonData = JsonConvert.SerializeObject(value, Formatting.None);
             }
 
             return data;
@@ -61,7 +62,7 @@ namespace Exerussus._1Extensions.Serialization
 
             if (forceReflected)
             {
-                using (MemoryStream stream = new MemoryStream(data.BinaryData))
+                using (MemoryStream stream = new MemoryStream(data.binaryData))
                 {
                     var formatter = new BinaryFormatter();
                     return (T)formatter.Deserialize(stream);
@@ -69,7 +70,7 @@ namespace Exerussus._1Extensions.Serialization
             }
             else
             {
-                return JsonConvert.DeserializeObject<T>(data.JsonData);
+                return JsonConvert.DeserializeObject<T>(data.jsonData);
             }
         }
     }
@@ -78,7 +79,12 @@ namespace Exerussus._1Extensions.Serialization
     [Serializable]
     public class SerializationData
     {
-        public string JsonData;
-        public byte[] BinaryData;
+        public string jsonData;
+        public byte[] binaryData;
+
+        public override string ToString()
+        {
+            return jsonData;
+        }
     }
 }
