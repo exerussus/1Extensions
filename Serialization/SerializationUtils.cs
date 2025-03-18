@@ -2,9 +2,8 @@
 using System;
 using System.IO;
 using System.Runtime.Serialization.Formatters.Binary;
-using Unity.Plastic.Newtonsoft.Json;
+using Newtonsoft.Json;
 using UnityEngine;
-using UnityEngine.Serialization;
 
 namespace Exerussus._1Extensions.Serialization
 {
