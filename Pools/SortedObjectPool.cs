@@ -52,7 +52,7 @@ namespace Exerussus._1Extensions.Pools
 
         public T GetObject(Vector3 position)
         {
-            var pooledObject = FreeObjects.Count > 0 ? FreeObjects.Dequeue() : CreateNewObject();
+            var pooledObject = GetOrCreate();
             pooledObject.transform.SetPositionAndRotation(position, Quaternion.identity);
             pooledObject.gameObject.SetActive(true);
             return pooledObject;
@@ -60,7 +60,7 @@ namespace Exerussus._1Extensions.Pools
 
         public T GetObject(Vector3 position, Quaternion rotation)
         {
-            var pooledObject = FreeObjects.Count > 0 ? FreeObjects.Dequeue() : CreateNewObject();
+            var pooledObject = GetOrCreate();
             pooledObject.transform.SetPositionAndRotation(position, rotation);
             pooledObject.gameObject.SetActive(true);
             return pooledObject;
@@ -68,7 +68,7 @@ namespace Exerussus._1Extensions.Pools
 
         public T GetObject(Vector3 position, Vector2 scale, Quaternion rotation)
         {
-            var pooledObject = FreeObjects.Count > 0 ? FreeObjects.Dequeue() : CreateNewObject();
+            var pooledObject = GetOrCreate();
             pooledObject.transform.SetPositionAndRotation(position, rotation);
             pooledObject.gameObject.transform.localScale = scale;
             pooledObject.gameObject.SetActive(true);
@@ -77,7 +77,7 @@ namespace Exerussus._1Extensions.Pools
 
         public T GetObject(Vector3 position, Vector2 scale)
         {
-            var pooledObject = FreeObjects.Count > 0 ? FreeObjects.Dequeue() : CreateNewObject();
+            var pooledObject = GetOrCreate();
             pooledObject.transform.SetPositionAndRotation(position, Quaternion.identity);
             pooledObject.gameObject.transform.localScale = scale;
             pooledObject.gameObject.SetActive(true);
@@ -86,7 +86,7 @@ namespace Exerussus._1Extensions.Pools
 
         public T GetObject(Vector3 position, Transform parent, Quaternion rotation)
         {
-            var pooledObject = FreeObjects.Count > 0 ? FreeObjects.Dequeue() : CreateNewObject();
+            var pooledObject = GetOrCreate();
             pooledObject.transform.SetParent(parent);
             pooledObject.transform.SetPositionAndRotation(position, rotation);
             pooledObject.gameObject.transform.localScale = Vector3.one;
@@ -107,6 +107,13 @@ namespace Exerussus._1Extensions.Pools
             FreeObjects.Enqueue(element);
         }
 
+        private T GetOrCreate()
+        {
+            var pooledObject = FreeObjects.Count > 0 ? FreeObjects.Dequeue() : CreateNewObject();
+            if (pooledObject == null) return GetOrCreate();
+            return pooledObject;
+        }
+        
         private T CreateNewObject()
         {
             _count++;
