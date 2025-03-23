@@ -16,7 +16,7 @@ namespace Exerussus._1Extensions.SmallFeatures
             if (!Traces.TryDequeue(out var trace)) trace = new Trace();
             
             trace.Prefix = prefix;
-            Debug.Log($"{trace.Prefix} | Tracing started.");
+            Debug.Log($"{trace.Prefix} | Tracing started. | {Time.realtimeSinceStartup}");
             return trace;
         }
 
@@ -26,7 +26,7 @@ namespace Exerussus._1Extensions.SmallFeatures
             
             trace.Prefix = prefix;
             trace.BlockLogs = !isEnabled;
-            if (!trace.BlockLogs) Debug.Log($"{trace.Prefix} | Tracing started.");
+            if (!trace.BlockLogs) Debug.Log($"{trace.Prefix} | Tracing started. | {Time.realtimeSinceStartup}");
             return trace;
         }
 
@@ -52,7 +52,7 @@ namespace Exerussus._1Extensions.SmallFeatures
             {
                 if (_disableLog || BlockLogs) return this;
                 _count++;
-                Debug.Log($"{Prefix} | {_count}. {message}");
+                Debug.Log($"{Prefix} | {_count}. {message} | {Time.realtimeSinceStartup}");
                 return this;
             }
 
@@ -64,7 +64,7 @@ namespace Exerussus._1Extensions.SmallFeatures
 
             public void End()
             {
-                if (!BlockLogs) Debug.Log($"{Prefix} | Tracing end.");
+                if (!BlockLogs) Debug.Log($"{Prefix} | Tracing end. | {Time.realtimeSinceStartup}");
                 _count = 0;
                 _disableLog = false;
                 BlockLogs = false;
