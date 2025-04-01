@@ -57,7 +57,7 @@ namespace Exerussus._1Extensions.SmallFeatures
 
         public void Update()
         {
-            _time = Time.time;
+            _time = Time.realtimeSinceStartup;
             UpdateJobQueue();
             UpdateAsyncJobQueue();
         }
@@ -70,7 +70,7 @@ namespace Exerussus._1Extensions.SmallFeatures
             {
                 var job = _asyncJobQueue[i];
 
-                if (job.EndTime <= Time.time)
+                if (job.EndTime <= Time.realtimeSinceStartup)
                 {
                     ExecuteAsyncJob(i);
                     i--;
@@ -86,7 +86,7 @@ namespace Exerussus._1Extensions.SmallFeatures
             {
                 var job = _jobQueue[i];
 
-                if (job.EndTime <= Time.time)
+                if (job.EndTime <= Time.realtimeSinceStartup)
                 {
                     ExecuteJob(i);
                     i--;
