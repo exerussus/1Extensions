@@ -106,6 +106,27 @@ namespace Exerussus._1Extensions.Scripts.Extensions
             return value;
         }
         
+        public static (TCollection key, int amount) PopAmountFromRandomKey<TCollection>(this Dictionary<TCollection, int> dictionary, int amount = 1)
+        {
+#if UNITY_EDITOR
+            if (dictionary.Count == 0) throw new InvalidOperationException("Cannot pop from an empty dictionary.");
+#endif
+            
+            var index = Random.Range(0, dictionary.Count);
+            var enumerator = dictionary.GetEnumerator();
+
+            while (index-- >= 0 && enumerator.MoveNext()) { }
+
+            var value = dictionary[enumerator.Current.Key];
+            var resultAmount = Mathf.Min(amount, value);
+            value -= resultAmount;
+
+            if (value < 1) dictionary.Remove(enumerator.Current.Key);
+            else dictionary[enumerator.Current.Key] = value;
+            
+            return (enumerator.Current.Key, resultAmount);
+        }
+        
         public static (TCollection key, TItem value) PopRandomKeyValue<TCollection, TItem>(this Dictionary<TCollection, TItem> dictionary)
         {
 #if UNITY_EDITOR
