@@ -52,14 +52,80 @@ namespace Exerussus._1Extensions.Scripts.Extensions
             oldItem = dictionary[key];
             dictionary[key] = newItem;
             return true;
-        }        
+        }
         
-        public static TItem PopRandom<TCollection, TItem>(this Dictionary<TCollection, TItem> dictionary)
+        public static bool TryGetRandomKey<TCollection, TItem>(this Dictionary<TCollection, TItem> dictionary, out TCollection randomKey)
         {
-            var keys = dictionary.Keys.ToArray();
-            var rItem = keys.GetRandomItem();
-            var item = dictionary.Pop(rItem);
-            return item;
+            if (dictionary.Count == 0)
+            {
+                randomKey = default;
+                return false;
+            }
+
+            randomKey = dictionary.GetRandomKey();
+            return true;
+        }
+        
+        public static TCollection GetRandomKey<TCollection, TItem>(this Dictionary<TCollection, TItem> dictionary)
+        {
+#if UNITY_EDITOR
+            if (dictionary.Count == 0) throw new InvalidOperationException("Cannot get a random key from an empty dictionary.");
+#endif
+
+            var index = Random.Range(0, dictionary.Count);
+            var enumerator = dictionary.GetEnumerator();
+
+            while (index-- >= 0 && enumerator.MoveNext()) { }
+
+            return enumerator.Current.Key;
+        }
+        
+        public static (TCollection key, TItem value) GetRandomKeyValue<TCollection, TItem>(this Dictionary<TCollection, TItem> dictionary)
+        {
+#if UNITY_EDITOR
+            if (dictionary.Count == 0) throw new InvalidOperationException("Cannot get a random key from an empty dictionary.");
+#endif
+
+            var index = Random.Range(0, dictionary.Count);
+            var enumerator = dictionary.GetEnumerator();
+
+            while (index-- >= 0 && enumerator.MoveNext()) { }
+
+            return (enumerator.Current.Key, enumerator.Current.Value);
+        }
+        
+        public static TItem PopRandomValue<TCollection, TItem>(this Dictionary<TCollection, TItem> dictionary)
+        {
+#if UNITY_EDITOR
+            if (dictionary.Count == 0) throw new InvalidOperationException("Cannot pop from an empty dictionary.");
+#endif
+            
+            var key = dictionary.GetRandomKey();
+            var value = dictionary[key];
+            dictionary.Remove(key);
+            return value;
+        }
+        
+        public static (TCollection key, TItem value) PopRandomKeyValue<TCollection, TItem>(this Dictionary<TCollection, TItem> dictionary)
+        {
+#if UNITY_EDITOR
+            if (dictionary.Count == 0) throw new InvalidOperationException("Cannot pop from an empty dictionary.");
+#endif
+            
+            var key = dictionary.GetRandomKey();
+            var value = dictionary[key];
+            dictionary.Remove(key);
+            return (key, value);
+        }
+        
+        public static TItem GetRandomValue<TCollection, TItem>(this Dictionary<TCollection, TItem> dictionary)
+        {
+#if UNITY_EDITOR
+            if (dictionary.Count == 0) throw new InvalidOperationException("Cannot get a random value from an empty dictionary.");
+#endif
+
+            var key = dictionary.GetRandomKey();
+            return dictionary[key];
         }
         
         public static T PopRandom<T>(this List<T> list)
