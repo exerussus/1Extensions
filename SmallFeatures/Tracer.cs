@@ -30,14 +30,38 @@ namespace Exerussus._1Extensions.SmallFeatures
             return trace;
         }
 
+        public static Trace Start(UnityEngine.Object context, string prefix = Tracer.DefaultPrefix)
+        {
+            if (!Traces.TryDequeue(out var trace)) trace = new Trace();
+            
+            trace.Prefix = prefix;
+            Debug.Log($"{trace.Prefix} | Tracing started. | {Time.realtimeSinceStartup}", context);
+            return trace;
+        }
+
+        public static Trace StartIf(UnityEngine.Object context, bool isEnabled, string prefix = Tracer.DefaultPrefix)
+        {
+            if (!Traces.TryDequeue(out var trace)) trace = new Trace();
+            
+            trace.Prefix = prefix;
+            trace.BlockLogs = !isEnabled;
+            if (!trace.BlockLogs) Debug.Log($"{trace.Prefix} | Tracing started. | {Time.realtimeSinceStartup}", context);
+            return trace;
+        }
+
         public static void Ping(int message)
         {
             Debug.Log($"{DefaultPrefix}{message}");
         }
 
-        public static void Ping(string message)
+        public static void Ping(int message, UnityEngine.Object context)
         {
-            Debug.Log($"{DefaultPrefix}{message}");
+            Debug.Log($"{DefaultPrefix}{message}", context);
+        }
+
+        public static void Ping(string message, UnityEngine.Object context)
+        {
+            Debug.Log($"{DefaultPrefix}{message}", context);
         }
 
         public class Trace : IDisposable
