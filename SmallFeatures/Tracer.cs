@@ -59,6 +59,11 @@ namespace Exerussus._1Extensions.SmallFeatures
             Debug.Log($"{DefaultPrefix}{message}", context);
         }
 
+        public static void Ping(string message)
+        {
+            Debug.Log($"{DefaultPrefix}{message}");
+        }
+
         public static void Ping(string message, UnityEngine.Object context)
         {
             Debug.Log($"{DefaultPrefix}{message}", context);
