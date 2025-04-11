@@ -62,17 +62,19 @@ namespace Exerussus._1Extensions.Scripts.Extensions
 
                 if (dx > dy)
                 {
-                    var aRight = aMax.x;
-                    var bLeft = bMin.x;
-                    start = new Vector2(aRight, aCenter.y);
-                    end = new Vector2(bLeft, bCenter.y);
+                    float x1 = aCenter.x < bCenter.x ? aMax.x : aMin.x;
+                    float x2 = aCenter.x < bCenter.x ? bMin.x : bMax.x;
+                    float y = (aCenter.y + bCenter.y) * 0.5f;
+                    start = new Vector2(x1, y);
+                    end = new Vector2(x2, y);
                 }
                 else
                 {
-                    var aBottom = aMin.y;
-                    var bTop = bMax.y;
-                    start = new Vector2(aCenter.x, aBottom);
-                    end = new Vector2(bCenter.x, bTop);
+                    float y1 = aCenter.y < bCenter.y ? aMax.y : aMin.y;
+                    float y2 = aCenter.y < bCenter.y ? bMin.y : bMax.y;
+                    float x = (aCenter.x + bCenter.x) * 0.5f;
+                    start = new Vector2(x, y1);
+                    end = new Vector2(x, y2);
                 }
 
                 center = (start + end) * 0.5f;
