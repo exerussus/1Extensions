@@ -29,9 +29,9 @@ namespace Exerussus._1Extensions.Sections
             return new Vector2(Random.Range(section.LeftBottom.x, section.RightTop.x), Random.Range(section.LeftBottom.y, section.RightTop.y));
         }
 
-        public static bool TryGetIntersection(this Section section, Section other, out Vector2 start, out Vector2 center, out Vector2 end, bool force = false)
+        public static (Vector2 start, Vector2 center, Vector2 end) GetIntersection(this Section section, Section other)
         {
-            return Vector2Extensions.TryGetIntersection(section.LeftBottom, section.RightTop, other.LeftBottom, other.RightTop, out start, out center, out end, force);
+            return Vector2Extensions.GetIntersection(section.LeftBottom, section.RightTop, other.LeftBottom, other.RightTop);
         }
     }
 }

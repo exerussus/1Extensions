@@ -28,61 +28,20 @@ namespace Exerussus._1Extensions.Scripts.Extensions
         /// <param name="aMax">Максимальная точка первого прямоугольника.</param>
         /// <param name="bMin">Минимальная точка второго прямоугольника.</param>
         /// <param name="bMax">Максимальная точка второго прямоугольника.</param>
-        /// <param name="start">Верхняя левая точка пересечения.</param>
-        /// <param name="center">Центральная точка между Start и End.</param>
-        /// <param name="end">Нижняя левая точка пересечения.</param>
-        /// <param name="force">Если true - точки высчитываются, даже без явного пересечения с выстраиванием проекционных линий.</param>
-        /// <returns><c>true</c>, если прямоугольники пересекаются; иначе <c>false</c>.</returns>
-        public static bool TryGetIntersection(
-            Vector2 aMin, Vector2 aMax,
-            Vector2 bMin, Vector2 bMax,
-            out Vector2 start, out Vector2 center, out Vector2 end,
-            bool force = false)
+        public static (Vector2 start, Vector2 center, Vector2 end) GetIntersection(Vector2 aMin, Vector2 aMax, Vector2 bMin, Vector2 bMax)
         {
-            var xMin = Mathf.Max(aMin.x, bMin.x);
-            var yMin = Mathf.Max(aMin.y, bMin.y);
-            var xMax = Mathf.Min(aMax.x, bMax.x);
-            var yMax = Mathf.Min(aMax.y, bMax.y);
+            var startX = Mathf.Max(aMin.x, bMin.x);
+            var endX = Mathf.Min(aMax.x, bMax.x);
+            var centerX = (startX + endX) / 2;
+            
+            var startY = Mathf.Max(aMin.y, bMin.y);
+            var endY = Mathf.Min(aMax.y, bMax.y);
+            var centerY = (startY + endY) / 2;
 
-            if (xMin < xMax && yMin < yMax)
-            {
-                start = new Vector2(xMin, yMax);
-                end = new Vector2(xMin, yMin);
-                center = (start + end) * 0.5f;
-                return true;
-            }
-
-            if (force)
-            {
-                Vector2 aCenter = (aMin + aMax) * 0.5f;
-                Vector2 bCenter = (bMin + bMax) * 0.5f;
-
-                var dx = Mathf.Abs(aCenter.x - bCenter.x);
-                var dy = Mathf.Abs(aCenter.y - bCenter.y);
-
-                if (dx > dy)
-                {
-                    float x1 = aCenter.x < bCenter.x ? aMax.x : aMin.x;
-                    float x2 = aCenter.x < bCenter.x ? bMin.x : bMax.x;
-                    float y = (aCenter.y + bCenter.y) * 0.5f;
-                    start = new Vector2(x1, y);
-                    end = new Vector2(x2, y);
-                }
-                else
-                {
-                    float y1 = aCenter.y < bCenter.y ? aMax.y : aMin.y;
-                    float y2 = aCenter.y < bCenter.y ? bMin.y : bMax.y;
-                    float x = (aCenter.x + bCenter.x) * 0.5f;
-                    start = new Vector2(x, y1);
-                    end = new Vector2(x, y2);
-                }
-
-                center = (start + end) * 0.5f;
-                return false;
-            }
-
-            start = center = end = Vector2.zero;
-            return false;
+            var maxPoint = new Vector2(Mathf.Max(startX, endX), Mathf.Max(startY, endY));
+            var minPoint = new Vector2(Mathf.Min(startX, endX), Mathf.Min(startY, endY));
+            
+            return (minPoint, new Vector2(centerX, centerY), maxPoint);
         }
     
         /// <summary>
