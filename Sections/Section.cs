@@ -66,7 +66,7 @@ namespace Exerussus._1Extensions.Sections
 #if UNITY_EDITOR
         [Button]
 #endif
-        private void Recalculate()
+        public void Recalculate()
         {
             centerPosition = leftBottom + (rightTop - leftBottom) / 2f;
             bottomCenter = new Vector2(centerPosition.x, leftBottom.y);
