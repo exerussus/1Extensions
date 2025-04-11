@@ -20,7 +20,69 @@ namespace Exerussus._1Extensions.Scripts.Extensions
             var dy = originPosition.y - targetPosition.y;
             return dx * dx + dy * dy;
         }
+        
+        /// <summary>
+        /// Пытается вычислить пересечение двух прямоугольников и получить точки Start, Center и End.
+        /// </summary>
+        /// <param name="aMin">Минимальная точка первого прямоугольника.</param>
+        /// <param name="aMax">Максимальная точка первого прямоугольника.</param>
+        /// <param name="bMin">Минимальная точка второго прямоугольника.</param>
+        /// <param name="bMax">Максимальная точка второго прямоугольника.</param>
+        /// <param name="start">Верхняя левая точка пересечения.</param>
+        /// <param name="center">Центральная точка между Start и End.</param>
+        /// <param name="end">Нижняя левая точка пересечения.</param>
+        /// <param name="force">Если true - точки высчитываются, даже без явного пересечения с выстраиванием проекционных линий.</param>
+        /// <returns><c>true</c>, если прямоугольники пересекаются; иначе <c>false</c>.</returns>
+        public static bool TryGetIntersection(
+            Vector2 aMin, Vector2 aMax,
+            Vector2 bMin, Vector2 bMax,
+            out Vector2 start, out Vector2 center, out Vector2 end,
+            bool force = false)
+        {
+            var xMin = Mathf.Max(aMin.x, bMin.x);
+            var yMin = Mathf.Max(aMin.y, bMin.y);
+            var xMax = Mathf.Min(aMax.x, bMax.x);
+            var yMax = Mathf.Min(aMax.y, bMax.y);
 
+            if (xMin < xMax && yMin < yMax)
+            {
+                start = new Vector2(xMin, yMax);
+                end = new Vector2(xMin, yMin);
+                center = (start + end) * 0.5f;
+                return true;
+            }
+
+            if (force)
+            {
+                Vector2 aCenter = (aMin + aMax) * 0.5f;
+                Vector2 bCenter = (bMin + bMax) * 0.5f;
+
+                var dx = Mathf.Abs(aCenter.x - bCenter.x);
+                var dy = Mathf.Abs(aCenter.y - bCenter.y);
+
+                if (dx > dy)
+                {
+                    var aRight = aMax.x;
+                    var bLeft = bMin.x;
+                    start = new Vector2(aRight, aCenter.y);
+                    end = new Vector2(bLeft, bCenter.y);
+                }
+                else
+                {
+                    var aBottom = aMin.y;
+                    var bTop = bMax.y;
+                    start = new Vector2(aCenter.x, aBottom);
+                    end = new Vector2(bCenter.x, bTop);
+                }
+
+                center = (start + end) * 0.5f;
+                return false;
+            }
+
+            start = center = end = Vector2.zero;
+            return false;
+        }
+    
         /// <summary>
         /// Возвращает квадрат расстояния между вектором <see cref="Vector2"/> и <see cref="Vector3"/>, 
         /// при этом ось Z у Vector3 игнорируется.
@@ -31,8 +93,8 @@ namespace Exerussus._1Extensions.Scripts.Extensions
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static float GetSqrDistance(this Vector2 originPosition, Vector3 targetPosition)
         {
-            float dx = originPosition.x - targetPosition.x;
-            float dy = originPosition.y - targetPosition.y;
+            var dx = originPosition.x - targetPosition.x;
+            var dy = originPosition.y - targetPosition.y;
             return dx * dx + dy * dy;
         }
         
