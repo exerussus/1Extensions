@@ -1,4 +1,5 @@
 ﻿using Exerussus._1Extensions.GizmosExtensions;
+using Exerussus._1Extensions.Scripts.Extensions;
 using UnityEngine;
 
 namespace Exerussus._1Extensions.Sections
@@ -26,6 +27,11 @@ namespace Exerussus._1Extensions.Sections
         public static Vector2 GetRandomPosition(this Section section)
         {
             return new Vector2(Random.Range(section.LeftBottom.x, section.RightTop.x), Random.Range(section.LeftBottom.y, section.RightTop.y));
+        }
+
+        public static bool TryGetIntersection(this Section section, Section other, out Vector2 start, out Vector2 center, out Vector2 end, bool force = false)
+        {
+            return Vector2Extensions.TryGetIntersection(section.LeftBottom, section.RightTop, other.LeftBottom, other.RightTop, out start, out center, out end, force);
         }
     }
 }
