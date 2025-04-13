@@ -9,7 +9,7 @@ using UnityEditor;
 
 namespace Exerussus._1Extensions.ProjectLoader.Loaders
 {
-    [Preserve, CreateAssetMenu(menuName = "1Extensions/ConfigHub", fileName = "ConfigHub")]
+    [Preserve, CreateAssetMenu(menuName = "Exerussus/1Extensions/ConfigHub", fileName = "ConfigHub")]
     public class ConfigHub : ScriptableObject
     {
         private const string ConfigsPath = "Assets/Configs";

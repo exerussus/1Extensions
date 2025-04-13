@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace Exerussus._1Extensions.SmallFeatures
 {
-    [CreateAssetMenu(menuName = "1Extensions/GameShareHandler", fileName = "GameShareHandler")]
+    [CreateAssetMenu(menuName = "Exerussus/1Extensions/GameShareHandler", fileName = "GameShareHandler")]
     public class GameShareHandler : ScriptableObject
     {
         [SerializeField] private List<GameShare> gameShares;

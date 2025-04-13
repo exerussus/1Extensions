@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace Exerussus._1Extensions.SignalSystem
 {
-    [CreateAssetMenu(menuName = "1Extensions/SignalHandler", fileName = "SignalHandler")]
+    [CreateAssetMenu(menuName = "Exerussus/1Extensions/SignalHandler", fileName = "SignalHandler")]
     public class SignalHandler : ScriptableObject, IInitializable
     {
         public Signal Signal { get; private set; } = new Signal();
