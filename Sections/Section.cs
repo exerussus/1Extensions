@@ -1,7 +1,6 @@
 ﻿using System;
 using Sirenix.OdinInspector;
 using UnityEngine;
-using UnityEngine.Serialization;
 
 namespace Exerussus._1Extensions.Sections
 {
@@ -16,8 +15,8 @@ namespace Exerussus._1Extensions.Sections
             this.rightTop = rightTop;
         }
 
-        [FormerlySerializedAs("minPosition")] [SerializeField, ReadOnly] private Vector2 leftBottom;
-        [FormerlySerializedAs("maxPosition")] [SerializeField, ReadOnly] private Vector2 rightTop;
+        [SerializeField, ReadOnly] private Vector2 leftBottom;
+        [SerializeField, ReadOnly] private Vector2 rightTop;
         [SerializeField, ReadOnly] private Vector2 centerPosition;
         
         [SerializeField, ReadOnly] private Vector2 bottomCenter;
