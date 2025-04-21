@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System.Runtime.CompilerServices;
+using UnityEngine;
 
 namespace Exerussus._1Extensions.Scripts.Extensions
 {
@@ -7,9 +8,22 @@ namespace Exerussus._1Extensions.Scripts.Extensions
         /// <summary> Бросает рандом между 1 и 100 включительно. </summary>
         /// <param name="value">Текущий шанс.</param>
         /// <returns>True, если выпало значение меньше или равное value</returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool Roll100(this int value)
         {
             return Random.Range(1, 101) <= value;
+        }
+
+        /// <summary> Бросает рандом между 1 и 100 включительно несколько раз. </summary>
+        /// <param name="value">Текущий шанс.</param>
+        /// <param name="rollTimes">Сколько раз кидается ролл.</param>
+        /// <param name="successfulRolls">Сколько успешно брошенных роллов.</param>
+        /// <returns>True, если хотя бы один ролл был успешен.</returns>
+        public static bool Roll100Many(this int value, int rollTimes, out int successfulRolls)
+        {
+            successfulRolls = 0;
+            for (int i = 0; i < rollTimes; i++) if (Random.Range(1, 101) <= value) successfulRolls++;
+            return successfulRolls > 1;
         }
 
         /// <summary>
@@ -83,6 +97,7 @@ namespace Exerussus._1Extensions.Scripts.Extensions
         /// <param name="originValue">Исходное значение.</param>
         /// <param name="offset">Отклонение от исходного значения.</param>
         /// <returns>Случайное значение в диапазоне [originValue - offset, originValue + offset].</returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static float RandomOffset(this float originValue, float offset)
         {
             return Random.Range(originValue - offset, originValue + offset);
@@ -94,6 +109,7 @@ namespace Exerussus._1Extensions.Scripts.Extensions
         /// <param name="originValue">Исходное значение.</param>
         /// <param name="offset">Отклонение от исходного значения.</param>
         /// <returns>Случайное целое значение в диапазоне [originValue - offset, originValue + offset + 1].</returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static int RandomOffset(this int originValue, int offset)
         {
             return Random.Range(originValue - offset, originValue + offset + 1);
@@ -103,6 +119,7 @@ namespace Exerussus._1Extensions.Scripts.Extensions
         /// <param name="value">Текущий шанс.</param>
         /// <param name="result">Выпавшее значение между 1 и 100 включительно.</param>
         /// <returns>True, если выпало значение меньше или равное value</returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool Roll100(this int value, out int result)
         {
             result = Random.Range(1, 101);
@@ -113,6 +130,7 @@ namespace Exerussus._1Extensions.Scripts.Extensions
         /// <param name="current">Текущий шанс.</param>
         /// <param name="target">Максимальное число для рандома. Рандом кидается между 1 и target включительно.</param>
         /// <returns>True, если выпало значение меньше или равное current.</returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool Roll(this int current, int target)
         {
             return Random.Range(1, target + 1) <= current;
@@ -123,6 +141,7 @@ namespace Exerussus._1Extensions.Scripts.Extensions
         /// <param name="target">Максимальное число для рандома. Рандом кидается между 1 и target включительно.</param>
         /// <param name="result">Выпавшее значение между 1 и target включительно.</param>
         /// <returns>True, если выпало значение меньше или равное current.</returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool Roll(this int current, int target, out int result)
         {
             result = Random.Range(1, target + 1);
