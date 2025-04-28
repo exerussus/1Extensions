@@ -1,4 +1,5 @@
-﻿using System;
+﻿
+using System.Diagnostics;
 using UnityEngine;
 
 namespace Exerussus._1Extensions.GizmosExtensions
@@ -21,6 +22,35 @@ namespace Exerussus._1Extensions.GizmosExtensions
             new Color(1, 0.5f, 1, 1),
         };
         
+#if UNITY_EDITOR
+        private static readonly GUIStyle TextStyle = new GUIStyle()
+        {
+            fontStyle = FontStyle.Bold,
+            fontSize = 30
+        };
+#endif
+
+        [Conditional("UNITY_EDITOR")]
+        public static void DrawText(string text, Vector3 position, Color color)
+        {
+#if UNITY_EDITOR
+            TextStyle.normal.textColor = color;
+            UnityEditor.Handles.Label(position, text, TextStyle); 
+#endif
+        }
+        
+        [Conditional("UNITY_EDITOR")]
+        public static void DrawText(string text, Vector3 position, Color color, FontStyle fontStyle, int fontSize)
+        {
+#if UNITY_EDITOR
+            TextStyle.normal.textColor = color;
+            TextStyle.fontStyle = fontStyle;
+            TextStyle.fontSize = fontSize;
+            UnityEditor.Handles.Label(position, text, TextStyle); 
+#endif
+        }
+        
+        [Conditional("UNITY_EDITOR")]
         public static void DrawLine(Vector3 start, Vector3 end, Color color)
         {
             var prevColor = Gizmos.color;
@@ -29,6 +59,7 @@ namespace Exerussus._1Extensions.GizmosExtensions
             Gizmos.color = prevColor;
         }
 
+        [Conditional("UNITY_EDITOR")]
         public static void DrawQuad(Vector2 minPosition, Vector2 maxPosition, Color color)
         {
             var prevColor = Gizmos.color;
@@ -45,6 +76,7 @@ namespace Exerussus._1Extensions.GizmosExtensions
             Gizmos.color = prevColor;
         }
 
+        [Conditional("UNITY_EDITOR")]
         public static void DrawSolidQuad(Vector2 minPosition, Vector2 maxPosition, Color lineColor, Color solidColor)
         {
             var prevColor = Gizmos.color;
@@ -66,6 +98,7 @@ namespace Exerussus._1Extensions.GizmosExtensions
             Gizmos.color = prevColor;
         }
         
+        [Conditional("UNITY_EDITOR")]
         public static void DrawCircle(Vector2 center, float radius, Color color)
         {
             var prevColor = Gizmos.color;

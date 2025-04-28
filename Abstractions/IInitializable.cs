@@ -36,4 +36,9 @@ namespace Exerussus._1Extensions.Abstractions
     {
         public void PostInitialize(T reference);
     }
+    
+    public interface IDeinitializable
+    {
+        public void Deinitialize();
+    }
 }
