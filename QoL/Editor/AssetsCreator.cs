@@ -15,13 +15,15 @@ namespace Exerussus._1Extensions.QoL.Editor
         /// <returns>Итоговый AssetPath созданного Scriptable Object.</returns>
         public static string CreateScriptableObject<T>(string folder, string fileName) where T : ScriptableObject
         {
+            var folders = PathUtils.GetIncrementalPathsWithFolderName(folder);
             var assetPath = $"{folder}/{fileName}.asset";
             var existingAsset = AssetDatabase.LoadAssetAtPath<T>(assetPath);
             if (existingAsset != null) return assetPath;
-            
-            CreateFolderIfNotExists("Assets", "Configs");
-            CreateFolderIfNotExists("Assets/Configs", "ExerussusCenter");
-            CreateFolderIfNotExists("Assets/Configs/ExerussusCenter", "Editor");
+
+            foreach (var (folderPath, folderName) in folders)
+            {
+                CreateFolderIfNotExists(folderPath, folderName);
+            }
 
             var asset = ScriptableObject.CreateInstance<T>();
             AssetDatabase.CreateAsset(asset, assetPath);
