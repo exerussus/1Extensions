@@ -281,7 +281,19 @@ namespace Exerussus._1Extensions.SignalSystem
 
     public class PackedObject
     {
+        public PackedObject() { }
+
+        public PackedObject(object o) { Object = o; }
+
         public object Object { get; set; }
+    }
+
+    public class PackedObject<T>
+    {
+        public PackedObject() { }
+
+        public PackedObject(T o) { Object = o; }
+        public T Object { get; set; }
     }
 
     public interface IAsyncSignal<T> where T : SignalContext
