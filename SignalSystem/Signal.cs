@@ -279,6 +279,11 @@ namespace Exerussus._1Extensions.SignalSystem
         public Dictionary<string, object> OutputParameters { get; private set; } = new();
     }
 
+    public class PackedObject
+    {
+        public object Object { get; set; }
+    }
+
     public interface IAsyncSignal<T> where T : SignalContext
     {
         public T Context { get; set; }
