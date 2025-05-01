@@ -9,7 +9,12 @@ namespace Exerussus._1Extensions.SignalSystem
     public class SignalHandler : ScriptableObject, IInitializable
     {
         public Signal Signal { get => SignalQoL.Instance; private set => SignalQoL.Instance = value; }
-        
+
+        private void Awake()
+        {
+            
+        }
+
         public void Initialize()
         {
             

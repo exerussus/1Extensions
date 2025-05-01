@@ -11,8 +11,8 @@ namespace Exerussus._1Extensions.SmallFeatures
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
         private static void Initialize()
         {
-            _jobHandler = new JobHandler("", logLevel:JobHandler.LogLevel.ErrorsOnly);
-            Debug.Log("JobQoL initialized");
+            _jobHandler ??= new JobHandler("", logLevel: JobHandler.LogLevel.ErrorsOnly);
+            ExerussusCore.OnUpdate -= _jobHandler.Update;
             ExerussusCore.OnUpdate += _jobHandler.Update;
         }
 

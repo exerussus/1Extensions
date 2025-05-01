@@ -1,4 +1,4 @@
-﻿using System;
+﻿
 using UnityEngine;
 
 namespace Exerussus._1Extensions
@@ -6,9 +6,11 @@ namespace Exerussus._1Extensions
     internal class ExerussusCore : MonoBehaviour
     {
         private static ExerussusCore _instance;
-        public static event Action OnUpdate;
+        public static event AwakeEvent OnAwake;
+        public static event StartEvent OnStart;
+        public static event UpdateEvent OnUpdate;
 
-        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterAssembliesLoaded)]
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
         private static void Init()
         {
             if (_instance != null) return;
@@ -16,6 +18,16 @@ namespace Exerussus._1Extensions
             var go = new GameObject("[Exerussus Core]");
             go.AddComponent<ExerussusCore>();
             DontDestroyOnLoad(go);
+        }
+        
+        private void Awake()
+        {
+            OnAwake?.Invoke();
+        }
+
+        private void Start()
+        {
+            OnStart?.Invoke();
         }
 
         private void Update()
@@ -45,4 +57,9 @@ namespace Exerussus._1Extensions
         
 #endif
     }
+
+
+    public delegate void AwakeEvent();
+    public delegate void StartEvent();
+    public delegate void UpdateEvent();
 }
