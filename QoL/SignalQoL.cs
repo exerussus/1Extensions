@@ -11,7 +11,7 @@ namespace Exerussus._1Extensions.SmallFeatures
         public static Signal Instance;
         private static bool _isInitialized;
 
-        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterAssembliesLoaded)]
         public static void Initialize()
         {
             Instance = new();
