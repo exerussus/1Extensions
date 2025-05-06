@@ -21,7 +21,17 @@ namespace Exerussus._1Extensions.SmallFeatures
             _jobHandler.AddJob(action, comment, delay);
         }
 
+        public static void CreateJob(this Action action, string comment, float delay = 0)
+        {
+            _jobHandler.AddJob(action, comment, delay);
+        }
+
         public static async Task AddJobAsync(Action action, string comment, float delay = 0, int timeoutMs = 10000)
+        {
+            await _jobHandler.AddJobAsync(action, comment, delay, timeoutMs);
+        }
+
+        public static async Task CreateJobAsync(this Action action, string comment, float delay = 0, int timeoutMs = 10000)
         {
             await _jobHandler.AddJobAsync(action, comment, delay, timeoutMs);
         }
