@@ -10,7 +10,7 @@ namespace Exerussus._1Extensions
         public static event StartEvent OnStart;
         public static event UpdateEvent OnUpdate;
 
-        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterAssembliesLoaded)]
         private static void Init()
         {
             if (_instance != null) return;

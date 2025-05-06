@@ -8,7 +8,7 @@ namespace Exerussus._1Extensions.SmallFeatures
     {
         private static JobHandler _jobHandler;
         
-        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterAssembliesLoaded)]
         private static void Initialize()
         {
             _jobHandler ??= new JobHandler("", logLevel: JobHandler.LogLevel.ErrorsOnly);
