@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Reflection;
 using Exerussus._1Extensions.SmallFeatures;
+using UnityEngine;
 
 namespace Exerussus._1EasyEcs.Scripts.Core
 {
@@ -65,13 +66,29 @@ namespace Exerussus._1EasyEcs.Scripts.Core
             Func<T, Type> getType,
             Action<object> setValue) where T : MemberInfo
         {
+#if UNITY_EDITOR
+            try
+            {
+                var attribute = Attribute.GetCustomAttribute(member, typeof(InjectSharedObjectAttribute)) as InjectSharedObjectAttribute;
+                if (attribute == null) return;
+
+                var memberType = getType(member);
+                var sharedObject = GetSharedObject(gameShare, memberType, attribute);
+                setValue(sharedObject);
+            }
+            catch (Exception e)
+            {
+                throw new Exception($"Ошибка при инъекции {member.Name} в {target.GetType().Name}:\n\n{e.Message}\n{e.StackTrace}");
+            }
+#else
+
             var attribute = Attribute.GetCustomAttribute(member, typeof(InjectSharedObjectAttribute)) as InjectSharedObjectAttribute;
-            if (attribute == null)
-                return;
+            if (attribute == null) return;
 
             var memberType = getType(member);
             var sharedObject = GetSharedObject(gameShare, memberType, attribute);
             setValue(sharedObject);
+#endif
         }
 
         private static object GetSharedObject(GameShare gameShare, Type memberType, InjectSharedObjectAttribute attribute)
