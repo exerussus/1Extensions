@@ -78,8 +78,7 @@ namespace Exerussus._1EasyEcs.Scripts.Core
             }
             catch (Exception e)
             {
-                var memberType = getType(member);
-                throw new Exception($"Ошибка при инъекции в классе : {target.GetType().Name} | Поле: {member.Name} | Зависимость : {memberType}.\n\n{e.Message}\n{e.StackTrace}");
+                throw new Exception($"Ошибка при инъекции в классе : {target.GetType().Name} | Поле: {member.Name} | Зависимость : {typeof(T).Name}.\n\n{e.Message}\n{e.StackTrace}");
             }
 #else
 
