@@ -14,7 +14,7 @@
             _value = startValue;
         }
 
-        private int _default;
+        private readonly int _default;
         private int _value;
 
         public void Clear()
@@ -43,7 +43,7 @@
             _value = startValue;
         }
 
-        private int _default;
+        private readonly int _default;
         private int _value;
 
         public void Clear()
