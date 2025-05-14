@@ -1,39 +1,11 @@
-﻿using System;
-using System.Runtime.CompilerServices;
+﻿using System.Runtime.CompilerServices;
 using UnityEngine;
-using Random = UnityEngine.Random;
 
 namespace Exerussus._1Extensions.Scripts.Extensions
 {
     public static class Vector2Extensions
     { 
         private const float TwoPI = 6.2831853f;
-        
-        public static string SerializeToString(this Vector2 vector)
-        {
-            return $"{vector.x},{vector.y}";
-        }
-
-        public static Vector2 DeserializeFromString(this string data)
-        {
-            var parts = data.Split(',');
-            if (parts.Length != 2) throw new FormatException("Invalid Vector2 string format.");
-            return new Vector2(float.Parse(parts[0]), float.Parse(parts[1]));
-        }
-
-        public static byte[] SerializeToBytes(this Vector2 vector)
-        {
-            var bytes = new byte[sizeof(float) * 2];
-            Buffer.BlockCopy(BitConverter.GetBytes(vector.x), 0, bytes, 0, sizeof(float));
-            Buffer.BlockCopy(BitConverter.GetBytes(vector.y), 0, bytes, sizeof(float), sizeof(float));
-            return bytes;
-        }
-
-        public static Vector2 DeserializeFromBytes(this byte[] bytes)
-        {
-            if (bytes.Length != sizeof(float) * 2) throw new ArgumentException("Invalid byte array size for Vector2.");
-            return new Vector2(BitConverter.ToSingle(bytes, 0), BitConverter.ToSingle(bytes, sizeof(float)));
-        }
         
         /// <summary>
         /// Возвращает квадрат расстояния между двумя векторами <see cref="Vector2"/>.
