@@ -16,6 +16,19 @@ namespace Exerussus._1Extensions.SmallFeatures
         private Dictionary<string, DataPackById> _sharedObjectsById = new();
         private Dictionary<Type, Dictionary<Type, DataPackByType>> _subObjects = new();
 
+        /// <returns>True, если список не пустой.</returns>
+        public bool GetAllObjectsByType<T>(out List<T> list)
+        {
+            list = new();
+            
+            foreach (var dataPack in _sharedObjectsByType.Values)
+            {
+                if (dataPack.Object is T t) list.Add(t);
+            }
+
+            return list.Count > 0;
+        }
+        
         [Preserve]
         private T InjectSharedObject<T>(Type type)
         {
