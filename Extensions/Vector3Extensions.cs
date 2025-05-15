@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Globalization;
 using UnityEngine;
 
 namespace Exerussus._1Extensions.Scripts.Extensions
@@ -17,18 +18,82 @@ namespace Exerussus._1Extensions.Scripts.Extensions
         
         public static string SerializeToString(this Vector3 vector)
         {
-            return $"{vector.x},{vector.y},{vector.z}";
+            return $"{vector.x.ToString(CultureInfo.InvariantCulture)},{vector.y.ToString(CultureInfo.InvariantCulture)},{vector.z.ToString(CultureInfo.InvariantCulture)}";
         }
 
         public static Vector3 DeserializeFromString(this string data)
         {
             var parts = data.Split(',');
             if (parts.Length != 3) throw new FormatException("Invalid Vector3 string format.");
-            return new Vector3(
-                float.Parse(parts[0]),
-                float.Parse(parts[1]),
-                float.Parse(parts[2])
-            );
+            return new Vector3(float.Parse(parts[0], CultureInfo.InvariantCulture), float.Parse(parts[1], CultureInfo.InvariantCulture), float.Parse(parts[2], CultureInfo.InvariantCulture));
+        }
+        
+        public static bool TryDeserializeVector3FromString(this string data, out Vector3 result)
+        {
+            result = default;
+
+            if (string.IsNullOrWhiteSpace(data)) return false;
+
+            var parts = data.Split(',');
+            if (parts.Length != 3) return false;
+
+            bool parsedX = float.TryParse(parts[0], NumberStyles.Any, CultureInfo.InvariantCulture, out float x);
+            bool parsedY = float.TryParse(parts[1], NumberStyles.Any, CultureInfo.InvariantCulture, out float y);
+            bool parsedZ = float.TryParse(parts[2], NumberStyles.Any, CultureInfo.InvariantCulture, out float z);
+
+            if (parsedX && parsedY && parsedZ)
+            {
+                result = new Vector3(x, y, z);
+                return true;
+            }
+
+            return false;
+        }
+        
+        public static bool TryDeserializeFromString(ref Vector3 result, string data)
+        {
+            if (string.IsNullOrWhiteSpace(data)) return false;
+
+            var parts = data.Split(',');
+            if (parts.Length != 3) return false;
+
+            bool parsedX = float.TryParse(parts[0], NumberStyles.Any, CultureInfo.InvariantCulture, out float x);
+            bool parsedY = float.TryParse(parts[1], NumberStyles.Any, CultureInfo.InvariantCulture, out float y);
+            bool parsedZ = float.TryParse(parts[2], NumberStyles.Any, CultureInfo.InvariantCulture, out float z);
+
+            if (parsedX && parsedY && parsedZ)
+            {
+                result.x = x;
+                result.y = y;
+                result.z = z;
+                return true;
+            }
+
+            return false;
+        }
+        
+        public static bool TryDeserializeFromString(string data, out Vector3 result)
+        {
+            result = new Vector3();
+            
+            if (string.IsNullOrWhiteSpace(data)) return false;
+
+            var parts = data.Split(',');
+            if (parts.Length != 3) return false;
+
+            bool parsedX = float.TryParse(parts[0], NumberStyles.Any, CultureInfo.InvariantCulture, out float x);
+            bool parsedY = float.TryParse(parts[1], NumberStyles.Any, CultureInfo.InvariantCulture, out float y);
+            bool parsedZ = float.TryParse(parts[2], NumberStyles.Any, CultureInfo.InvariantCulture, out float z);
+
+            if (parsedX && parsedY && parsedZ)
+            {
+                result.x = x;
+                result.y = y;
+                result.z = z;
+                return true;
+            }
+
+            return false;
         }
 
         public static byte[] SerializeToBytes(this Vector3 vector)

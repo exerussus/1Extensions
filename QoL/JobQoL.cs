@@ -8,12 +8,12 @@ namespace Exerussus._1Extensions.SmallFeatures
     {
         private static JobHandler _jobHandler;
         
-        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterAssembliesLoaded)]
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
         private static void Initialize()
         {
             _jobHandler ??= new JobHandler("", logLevel: JobHandler.LogLevel.ErrorsOnly);
-            ExerussusCore.OnUpdate -= _jobHandler.Update;
-            ExerussusCore.OnUpdate += _jobHandler.Update;
+            ExerussusCore.RemoveOnUpdate(_jobHandler.Update);
+            ExerussusCore.AddOnUpdate(_jobHandler.Update);
         }
 
         public static void AddJob(Action action, string comment, float delay = 0)

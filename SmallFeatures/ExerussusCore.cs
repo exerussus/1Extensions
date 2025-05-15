@@ -1,23 +1,59 @@
-﻿
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace Exerussus._1Extensions
 {
-    internal class ExerussusCore : MonoBehaviour
+    public class ExerussusCore : MonoBehaviour
     {
         private static ExerussusCore _instance;
-        public static event AwakeEvent OnAwake;
-        public static event StartEvent OnStart;
-        public static event UpdateEvent OnUpdate;
-
-        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterAssembliesLoaded)]
-        private static void Init()
+        private static readonly object Lock = new object();
+        private static event AwakeEvent OnAwake;
+        private static event StartEvent OnStart;
+        private static event UpdateEvent OnUpdate;
+        
+        public static void AddOnAwake(AwakeEvent @event)
         {
-            if (_instance != null) return;
+            Init();
+            OnAwake += @event;
+        }
 
-            var go = new GameObject("[Exerussus Core]");
-            go.AddComponent<ExerussusCore>();
-            DontDestroyOnLoad(go);
+        public static void AddOnStart(StartEvent @event)
+        {
+            Init();
+            OnStart += @event;
+        }
+
+        public static void AddOnUpdate(UpdateEvent @event)
+        {
+            Init();
+            OnUpdate += @event;
+        }
+
+        public static void RemoveOnAwake(AwakeEvent @event)
+        {
+            OnAwake -= @event;
+        }
+
+        public static void RemoveOnStart(StartEvent @event)
+        {
+            OnStart -= @event;
+        }
+
+        public static void RemoveOnUpdate(UpdateEvent @event)
+        {
+            OnUpdate -= @event;
+        }
+
+        public static void Init()
+        {
+            lock (Lock)
+            {
+                if (_instance != null) return;
+
+                var go = new GameObject("[Exerussus Core]");
+                DontDestroyOnLoad(go);
+                _instance = go.AddComponent<ExerussusCore>();
+                go.SetActive(true);
+            }
         }
         
         private void Awake()
@@ -50,6 +86,8 @@ namespace Exerussus._1Extensions
             {
                 if (state == UnityEditor.PlayModeStateChange.ExitingPlayMode || state == UnityEditor.PlayModeStateChange.ExitingEditMode)
                 {
+                    OnAwake = null;
+                    OnStart = null;
                     OnUpdate = null;
                 }
             }
