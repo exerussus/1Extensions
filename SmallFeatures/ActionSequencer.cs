@@ -15,6 +15,11 @@ namespace Exerussus._1Extensions.SmallFeatures
             _dict.Add(_freeId, new SequenceAction(delay));
             return _freeId;
         }
+
+        public void ChangeDelay(int id, float delay)
+        {
+            _dict[id].Delay = delay;
+        }
         
         public void AddToSequence(int id, Action action)
         {
@@ -86,6 +91,7 @@ namespace Exerussus._1Extensions.SmallFeatures
         private readonly ActionSequencer _sequencer;
         
         public void AddToSequence(Action action) => _sequencer.AddToSequence(_id, action);
+        public void ChangeDelay(float delay) => _sequencer.ChangeDelay(_id, delay);
         public bool IsDone() => _sequencer.IsDone(_id);
         public void ClearSequence() => _sequencer.ClearSequence(_id);
         public void ClearAllSequences() => _sequencer.ClearAllSequences();
@@ -100,8 +106,8 @@ namespace Exerussus._1Extensions.SmallFeatures
             Delay = delay;
         }
 
-        public readonly float Delay;
         public readonly Queue<Action> Queue = new();
+        public float Delay;
         public float NextUpdateTime;
     }
 }
