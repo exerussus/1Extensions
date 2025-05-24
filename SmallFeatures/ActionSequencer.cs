@@ -20,13 +20,6 @@ namespace Exerussus._1Extensions.SmallFeatures
         {
             _dict[id].BaseDelay = delay;
         }
-
-        public void ChangeCurrentDelay(int id, float delay)
-        {
-            var sequence = _dict[id];
-            if (sequence.Queue.Count == 0) return;
-            sequence.Queue[0].Delay = delay;
-        }
         
         public SequenceAction AddToSequence(int id, Action action)
         {
@@ -83,28 +76,28 @@ namespace Exerussus._1Extensions.SmallFeatures
             foreach (var sequence in _dict.Values)
             {
                 if (sequence.IsBlock) continue;
-                if (sequence.Queue.Count != 0 && Time.time > sequence.NextUpdateTime)
-                {
-                    var sequenceAction = sequence.Queue[0];
-                    sequence.Queue.RemoveAt(0);
-                    sequenceAction.Action.Invoke();
-                    sequence.NextUpdateTime = Time.time + sequenceAction.Delay;
-                }
+                if (Time.time < sequence.NextUpdateTime) continue;
+                if (sequence.Queue.Count == 0) continue;
+                
+                var sequenceAction = sequence.Queue[0];
+                sequence.Queue.RemoveAt(0);
+                sequenceAction.Action.Invoke();
+                sequence.NextUpdateTime = Time.time + sequenceAction.Delay;
             }
         }
 
         public void UpdateCurrent(int id)
         {
             var sequence = _dict[id];
-            if (sequence.IsBlock) return;
             
-            if (sequence.Queue.Count != 0 && Time.time > sequence.NextUpdateTime)
-            {
-                var sequenceAction = sequence.Queue[0];
-                sequence.Queue.RemoveAt(0);
-                sequenceAction.Action.Invoke();
-                sequence.NextUpdateTime = Time.time + sequenceAction.Delay;
-            }
+            if (sequence.IsBlock) return;
+            if (Time.time < sequence.NextUpdateTime) return;
+            if (sequence.Queue.Count == 0) return;
+            
+            var sequenceAction = sequence.Queue[0];
+            sequence.Queue.RemoveAt(0);
+            sequenceAction.Action.Invoke();
+            sequence.NextUpdateTime = Time.time + sequenceAction.Delay;
         }
     }
 
@@ -150,18 +143,6 @@ namespace Exerussus._1Extensions.SmallFeatures
             return this;
         }
 
-        public SequenceCommander ClearAllSequences()
-        {
-            _sequencer.ClearAllSequences();
-            return this;
-        }
-        
-        public SequenceCommander ChangeCurrentDelay(float delay)
-        {
-            _sequencer.ChangeCurrentDelay(_id, delay);
-            return this;
-        }
-
         public SequenceCommander SetBlock(bool isBlock)
         {
             _sequencer.SetBlock(_id, isBlock);
@@ -192,21 +173,15 @@ namespace Exerussus._1Extensions.SmallFeatures
         public bool IsBlock;
     }
 
-    public class SequenceAction
+    public struct SequenceAction
     {
-        public SequenceAction(Action action)
-        {
-            Action = action;
-            Delay = -1;
-        }
-
         public SequenceAction(Action action, float delay)
         {
             Action = action;
             Delay = delay;
         }
 
-        public Action Action;
-        public float Delay;
+        public readonly Action Action;
+        public readonly float Delay;
     }
 }
