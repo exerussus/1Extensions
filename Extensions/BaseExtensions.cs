@@ -619,5 +619,30 @@ namespace Exerussus._1Extensions.Scripts.Extensions
             origin.ExceptWith(target);
             return origin;
         }
+        
+        
+        /// <summary> Перемешивает элементы списка в случайном порядке (алгоритм Фишера-Йейтса) с глобальным Random. </summary>
+        public static void Shuffle<T>(this List<T> list)
+        {
+            Shuffle(list, new System.Random());
+        }
+
+        /// <summary> Перемешивает элементы списка в случайном порядке (алгоритм Фишера-Йейтса) с заданным сидом. </summary>
+        public static void Shuffle<T>(this List<T> list, int seed)
+        {
+            Shuffle(list, new System.Random(seed));
+        }
+
+        /// <summary> Перемешивает элементы списка в случайном порядке (алгоритм Фишера-Йейтса) с заданным генератором случайных чисел. </summary>
+        public static void Shuffle<T>(this List<T> list, System.Random rng)
+        {
+            if (list == null || list.Count <= 1) return;
+
+            for (var i = list.Count - 1; i > 0; i--)
+            {
+                var j = rng.Next(i + 1);
+                (list[i], list[j]) = (list[j], list[i]);
+            }
+        }
     }
 }
