@@ -21,20 +21,16 @@ namespace Exerussus._1Extensions.SmallFeatures
             _dict[id].BaseDelay = delay;
         }
         
-        public SequenceAction AddToSequence(int id, Action action)
+        public void AddToSequence(int id, Action action)
         {
             var sequence = _dict[id];
-            var sequenceAction = new SequenceAction(action, sequence.BaseDelay);
-            sequence.Queue.Add(sequenceAction);
-            return sequenceAction;
+            sequence.Enqueue(new SequenceAction(action, sequence.BaseDelay));
         }
         
-        public SequenceAction AddToSequence(int id, float delay, Action action)
+        public void AddToSequence(int id, float delay, Action action)
         {
             var sequence = _dict[id];
-            var sequenceAction = new SequenceAction(action, delay);
-            sequence.Queue.Add(sequenceAction);
-            return sequenceAction;
+            sequence.Enqueue(new SequenceAction(action, delay));
         }
 
         public void SetBlock(int id, bool isBlock)
@@ -45,44 +41,45 @@ namespace Exerussus._1Extensions.SmallFeatures
 
         public bool IsDone(int id)
         {
-            return _dict[id].Queue.Count == 0;
+            return _dict[id].Count == 0;
         }
 
         public bool IsBlock(int id)
         {
             var sequence = _dict[id];
-            if (sequence.Queue.Count == 0) return false;
+            if (sequence.Count == 0) return false;
             return sequence.IsBlock;
         }
 
         public void ClearSequence(int id)
         {
-            if (_dict.TryGetValue(id, out var sequenceAction))
+            if (_dict.TryGetValue(id, out var sequence))
             {
-                sequenceAction.Queue.Clear();
+                sequence.Clear();
             }
         }
 
         public void ClearAllSequences()
         {
-            foreach (var sequenceAction in _dict.Values)
+            foreach (var sequence in _dict.Values)
             {
-                sequenceAction.Queue.Clear();
+                sequence.Clear();
             }
         }
 
         public void Update()
         {
+            var timeNow = Time.time;
+            
             foreach (var sequence in _dict.Values)
             {
                 if (sequence.IsBlock) continue;
-                if (Time.time < sequence.NextUpdateTime) continue;
-                if (sequence.Queue.Count == 0) continue;
+                if (timeNow < sequence.NextUpdateTime) continue;
+                if (sequence.Count == 0) continue;
                 
-                var sequenceAction = sequence.Queue[0];
-                sequence.Queue.RemoveAt(0);
-                sequenceAction.Action.Invoke();
-                sequence.NextUpdateTime = Time.time + sequenceAction.Delay;
+                var action = sequence.Dequeue();
+                action.Action.Invoke();
+                sequence.NextUpdateTime = timeNow + action.Delay;
             }
         }
 
@@ -91,13 +88,15 @@ namespace Exerussus._1Extensions.SmallFeatures
             var sequence = _dict[id];
             
             if (sequence.IsBlock) return;
-            if (Time.time < sequence.NextUpdateTime) return;
-            if (sequence.Queue.Count == 0) return;
             
-            var sequenceAction = sequence.Queue[0];
-            sequence.Queue.RemoveAt(0);
-            sequenceAction.Action.Invoke();
-            sequence.NextUpdateTime = Time.time + sequenceAction.Delay;
+            var timeNow = Time.time;
+            
+            if (timeNow < sequence.NextUpdateTime) return;
+            if (sequence.Count == 0) return;
+            
+            var action = sequence.Dequeue();
+            action.Action.Invoke();
+            sequence.NextUpdateTime = timeNow + action.Delay;
         }
     }
 
@@ -120,14 +119,16 @@ namespace Exerussus._1Extensions.SmallFeatures
         private readonly int _id;
         private readonly ActionSequencer _sequencer;
         
-        public SequenceAction AddToSequence(Action action)
+        public SequenceCommander AddToSequence(Action action)
         {
-            return _sequencer.AddToSequence(_id, action);
+            _sequencer.AddToSequence(_id, action);
+            return this;
         }
 
-        public SequenceAction AddToSequence(float delay, Action action)
+        public SequenceCommander AddToSequence(float delay, Action action)
         {
-            return _sequencer.AddToSequence(_id, delay, action);
+            _sequencer.AddToSequence(_id, delay, action);
+            return this;
         }
 
         public SequenceCommander ChangeBaseDelay(float delay)
@@ -162,15 +163,67 @@ namespace Exerussus._1Extensions.SmallFeatures
 
     public class Sequence
     {
-        public Sequence(float baseDelay)
+        public Sequence(float baseDelay, int capacity = 16)
         {
             BaseDelay = baseDelay;
+            _actions = new SequenceAction[capacity];
         }
 
-        public readonly List<SequenceAction> Queue = new();
         public float BaseDelay;
         public float NextUpdateTime;
         public bool IsBlock;
+
+        private SequenceAction[] _actions;
+        private int _start;
+        private int _end;
+        private int _count;
+
+        public int Count => _count;
+
+        public void Enqueue(SequenceAction action)
+        {
+            if (_count == _actions.Length)
+                Expand();
+
+            _actions[_end] = action;
+            _end = (_end + 1) % _actions.Length;
+            _count++;
+        }
+
+        public SequenceAction Dequeue()
+        {
+            if (_count == 0) throw new InvalidOperationException("Empty sequence");
+            var action = _actions[_start];
+            _start = (_start + 1) % _actions.Length;
+            _count--;
+            return action;
+        }
+
+        public SequenceAction Peek()
+        {
+            if (_count == 0) throw new InvalidOperationException("Empty sequence");
+            return _actions[_start];
+        }
+
+        public void Clear()
+        {
+            _start = _end = _count = 0;
+            for (int i = 0; i < _actions.Length; i++) _actions[i] = default;
+        }
+
+        private void Expand()
+        {
+            var newCapacity = _actions.Length + 4;
+            var newArray = new SequenceAction[newCapacity];
+            for (int i = 0; i < _count; i++)
+            {
+                newArray[i] = _actions[(_start + i) % _actions.Length];
+            }
+
+            _actions = newArray;
+            _start = 0;
+            _end = _count;
+        }
     }
 
     public struct SequenceAction
