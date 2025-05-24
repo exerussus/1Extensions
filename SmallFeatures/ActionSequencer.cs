@@ -4,11 +4,15 @@ using UnityEngine;
 
 namespace Exerussus._1Extensions.SmallFeatures
 {
+    /// <summary> Даёт возможность создать последовательность, к которой можно добавлять события для их последовательного выполнения. </summary>
     public class ActionSequencer
     {
         private readonly Dictionary<int, Sequence> _dict = new();
         private int _freeId;
         
+        /// <summary> Создает новую последовательность. </summary>
+        /// <param name="delay">Базовая задержка между событиями.</param>
+        /// <returns>Уникальный ID последовательности для обращения к ней.</returns>
         public int CreateSequence(float delay)
         {
             _freeId++;
@@ -16,34 +20,53 @@ namespace Exerussus._1Extensions.SmallFeatures
             return _freeId;
         }
 
+        /// <summary> Изменяет базовую задержку между событиями. </summary>
+        /// <param name="id">Уникальный ID последовательности выданный после её создания.</param>
+        /// <param name="delay">Задержка между событиями.</param>
         public void ChangeBaseDelay(int id, float delay)
         {
             _dict[id].BaseDelay = delay;
         }
         
+        /// <summary> Добавляет событие в последовательность с базовой задержкой. </summary>
+        /// <param name="id">Уникальный ID последовательности выданный после её создания.</param>
+        /// <param name="action">Событие.</param>
         public void AddToSequence(int id, Action action)
         {
             var sequence = _dict[id];
             sequence.Enqueue(new SequenceAction(action, sequence.BaseDelay));
         }
-        
+
+        /// <summary> Добавляет событие в последовательность с указанной задержкой. </summary>
+        /// <param name="id">Уникальный ID последовательности выданный после её создания.</param>
+        /// <param name="delay">Задержка после данного события.</param>
+        /// <param name="action">Событие.</param>
         public void AddToSequence(int id, float delay, Action action)
         {
             var sequence = _dict[id];
             sequence.Enqueue(new SequenceAction(action, delay));
         }
 
+        /// <summary> Блокирует, или активирует процесс выполнения событий. </summary>
+        /// <param name="id">Уникальный ID последовательности выданный после её создания.</param>
+        /// <param name="isBlock">Если true, блокирует процесс выполнения.</param>
         public void SetBlock(int id, bool isBlock)
         {
             var sequence = _dict[id];
             sequence.IsBlock = isBlock;
         }
 
+        /// <summary> Проверяет, закончилась ли последовательность. </summary>
+        /// <param name="id">Уникальный ID последовательности выданный после её создания.</param>
+        /// <returns>True, если все события выполнены.</returns>
         public bool IsDone(int id)
         {
             return _dict[id].Count == 0;
         }
 
+        /// <summary> Проверка на блокировку. </summary>
+        /// <param name="id">Уникальный ID последовательности выданный после её создания.</param>
+        /// <returns>True, если последовательность заблокирована.</returns>
         public bool IsBlock(int id)
         {
             var sequence = _dict[id];
@@ -51,22 +74,20 @@ namespace Exerussus._1Extensions.SmallFeatures
             return sequence.IsBlock;
         }
 
+        /// <summary> Очищает конкретную последовательность от событий. </summary>
+        /// <param name="id">Уникальный ID последовательности выданный после её создания.</param>
         public void ClearSequence(int id)
         {
-            if (_dict.TryGetValue(id, out var sequence))
-            {
-                sequence.Clear();
-            }
+            if (_dict.TryGetValue(id, out var sequence)) sequence.Clear();
         }
 
+        /// <summary> Очищает все последовательности от событий. </summary>
         public void ClearAllSequences()
         {
-            foreach (var sequence in _dict.Values)
-            {
-                sequence.Clear();
-            }
+            foreach (var sequence in _dict.Values) sequence.Clear();
         }
 
+        /// <summary> Вызывает глобальное обновление всех последовательностей. Вызов может происходить сколько угодно раз. </summary>
         public void Update()
         {
             var timeNow = Time.time;
@@ -83,6 +104,7 @@ namespace Exerussus._1Extensions.SmallFeatures
             }
         }
 
+        /// <summary> Вызывает обновление конкретной последовательности. Вызов может происходить сколько угодно раз. </summary>
         public void UpdateCurrent(int id)
         {
             var sequence = _dict[id];
@@ -108,6 +130,7 @@ namespace Exerussus._1Extensions.SmallFeatures
         }
     }
 
+    /// <summary> Класс, предоставляющий команды для управления последовательностью в стиле Fluent API. </summary>
     public class SequenceCommander
     {
         public SequenceCommander(int id, ActionSequencer sequencer)
@@ -119,42 +142,61 @@ namespace Exerussus._1Extensions.SmallFeatures
         private readonly int _id;
         private readonly ActionSequencer _sequencer;
         
+        
+        /// <summary> Добавляет событие в последовательность с базовой задержкой. </summary>
+        /// <param name="action">Событие.</param>
         public SequenceCommander AddToSequence(Action action)
         {
             _sequencer.AddToSequence(_id, action);
             return this;
         }
 
+        
+        /// <summary> Добавляет событие в последовательность с базовой задержкой. </summary>
+        /// <param name="delay">Задержка после данного события.</param>
+        /// <param name="action">Событие.</param>
         public SequenceCommander AddToSequence(float delay, Action action)
         {
             _sequencer.AddToSequence(_id, delay, action);
             return this;
         }
 
+
+        /// <summary> Изменяет базовую задержку между событиями. </summary>
+        /// <param name="delay">Задержка между событиями.</param>
         public SequenceCommander ChangeBaseDelay(float delay)
         {
             _sequencer.ChangeBaseDelay(_id, delay);
             return this;
         }
 
+        /// <summary> Проверяет, закончилась ли последовательность. </summary>
+        /// <returns>True, если все события выполнены.</returns>
         public bool IsDone() => _sequencer.IsDone(_id);
+        
+        /// <summary> Очищает конкретную последовательность от событий. </summary>
         public SequenceCommander ClearSequence()
         {
             _sequencer.ClearSequence(_id);
             return this;
         }
 
+        /// <summary> Блокирует, или активирует процесс выполнения событий. </summary>
+        /// <param name="isBlock">Если true, блокирует процесс выполнения.</param>
         public SequenceCommander SetBlock(bool isBlock)
         {
             _sequencer.SetBlock(_id, isBlock);
             return this;
         }
 
+        /// <summary> Вызывает обновление последовательности. Вызов может происходить сколько угодно раз. </summary>
         public void Update()
         {
             _sequencer.UpdateCurrent(_id);
         }
 
+        /// <summary> Проверка на блокировку. </summary>
+        /// <returns>True, если последовательность заблокирована.</returns>
         public bool IsBlock()
         {
             return _sequencer.IsBlock(_id);
