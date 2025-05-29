@@ -8,6 +8,7 @@
         public static readonly AssetDataBaseCore AssetDataBase = new ();
         public static readonly QoLCore QoL = new ();
         public static readonly UtilsCore Utils = new ();
+        public static readonly ConstantsCore Constants = new ();
         
         public class LoggerCore { }
         public class ParserCore { }
@@ -15,5 +16,6 @@
         public class QoLCore { }
         public class UtilsCore { }
         public class AssetDataBaseCore { }
+        public class ConstantsCore { }
     }
 }
