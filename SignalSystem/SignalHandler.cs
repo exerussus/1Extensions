@@ -15,9 +15,11 @@ namespace Exerussus._1Extensions.SignalSystem
             
         }
 
+        public bool IsInitialized { get; private set; }
+
         public void Initialize()
         {
-            
+            IsInitialized = true;
         }
     }
 }

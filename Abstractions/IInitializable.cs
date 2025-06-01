@@ -19,11 +19,13 @@ namespace Exerussus._1Extensions.Abstractions
     
     public interface IInitializable
     {
+        public bool IsInitialized { get; }
         public void Initialize();
     }
     
     public interface IInitializable<in T>
     {
+        public bool IsInitialized { get; }
         public void Initialize(T reference);
     }
 
