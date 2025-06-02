@@ -5,49 +5,45 @@ using UnityEngine;
 namespace Exerussus._1Extensions.Sections
 {
     [Serializable]
-    public class Section
+    public abstract class Section
     {
-        public Section() { }
-
-        public Section(Vector2 leftBottom, Vector2 rightTop)
-        {
-            this.leftBottom = leftBottom;
-            this.rightTop = rightTop;
-        }
-
-        [SerializeField, ReadOnly] private Vector2 leftBottom;
-        [SerializeField, ReadOnly] private Vector2 rightTop;
-        [SerializeField, ReadOnly] private Vector2 centerPosition;
+        protected Vector2 LeftBottomProtected { get ; set; }
+        protected Vector2 RightTopProtected { get ; set; }
         
-        [SerializeField, ReadOnly] private Vector2 bottomCenter;
-        [SerializeField, ReadOnly] private Vector2 topCenter;
-        [SerializeField, ReadOnly] private Vector2 leftCenter;
-        [SerializeField, ReadOnly] private Vector2 rightCenter;
-        
-        public Vector2 CenterPosition => centerPosition;
-        public Vector2 BottomCenter => bottomCenter;
-        public Vector2 TopCenter => topCenter;
-        public Vector2 LeftCenter => leftCenter;
-        public Vector2 RightCenter => rightCenter;
+        public Vector2 CenterPosition { get ; protected set; }
+        public Vector2 BottomCenter { get ; protected set; }
+        public Vector2 TopCenter { get ; protected set; }
+        public Vector2 LeftCenter { get ; protected set; }
+        public Vector2 RightCenter { get ; protected set; }
         
         public Vector2 LeftBottom
         {
-            get => leftBottom;
+            get => LeftBottomProtected;
             set
             {
-                leftBottom = value;
+                LeftBottomProtected = value;
                 Recalculate();
             }
         }
 
         public Vector2 RightTop
         {
-            get => rightTop;
+            get => RightTopProtected;
             set
             {
-                rightTop = value;
-                if (rightTop.x < leftBottom.x) rightTop.x = leftBottom.x;
-                if (rightTop.y < leftBottom.y) rightTop.y = leftBottom.y;
+                RightTopProtected = value;
+                if (RightTopProtected.x < LeftBottomProtected.x)
+                {
+                    var newValue = RightTopProtected;
+                    newValue.x = LeftBottomProtected.x;
+                    RightTopProtected = newValue;
+                }
+                if (RightTopProtected.y < LeftBottomProtected.y)
+                {
+                    var newValue = RightTopProtected;
+                    newValue.x = LeftBottomProtected.y;
+                    RightTopProtected = newValue;
+                }
                 Recalculate();
             }
         }
@@ -57,8 +53,8 @@ namespace Exerussus._1Extensions.Sections
 #endif
         public void SetPoints(Vector2 leftBottomPoint, Vector2 rightTopPint)
         {
-            leftBottom = leftBottomPoint;
-            rightTop = rightTopPint;
+            LeftBottomProtected = leftBottomPoint;
+            RightTopProtected = rightTopPint;
             Recalculate();
         }
              
@@ -67,11 +63,11 @@ namespace Exerussus._1Extensions.Sections
 #endif
         public void Recalculate()
         {
-            centerPosition = leftBottom + (rightTop - leftBottom) / 2f;
-            bottomCenter = new Vector2(centerPosition.x, leftBottom.y);
-            topCenter = new Vector2(centerPosition.x, rightTop.y);
-            leftCenter = new Vector2(leftBottom.x, centerPosition.y);
-            rightCenter = new Vector2(rightTop.x, centerPosition.y);
+            CenterPosition = LeftBottomProtected + (RightTopProtected - LeftBottomProtected) / 2f;
+            BottomCenter = new Vector2(CenterPosition.x, LeftBottomProtected.y);
+            TopCenter = new Vector2(CenterPosition.x, RightTopProtected.y);
+            LeftCenter = new Vector2(LeftBottomProtected.x, CenterPosition.y);
+            RightCenter = new Vector2(RightTopProtected.x, CenterPosition.y);
         }
     }
 }
