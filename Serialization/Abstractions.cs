@@ -18,12 +18,12 @@ namespace Exerussus._1Extensions.Serialization
     {
         public abstract string AssetFolder { get; }
         
-        public void Save()
+        public virtual void Save()
         {
             AssetSerializer.SavePersistent(this, AssetFolder);
         }
 
-        public void Load()
+        public virtual void Load()
         {
             var (result, loaded) = AssetSerializer.LoadPersistent<T>(AssetFolder);
             if (result) OnLoad(loaded);
