@@ -47,21 +47,15 @@ namespace Exerussus._1Extensions.Sections
                 Recalculate();
             }
         }
-        
-#if UNITY_EDITOR
-        [Button]
-#endif
-        public void SetPoints(Vector2 leftBottomPoint, Vector2 rightTopPint)
+
+        public virtual void SetPoints(Vector2 leftBottomPoint, Vector2 rightTopPint)
         {
             LeftBottomProtected = leftBottomPoint;
             RightTopProtected = rightTopPint;
             Recalculate();
         }
-             
-#if UNITY_EDITOR
-        [Button]
-#endif
-        public void Recalculate()
+        
+        public virtual void Recalculate()
         {
             CenterPosition = LeftBottomProtected + (RightTopProtected - LeftBottomProtected) / 2f;
             BottomCenter = new Vector2(CenterPosition.x, LeftBottomProtected.y);
