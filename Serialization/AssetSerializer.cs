@@ -138,6 +138,13 @@ namespace Exerussus._1Extensions.Serialization
             File.WriteAllText(path, json);
         }
         
+        public static bool TryLoadAndSetPersistent<T>(ref T data, string saveName)
+        {
+            var result = LoadPersistent<T>(saveName, data.GetType().Name);
+            if (result.result) data = result.asset;
+            return result.result;
+        }
+        
         public static bool TryLoadAndSetPersistent<T>(ref T data, string saveName, string fileName)
         {
             var result = LoadPersistent<T>(saveName, fileName);
