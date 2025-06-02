@@ -49,6 +49,9 @@ namespace Exerussus._1Extensions.SmallFeatures
             if (startType != StartType.Start) return;
             Run();
         }
+        
+        public virtual void OnPreInitialize() {}
+        public virtual void OnPostInitialize() {}
 
         private void Run()
         {
@@ -56,6 +59,7 @@ namespace Exerussus._1Extensions.SmallFeatures
             {
                 if (_isStarted) return;
                 _isStarted = true;
+                OnPreInitialize();
                 if (TryDestroy()) return;
 
                 foreach (var bootstrapStage in initializeQueue)
@@ -149,6 +153,7 @@ namespace Exerussus._1Extensions.SmallFeatures
             if (initializeQueue.Count == 0)
             {
                 OnAllInitialized?.Invoke();
+                OnPostInitialize();
                 Debug.Log("[Bootstrapper] All initialized.");
                 if (destroyGameObjectOnDone) Destroy(gameObject);
                 else Destroy(this);
