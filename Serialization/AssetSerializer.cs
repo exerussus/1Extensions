@@ -116,17 +116,6 @@ namespace Exerussus._1Extensions.Serialization
             }
         }
         
-        public static void SavePersistent<T>(T data, string saveName)
-        {
-            var fileName = typeof(T).Name;
-            var path = Path.Combine(Application.persistentDataPath, saveName, fileName);
-            var directory = Path.GetDirectoryName(path);
-            if (!Directory.Exists(directory)) Directory.CreateDirectory(directory);
-
-            string json = JsonUtility.ToJson(data, true);
-            File.WriteAllText(path, json);
-        }
-        
         public static void SavePersistent(object data, string saveName)
         {
             var fileName = data.GetType().Name;

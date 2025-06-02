@@ -147,5 +147,18 @@ namespace Exerussus._1Extensions.Scripts.Extensions
         {
             return new Vector2(vector.x + offsetX, vector.y + offsetY);
         }
+        
+        /// <summary>
+        /// Возвращает вектор с смещением.
+        /// </summary>
+        /// <param name="vector">Вектор.</param>
+        /// <param name="offsetX">Смещение по оси X.</param>
+        /// <param name="offsetY">Смещение по оси Y.</param>
+        /// <returns>Вектор с смещением.</returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static Vector2 WithOffset(this Vector2 vector, Vector2 offset)
+        {
+            return new Vector2(vector.x + offset.x, vector.y + offset.x);
+        }
     }
 }
