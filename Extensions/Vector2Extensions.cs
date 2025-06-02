@@ -136,12 +136,12 @@ namespace Exerussus._1Extensions.Scripts.Extensions
         }
         
         /// <summary>
-        /// Возвращает вектор с смещением.
+        /// Возвращает вектор со смещением.
         /// </summary>
         /// <param name="vector">Вектор.</param>
         /// <param name="offsetX">Смещение по оси X.</param>
         /// <param name="offsetY">Смещение по оси Y.</param>
-        /// <returns>Вектор с смещением.</returns>
+        /// <returns>Вектор со смещением.</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Vector2 WithOffset(this Vector2 vector, float offsetX, float offsetY)
         {
@@ -149,12 +149,11 @@ namespace Exerussus._1Extensions.Scripts.Extensions
         }
         
         /// <summary>
-        /// Возвращает вектор с смещением.
+        /// Возвращает вектор со смещением.
         /// </summary>
         /// <param name="vector">Вектор.</param>
-        /// <param name="offsetX">Смещение по оси X.</param>
-        /// <param name="offsetY">Смещение по оси Y.</param>
-        /// <returns>Вектор с смещением.</returns>
+        /// <param name="offset">Смещение.</param>
+        /// <returns>Вектор со смещением.</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Vector2 WithOffset(this Vector2 vector, Vector2 offset)
         {
