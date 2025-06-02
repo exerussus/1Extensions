@@ -134,5 +134,18 @@ namespace Exerussus._1Extensions.Scripts.Extensions
             var y = origin.y + (Random.value * 2f - 1f) * length;
             return new Vector2(x, y);
         }
+        
+        /// <summary>
+        /// Возвращает вектор с смещением.
+        /// </summary>
+        /// <param name="vector">Вектор.</param>
+        /// <param name="offsetX">Смещение по оси X.</param>
+        /// <param name="offsetY">Смещение по оси Y.</param>
+        /// <returns>Вектор с смещением.</returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static Vector2 WithOffset(this Vector2 vector, float offsetX, float offsetY)
+        {
+            return new Vector2(vector.x + offsetX, vector.y + offsetY);
+        }
     }
 }
