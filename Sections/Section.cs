@@ -7,14 +7,14 @@ namespace Exerussus._1Extensions.Sections
     [Serializable]
     public abstract class Section
     {
-        protected Vector2 LeftBottomProtected { get ; set; }
-        protected Vector2 RightTopProtected { get ; set; }
+        protected abstract Vector2 LeftBottomProtected { get ; set; }
+        protected abstract Vector2 RightTopProtected { get ; set; }
         
-        public Vector2 CenterPosition { get ; protected set; }
-        public Vector2 BottomCenter { get ; protected set; }
-        public Vector2 TopCenter { get ; protected set; }
-        public Vector2 LeftCenter { get ; protected set; }
-        public Vector2 RightCenter { get ; protected set; }
+        public abstract Vector2 CenterPosition { get ; protected set; }
+        public abstract Vector2 BottomCenter { get ; protected set; }
+        public abstract Vector2 TopCenter { get ; protected set; }
+        public abstract Vector2 LeftCenter { get ; protected set; }
+        public abstract Vector2 RightCenter { get ; protected set; }
         
         public Vector2 LeftBottom
         {
