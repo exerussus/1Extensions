@@ -29,10 +29,10 @@ namespace Exerussus._1Extensions.Serialization
                 Debug.LogError($"Ошибка при удалении файлов в папке '{path}': {e.Message}");
             }
         }
-        
-        public static async Task SavePersistentAsync<T>(T data, string saveName)
+
+        public static async Task SavePersistentAsync(object data, string saveName)
         {
-            var fileName = typeof(T).Name;
+            var fileName = data.GetType().Name;
             var path = Path.Combine(Application.persistentDataPath, saveName, fileName);
             var directory = Path.GetDirectoryName(path);
             if (!Directory.Exists(directory)) Directory.CreateDirectory(directory);
@@ -41,7 +41,7 @@ namespace Exerussus._1Extensions.Serialization
             await File.WriteAllTextAsync(path, json);
         }
         
-        public static async Task SavePersistentAsync<T>(T data, string saveName, string fileName)
+        public static async Task SavePersistentAsync(object data, string saveName, string fileName)
         {
             var path = Path.Combine(Application.persistentDataPath, saveName, fileName);
             var directory = Path.GetDirectoryName(path);
@@ -51,32 +51,27 @@ namespace Exerussus._1Extensions.Serialization
             await File.WriteAllTextAsync(path, json);
         }
         
-        public static async Task<(bool result, T asset)> LoadPersistentAsync<T>(string saveName, string fileName)
+        public static async Task<(bool result, T asset)> LoadPersistentAsync<T>(T data, string saveName)
         {
-            var path = Path.Combine(Application.persistentDataPath, saveName, fileName);
-            
-            if (!File.Exists(path))
-            {
-                Debug.LogWarning($"Файл {fileName} не найден в файлах сохранения {saveName}.");
-                return (false, default);
-            }
-
-            try
-            {
-                string json = await File.ReadAllTextAsync(path);
-                T asset = JsonUtility.FromJson<T>(json);
-                return (true, asset);
-            }
-            catch (Exception e)
-            {
-                Debug.LogError($"Не удалось загрузить файл {fileName}: {e.Message}");
-                return (false, default);
-            }
+            var result = await LoadPersistentAsync(typeof(T), saveName);
+            return (result.result, (T)result.asset);
         }
         
         public static async Task<(bool result, T asset)> LoadPersistentAsync<T>(string saveName)
         {
-            var fileName = typeof(T).Name;
+            var result = await LoadPersistentAsync(typeof(T), saveName);
+            return (result.result, (T)result.asset);
+        }
+        
+        public static async Task<(bool result, T asset)> LoadPersistentAsync<T>(string saveName, string fileName)
+        {
+            var result = await LoadPersistentAsync(typeof(T), saveName, fileName);
+            return (result.result, (T)result.asset);
+        }
+        
+        public static async Task<(bool result, object asset)> LoadPersistentAsync(Type type, string saveName)
+        {
+            var fileName = type.Name;
             var path = Path.Combine(Application.persistentDataPath, saveName, fileName);
             
             if (!File.Exists(path))
@@ -88,13 +83,36 @@ namespace Exerussus._1Extensions.Serialization
             try
             {
                 string json = await File.ReadAllTextAsync(path);
-                T asset = JsonUtility.FromJson<T>(json);
+                object asset = JsonUtility.FromJson(json, type);
                 return (true, asset);
             }
             catch (Exception e)
             {
                 Debug.LogError($"Не удалось загрузить файл {fileName}: {e.Message}");
+                return (false, null);
+            }
+        }
+        
+        public static async Task<(bool result, object asset)> LoadPersistentAsync(Type type, string saveName, string fileName)
+        {
+            var path = Path.Combine(Application.persistentDataPath, saveName, fileName);
+            
+            if (!File.Exists(path))
+            {
+                Debug.LogWarning($"Файл {fileName} не найден в файлах сохранения {saveName}.");
                 return (false, default);
+            }
+
+            try
+            {
+                string json = await File.ReadAllTextAsync(path);
+                object asset = JsonUtility.FromJson(json, type);
+                return (true, asset);
+            }
+            catch (Exception e)
+            {
+                Debug.LogError($"Не удалось загрузить файл {fileName}: {e.Message}");
+                return (false, null);
             }
         }
         
@@ -109,9 +127,32 @@ namespace Exerussus._1Extensions.Serialization
             File.WriteAllText(path, json);
         }
         
+        public static void SavePersistent(object data, string saveName)
+        {
+            var fileName = data.GetType().Name;
+            var path = Path.Combine(Application.persistentDataPath, saveName, fileName);
+            var directory = Path.GetDirectoryName(path);
+            if (!Directory.Exists(directory)) Directory.CreateDirectory(directory);
+
+            string json = JsonUtility.ToJson(data, true);
+            File.WriteAllText(path, json);
+        }
+        
+        public static bool TryLoadAndSetPersistent<T>(ref T data, string saveName, string fileName)
+        {
+            var result = LoadPersistent<T>(saveName, fileName);
+            if (result.result) data = result.asset;
+            return result.result;
+        }
+
         public static (bool result, T asset) LoadPersistent<T>(string saveName)
         {
             var fileName = typeof(T).Name;
+            return LoadPersistent<T>(saveName, fileName);
+        }
+
+        public static (bool result, T asset) LoadPersistent<T>(string saveName, string fileName)
+        {
             var path = Path.Combine(Application.persistentDataPath, saveName, fileName);
             
             if (!File.Exists(path))
@@ -168,9 +209,9 @@ namespace Exerussus._1Extensions.Serialization
             }
         }
         
-        public static void SaveStreaming<T>(T data, string saveName)
+        public static void SaveStreaming(object data, string saveName)
         {
-            var fileName = typeof(T).Name;
+            var fileName = data.GetType().Name;
             var path = Path.Combine(Application.streamingAssetsPath, saveName, fileName);
             var directory = Path.GetDirectoryName(path);
             if (!Directory.Exists(directory)) Directory.CreateDirectory(directory);
@@ -181,7 +222,13 @@ namespace Exerussus._1Extensions.Serialization
         
         public static (bool result, T asset) LoadStreaming<T>(string saveName)
         {
-            var fileName = typeof(T).Name;
+            var result = LoadStreaming(typeof(T), saveName);
+            return (result.result, (T)result.asset);
+        }
+        
+        public static (bool result, object asset) LoadStreaming(Type type, string saveName)
+        {
+            var fileName = type.Name;
             var path = Path.Combine(Application.streamingAssetsPath, saveName, fileName);
             
             if (!File.Exists(path))
@@ -193,7 +240,7 @@ namespace Exerussus._1Extensions.Serialization
             try
             {
                 string json = File.ReadAllText(path);
-                T asset = JsonUtility.FromJson<T>(json);
+                object asset = JsonUtility.FromJson(json, type);
                 return (true, asset);
             }
             catch (Exception e)
