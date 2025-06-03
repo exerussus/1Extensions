@@ -159,5 +159,30 @@ namespace Exerussus._1Extensions.Scripts.Extensions
         {
             return new Vector2(vector.x + offset.x, vector.y + offset.x);
         }
+        
+        /// <summary>
+        /// Возвращает вектор со смещением.
+        /// </summary>
+        /// <param name="vector">Вектор.</param>
+        /// <param name="offsetX">Смещение по оси X.</param>
+        /// <param name="offsetY">Смещение по оси Y.</param>
+        /// <returns>Вектор со смещением.</returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static Vector2Int WithOffset(this Vector2Int vector, int offsetX, int offsetY)
+        {
+            return new Vector2Int(vector.x + offsetX, vector.y + offsetY);
+        }
+        
+        /// <summary>
+        /// Возвращает вектор со смещением.
+        /// </summary>
+        /// <param name="vector">Вектор.</param>
+        /// <param name="offset">Смещение.</param>
+        /// <returns>Вектор со смещением.</returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static Vector2Int WithOffset(this Vector2Int vector, Vector2Int offset)
+        {
+            return new Vector2Int(vector.x + offset.x, vector.y + offset.x);
+        }
     }
 }
