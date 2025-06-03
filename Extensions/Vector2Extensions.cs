@@ -98,27 +98,27 @@ namespace Exerussus._1Extensions.Scripts.Extensions
         {
             var angle = Random.value * TwoPI;
             var dist = Mathf.Sqrt(Random.value) * radius;
-
-            FastSinCos(angle, out var sin, out var cos);
-
-            return new Vector2(
-                origin.x + cos * dist,
-                origin.y + sin * dist
-            );
+            return new Vector2(origin.x + FastCos(angle) * dist, origin.y + FastSin(angle) * dist);
         }        
         
         /// <summary>
-        /// Быстрая аппроксимация синуса и косинуса.
+        /// Быстрая аппроксимация синуса.
         /// </summary>
         /// <param name="x">Угол в радианах.</param>
-        /// <param name="sin">Рассчитанное значение синуса.</param>
-        /// <param name="cos">Рассчитанное значение косинуса.</param>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static void FastSinCos(float x, out float sin, out float cos)
+        private static float FastSin(float x)
         {
             var x2 = x * x;
-            sin = x * (1f - 0.16605f * x2);
-            cos = 1f - 0.5f * x2;
+            return x * (1f - 0.16605f * x2);
+        }    
+        
+        /// <summary> Быстрая аппроксимация косинуса. </summary>
+        /// <param name="x">Угол в радианах.</param>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private static float FastCos(float x)
+        {
+            var x2 = x * x;
+            return 1f - 0.5f * x2;
         }
         
         /// <summary>
@@ -127,7 +127,6 @@ namespace Exerussus._1Extensions.Scripts.Extensions
         /// <param name="origin">Центр квадрата.</param>
         /// <param name="length">Половина длины стороны квадрата. Должен быть неотрицательным.</param>
         /// <returns>Случайная точка внутри квадрата.</returns>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Vector2 GetRandomPointInQuad(this Vector2 origin, float length)
         {
             var x = origin.x + (Random.value * 2f - 1f) * length;
@@ -142,7 +141,6 @@ namespace Exerussus._1Extensions.Scripts.Extensions
         /// <param name="offsetX">Смещение по оси X.</param>
         /// <param name="offsetY">Смещение по оси Y.</param>
         /// <returns>Вектор со смещением.</returns>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Vector2 WithOffset(this Vector2 vector, float offsetX, float offsetY)
         {
             return new Vector2(vector.x + offsetX, vector.y + offsetY);
@@ -154,7 +152,6 @@ namespace Exerussus._1Extensions.Scripts.Extensions
         /// <param name="vector">Вектор.</param>
         /// <param name="offset">Смещение.</param>
         /// <returns>Вектор со смещением.</returns>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Vector2 WithOffset(this Vector2 vector, Vector2 offset)
         {
             return new Vector2(vector.x + offset.x, vector.y + offset.y);
@@ -167,7 +164,6 @@ namespace Exerussus._1Extensions.Scripts.Extensions
         /// <param name="offsetX">Смещение по оси X.</param>
         /// <param name="offsetY">Смещение по оси Y.</param>
         /// <returns>Вектор со смещением.</returns>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Vector2Int WithOffset(this Vector2Int vector, int offsetX, int offsetY)
         {
             return new Vector2Int(vector.x + offsetX, vector.y + offsetY);
@@ -179,10 +175,41 @@ namespace Exerussus._1Extensions.Scripts.Extensions
         /// <param name="vector">Вектор.</param>
         /// <param name="offset">Смещение.</param>
         /// <returns>Вектор со смещением.</returns>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Vector2Int WithOffset(this Vector2Int vector, Vector2Int offset)
         {
             return new Vector2Int(vector.x + offset.x, vector.y + offset.y);
+        }
+        
+        public static Vector2 Abs(this Vector2 vector)
+        {
+            return new Vector2(Mathf.Abs(vector.x), Mathf.Abs(vector.y));
+        }
+
+        public static Vector3 Abs(this Vector3 vector)
+        {
+            return new Vector3(Mathf.Abs(vector.x), Mathf.Abs(vector.y), Mathf.Abs(vector.z));
+        }
+
+        public static Vector2Int Abs(this Vector2Int vector)
+        {
+            return new Vector2Int(Mathf.Abs(vector.x), Mathf.Abs(vector.y));
+        }
+
+        public static Vector3Int Abs(this Vector3Int vector)
+        {
+            return new Vector3Int(Mathf.Abs(vector.x), Mathf.Abs(vector.y), Mathf.Abs(vector.z));
+        }
+        
+        /// <summary> Возвращает вектор с обмененными значения X и Y. </summary>
+        public static Vector2 Swap(this Vector2 vector)
+        {
+            return new Vector2(vector.y, vector.x);
+        }
+
+        /// <summary> Возвращает вектор с обмененными значения X и Y. </summary>
+        public static Vector2Int Swap(this Vector2Int vector)
+        {
+            return new Vector2Int(vector.y, vector.x);
         }
     }
 }
