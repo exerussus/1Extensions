@@ -157,7 +157,7 @@ namespace Exerussus._1Extensions.Scripts.Extensions
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Vector2 WithOffset(this Vector2 vector, Vector2 offset)
         {
-            return new Vector2(vector.x + offset.x, vector.y + offset.x);
+            return new Vector2(vector.x + offset.x, vector.y + offset.y);
         }
         
         /// <summary>
@@ -182,7 +182,7 @@ namespace Exerussus._1Extensions.Scripts.Extensions
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Vector2Int WithOffset(this Vector2Int vector, Vector2Int offset)
         {
-            return new Vector2Int(vector.x + offset.x, vector.y + offset.x);
+            return new Vector2Int(vector.x + offset.x, vector.y + offset.y);
         }
     }
 }
