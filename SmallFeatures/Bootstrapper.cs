@@ -11,13 +11,16 @@ namespace Exerussus._1Extensions.SmallFeatures
     public class Bootstrapper : MonoBehaviour
     {
         [SerializeField] private StartType startType = StartType.Awake;
-        
+
+        public bool safeMode = true;
         public bool destroyGameObjectOnDone = true;
         public bool enableWarnings = true;
         public bool enableErrors = true;
         public List<BootstrapStage> initializeQueue = new();
         
-        private readonly List<IInitializable> _current = new();
+        [ReadOnly, FoldoutGroup("DEBUG")] public List<BootstrapStage> initializeQueueProcess = new();
+        [ReadOnly, FoldoutGroup("DEBUG"), ShowInInspector] private List<IInitializable> _current = new();
+        
         private readonly HashSet<IInitializable> _tempNewInits = new();
         private readonly HashSet<IInitializable> _timeoutObjects = new();
         private readonly HashSet<IInitializable> _totalObjects = new();
@@ -60,9 +63,10 @@ namespace Exerussus._1Extensions.SmallFeatures
                 if (_isStarted) return;
                 _isStarted = true;
                 OnPreInitialize();
-                if (TryDestroy()) return;
+                
+                initializeQueueProcess = new List<BootstrapStage>(initializeQueue);
 
-                foreach (var bootstrapStage in initializeQueue)
+                foreach (var bootstrapStage in initializeQueueProcess)
                 {
                     if (bootstrapStage.objects is not { Count: > 0 }) continue;
                     foreach (var obj in bootstrapStage.objects)
@@ -71,6 +75,7 @@ namespace Exerussus._1Extensions.SmallFeatures
                     }
                 }
                 
+                if (TryDestroy()) return;
                 OnStarted?.Invoke(_totalObjects.Count);
                 Next();
             }
@@ -119,9 +124,9 @@ namespace Exerussus._1Extensions.SmallFeatures
 
         private void Next()
         {
-            if (initializeQueue.Count == 0) return;
+            if (initializeQueueProcess.Count == 0) return;
 
-            var stage = initializeQueue.PopFirst();
+            var stage = initializeQueueProcess.PopFirst();
             if (stage?.objects == null) return;
 
             _awaitTimeout = stage.customTimeout > 0 ? Time.time + stage.customTimeout : float.MaxValue;
@@ -136,21 +141,28 @@ namespace Exerussus._1Extensions.SmallFeatures
             
             foreach (var initializable in _current)
             {
-                try
+                if (safeMode)
+                {
+                    try
+                    {
+                        initializable.Initialize();
+                    }
+                    catch (Exception e)
+                    {
+                        if (enableErrors) Debug.LogError(e);
+                        OnError?.Invoke(e);
+                    }
+                }
+                else
                 {
                     initializable.Initialize();
-                }
-                catch (Exception e)
-                {
-                    if (enableErrors) Debug.LogError(e);
-                    OnError?.Invoke(e);
                 }
             }
         }
 
         private bool TryDestroy()
         {
-            if (initializeQueue.Count == 0)
+            if (initializeQueueProcess.Count == 0)
             {
                 OnAllInitialized?.Invoke();
                 OnPostInitialize();

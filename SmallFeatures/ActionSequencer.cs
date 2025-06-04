@@ -36,6 +36,14 @@ namespace Exerussus._1Extensions.SmallFeatures
             var sequence = _dict[id];
             sequence.Enqueue(new SequenceAction(action, sequence.BaseDelay));
         }
+        
+        /// <summary> Обнуляет текущую задержку между событиями. </summary>
+        /// <param name="id">Уникальный ID последовательности выданный после её создания.</param>
+        public void ClearDelay(int id)
+        {
+            var sequence = _dict[id];
+            sequence.NextUpdateTime = 0;
+        }
 
         /// <summary> Добавляет событие в последовательность с указанной задержкой. </summary>
         /// <param name="id">Уникальный ID последовательности выданный после её создания.</param>
@@ -150,7 +158,13 @@ namespace Exerussus._1Extensions.SmallFeatures
             _sequencer.AddToSequence(_id, action);
             return this;
         }
-
+        
+        /// <summary> Обнуляет текущую задержку между событиями. </summary>
+        public SequenceCommander ClearDelay()
+        {
+            _sequencer.ClearDelay(_id);
+            return this;
+        }
         
         /// <summary> Добавляет событие в последовательность с базовой задержкой. </summary>
         /// <param name="delay">Задержка после данного события.</param>
