@@ -22,5 +22,7 @@ namespace Exerussus._1Extensions.SmallFeatures
 
             return result;
         }
+        
+        public static long GetStableLongId(this string input) => GetStableId(input);
     }
 }
