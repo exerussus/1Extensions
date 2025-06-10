@@ -8,8 +8,15 @@ namespace Exerussus._1Extensions.Scripts.Extensions
         /// <summary> Бросает рандом между 1 и 100 включительно. </summary>
         /// <param name="value">Текущий шанс.</param>
         /// <returns>True, если выпало значение меньше или равное value</returns>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool Roll100(this int value)
+        {
+            return Random.Range(1, 101) <= value;
+        }
+        
+        /// <summary> Бросает рандом между 1 и 100 включительно. </summary>
+        /// <param name="value">Текущий шанс.</param>
+        /// <returns>True, если выпало значение меньше или равное value</returns>
+        public static bool Roll100(this float value)
         {
             return Random.Range(1, 101) <= value;
         }
