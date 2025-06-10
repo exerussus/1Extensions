@@ -42,7 +42,7 @@ namespace Exerussus._1Extensions.SignalSystem
         }
         
         /// <summary> Вызывает сигнал с фильтрацией по long id. </summary>
-        public void RegistryRaiseLong<T>(long id, T data) where T : struct
+        public void RegistryRaiseFilter<T>(long id, T data) where T : struct
         {
             var type = typeof(T);
             if (IsLogEnabled) Debug.Log($"{type}");
