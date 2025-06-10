@@ -20,6 +20,7 @@ namespace Exerussus._1Extensions.SignalSystem
         private Dictionary<Type, object> _shotListeners = new Dictionary<Type, object>();
         private Dictionary<Type, object> _shotLstnrWithIds = new Dictionary<Type, object>();
         private Dictionary<Type, object> _cancelableListeners = new();
+        private Dictionary<Type, object> _longListeners = new();
         
         /// <summary> Вызывает сигнал. </summary>
         public void RegistryRaise<T>(T data) where T : struct
@@ -39,7 +40,24 @@ namespace Exerussus._1Extensions.SignalSystem
 
             FindAndInvokeAction(ref data, type);
         }
+        
+        /// <summary> Вызывает сигнал с фильтрацией по long id. </summary>
+        public void RegistryRaiseLong<T>(long id, T data) where T : struct
+        {
+            var type = typeof(T);
+            if (IsLogEnabled) Debug.Log($"{type}");
 
+            if (!_listeners.TryGetValue(type, out var longDict)) return;
+            
+            var longs = (Dictionary<long, List<Action<T>>>)longDict;
+            if (!longs.TryGetValue(id, out var actions)) return;
+            
+            for (var index = actions.Count - 1; index >= 0; index--)
+            {
+                actions[index].Invoke(data);
+            }
+        }
+        
         private void FindAndInvokeAction<T>(ref T data, Type type) where T : struct
         {
             if (_listeners.TryGetValue(type, out var actionList))
@@ -215,6 +233,33 @@ namespace Exerussus._1Extensions.SignalSystem
             var type = typeof(T);
             if (!_listeners.TryGetValue(type, out var actionList) || actionList is not List<Action<T>> list) _listeners[type] = list = new List<Action<T>>();
             list.Add(action);
+        }
+
+        public void SubscribeFilter<T>(long id, Action<T> action) where T : struct
+        {
+            var type = typeof(T);
+            
+            if (!_longListeners.TryGetValue(type, out var raw) || raw is not Dictionary<long, List<Action<T>>> dict)
+            {
+                dict = new Dictionary<long, List<Action<T>>>();
+                _longListeners[type] = dict;
+            }
+
+            if (!dict.TryGetValue(id, out var listeners))
+            {
+                listeners = new List<Action<T>>();
+                dict[id] = listeners;
+            }
+            
+            listeners.Add(action);
+        }
+
+        public void UnsubscribeFilter<T>(long id, Action<T> action) where T : struct
+        {
+            var type = typeof(T);
+            if (!_longListeners.TryGetValue(type, out var raw)) return;
+            var dict = (Dictionary<long, List<Action<T>>>)raw;
+            if (dict.TryGetValue(id, out var actions)) actions.Remove(action);
         }
 
         public void SubscribeShot<T>(Action<T> action) where T : struct
