@@ -34,6 +34,13 @@ namespace Exerussus._1Extensions.Scripts.Extensions
             return dictionary.Remove(key, out item);
         }  
         
+        /// <summary> Очищает лист и заполняет его элементами из массива. </summary>
+        public static void ResetWith<T>(this List<T> list, T[] source)
+        {
+            list.Clear();
+            list.AddRange(source);
+        }
+        
         /// <summary>
         /// Устанавливает newItem по ключу, и возвращает старый, если был.
         /// </summary>
