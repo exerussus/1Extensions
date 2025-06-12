@@ -21,6 +21,26 @@ namespace Exerussus._1Extensions.Scripts.Extensions
             return Random.Range(1, 101) <= value;
         }
 
+        /// <summary> Бросает детерминированный рандом между 1 и 100 включительно, используя seed. </summary>
+        /// <param name="value">Текущий шанс.</param>
+        /// <param name="seed">Зерно для генерации рандома.</param>
+        /// <returns>True, если выпало значение меньше или равное value</returns>
+        public static bool Roll100(this int value, int seed)
+        {
+            var random = new System.Random(seed);
+            return random.Next(1, 101) <= value;
+        }
+
+        /// <summary> Бросает детерминированный рандом между 1 и 100 включительно, используя seed. </summary>
+        /// <param name="value">Текущий шанс.</param>
+        /// <param name="seed">Зерно для генерации рандома.</param>
+        /// <returns>True, если выпало значение меньше или равное value</returns>
+        public static bool Roll100(this float value, int seed)
+        {
+            var random = new System.Random(seed);
+            return random.Next(1, 101) <= value;
+        }
+
         /// <summary> Бросает рандом между 1 и 100 включительно несколько раз. </summary>
         /// <param name="value">Текущий шанс.</param>
         /// <param name="rollTimes">Сколько раз кидается ролл.</param>

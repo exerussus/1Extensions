@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Reflection;
 using Exerussus._1Extensions.SmallFeatures;
-using UnityEngine;
 
 namespace Exerussus._1EasyEcs.Scripts.Core
 {
