@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Security.Cryptography;
 using System.Text;
 
@@ -6,6 +7,8 @@ namespace Exerussus._1Extensions.SmallFeatures
 {
     public static class StringToStableLongId
     {
+        private static Dictionary<long, string> _dictionary = new();
+        
         /// <summary>
         /// Возвращает стабильный уникальный long-идентификатор для строки.
         /// Использует SHA256. Идентификатор не зависит от платформы или времени запуска.
@@ -23,6 +26,13 @@ namespace Exerussus._1Extensions.SmallFeatures
             return result;
         }
         
-        public static long GetStableLongId(this string input) => GetStableId(input);
+        public static long GetStableLongId(this string input)
+        {
+            var result = GetStableId(input);
+            _dictionary[result] = input;
+            return result;
+        }
+        
+        public static bool TryGetString(this long id, out string result) => _dictionary.TryGetValue(id, out result);
     }
 }
