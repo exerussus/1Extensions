@@ -33,6 +33,6 @@ namespace Exerussus._1Extensions.SmallFeatures
             return result;
         }
         
-        public static bool TryGetString(this long id, out string result) => _dictionary.TryGetValue(id, out result);
+        public static bool TryGetStringFromStableId(this long id, out string result) => _dictionary.TryGetValue(id, out result);
     }
 }
