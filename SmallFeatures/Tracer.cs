@@ -13,7 +13,9 @@ namespace Exerussus._1Extensions.SmallFeatures
 
         public static Trace Start(string prefix = Tracer.DefaultPrefix)
         {
-            if (!Traces.TryDequeue(out var trace)) trace = new Trace();
+            Trace trace;
+            lock (Traces) Traces.TryDequeue(out trace);
+            if (trace == null) trace = new Trace();
             
             trace.Prefix = prefix;
             Debug.Log($"{trace.Prefix} | Tracing started. | {Time.realtimeSinceStartup}");
@@ -22,7 +24,9 @@ namespace Exerussus._1Extensions.SmallFeatures
 
         public static Trace StartIf(bool isEnabled, string prefix = Tracer.DefaultPrefix)
         {
-            if (!Traces.TryDequeue(out var trace)) trace = new Trace();
+            Trace trace;
+            lock (Traces) Traces.TryDequeue(out trace);
+            if (trace == null) trace = new Trace();
             
             trace.Prefix = prefix;
             trace.BlockLogs = !isEnabled;
@@ -32,7 +36,9 @@ namespace Exerussus._1Extensions.SmallFeatures
 
         public static Trace Start(UnityEngine.Object context, string prefix = Tracer.DefaultPrefix)
         {
-            if (!Traces.TryDequeue(out var trace)) trace = new Trace();
+            Trace trace;
+            lock (Traces) Traces.TryDequeue(out trace);
+            if (trace == null) trace = new Trace();
             
             trace.Prefix = prefix;
             Debug.Log($"{trace.Prefix} | Tracing started. | {Time.realtimeSinceStartup}", context);
@@ -41,7 +47,9 @@ namespace Exerussus._1Extensions.SmallFeatures
 
         public static Trace StartIf(UnityEngine.Object context, bool isEnabled, string prefix = Tracer.DefaultPrefix)
         {
-            if (!Traces.TryDequeue(out var trace)) trace = new Trace();
+            Trace trace;
+            lock (Traces) Traces.TryDequeue(out trace);
+            if (trace == null) trace = new Trace();
             
             trace.Prefix = prefix;
             trace.BlockLogs = !isEnabled;
@@ -75,7 +83,7 @@ namespace Exerussus._1Extensions.SmallFeatures
             public bool BlockLogs;
             private int _count;
             private bool _disableLog;
-            
+            private bool _isEnded;
 
             public Trace Ping(string message = "")
             {
@@ -93,16 +101,23 @@ namespace Exerussus._1Extensions.SmallFeatures
 
             public void End()
             {
+                _isEnded = true;
                 if (!BlockLogs) Debug.Log($"{Prefix} | Tracing end. | {Time.realtimeSinceStartup}");
-                _count = 0;
-                _disableLog = false;
-                BlockLogs = false;
-                Traces.Enqueue(this);
+                Clear();
             }
         
             public void Dispose()
             {
-                End();
+                if (!_isEnded) Debug.LogWarning($"{Prefix} | Tracing not ended. | {Time.realtimeSinceStartup}");
+                Clear();
+            }
+
+            private void Clear()
+            {
+                _count = 0;
+                _disableLog = false;
+                BlockLogs = false;
+                lock (Traces) Traces.Enqueue(this);
             }
         }
     }
