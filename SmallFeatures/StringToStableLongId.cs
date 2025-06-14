@@ -8,6 +8,7 @@ namespace Exerussus._1Extensions.SmallFeatures
     public static class StringToStableLongId
     {
         private static Dictionary<long, string> _dictionary = new();
+        private const string UnknownEntity = "unknown";
         
         /// <summary>
         /// Возвращает стабильный уникальный long-идентификатор для строки.
@@ -34,5 +35,6 @@ namespace Exerussus._1Extensions.SmallFeatures
         }
         
         public static bool TryGetStringFromStableId(this long id, out string result) => _dictionary.TryGetValue(id, out result);
+        public static string ToStringFromStableId(this long id) => _dictionary.GetValueOrDefault(id, UnknownEntity);
     }
 }
