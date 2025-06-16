@@ -312,6 +312,17 @@ namespace Exerussus._1Extensions.Scripts.Extensions
         }
         
         /// <summary>
+        /// Получает случайный элемент из списка.
+        /// </summary>
+        /// <param name="collection">Список, из которого нужно выбрать случайный элемент.</param>
+        /// <returns>Случайный элемент из списка.</returns>
+        public static T GetRandomItem<T>(this IReadOnlyList<T> collection)
+        {
+            var rValue = Random.Range(0, collection.Count);
+            return collection[rValue];
+        }
+        
+        /// <summary>
         /// Добавляет элементы из другого массива в список, избегая дублирования.
         /// </summary>
         /// <param name="list">Список, в который нужно добавить элементы.</param>
