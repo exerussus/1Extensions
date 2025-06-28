@@ -10,10 +10,12 @@ namespace Exerussus._1Extensions.SmallFeatures
     {
         /// <param name="prefix">приписка к логам</param>
         /// <param name="logLevel">уровень логирования</param>
-        public JobHandler(string prefix, LogLevel logLevel)
+        /// <param name="isProtected"></param>
+        public JobHandler(string prefix, LogLevel logLevel, bool isProtected = true)
         {
             _prefix = prefix;
             _logLevel = (int)logLevel;
+            _isProtected = isProtected;
         }
 
         private readonly string _prefix;
@@ -21,6 +23,7 @@ namespace Exerussus._1Extensions.SmallFeatures
         private readonly List<Job> _jobQueue = new();
         private readonly List<AsyncJob> _asyncJobQueue = new();
         private readonly List<AsyncJob> _asyncJobDone = new();
+        private readonly bool _isProtected;
         private float _time;
         
         public void AddJob(Action action, string comment, float delay = 0)
@@ -99,25 +102,35 @@ namespace Exerussus._1Extensions.SmallFeatures
             var job = _asyncJobQueue[index];
             _asyncJobQueue.RemoveAt(index);
 
-            try
+            if (_isProtected)
+            {
+                try
+                {
+                    job.Action.Invoke();
+#if UNITY_EDITOR
+                    if (_logLevel > 1) Debug.Log($"JobHandler | Выполнена задача : {job.Comment}");
+#endif
+                }
+                catch (Exception e)
+                {
+                    if (_logLevel > 0)
+                        Debug.LogError($"ERROR ! {_prefix} | JobHandler | Ошибка при выполнении асинхронной задачи! |" +
+
+#if UNITY_EDITOR
+                                       $" Comment : {job.Comment}." +
+#endif
+
+                                       $" Детали:\n{e}");
+                }
+                finally
+                {
+                    job.IsDone = true;
+                    _asyncJobDone.Add(job);
+                }
+            }
+            else
             {
                 job.Action.Invoke();
-#if UNITY_EDITOR
-                if (_logLevel > 1) Debug.Log($"JobHandler | Выполнена задача : {job.Comment}");
-#endif
-            }
-            catch (Exception e)
-            {
-                if (_logLevel > 0) Debug.LogError($"ERROR ! {_prefix} | JobHandler | Ошибка при выполнении асинхронной задачи! |" +
-                                                          
-#if UNITY_EDITOR
-                                                  $" Comment : {job.Comment}." +
-#endif
-                                                  
-                                                  $" Детали:\n{e}");
-            }
-            finally
-            {
                 job.IsDone = true;
                 _asyncJobDone.Add(job);
             }
@@ -127,23 +140,32 @@ namespace Exerussus._1Extensions.SmallFeatures
         {
             var job = _jobQueue[index];
             _jobQueue.RemoveAt(index);
+            
+            if (_isProtected)
+            {
 
-            try
+                try
+                {
+                    job.Action.Invoke();
+#if UNITY_EDITOR
+                    if (_logLevel > 1) Debug.Log($"JobHandler | Выполнена задача : {job.Comment}");
+#endif
+                }
+                catch (Exception e)
+                {
+                    if (_logLevel > 0)
+                        Debug.LogError($"ERROR ! {_prefix} | JobHandler | Ошибка при выполнении задачи! |" +
+
+#if UNITY_EDITOR
+                                       $" Comment : {job.Comment}." +
+#endif
+
+                                       $" Детали:\n{e}");
+                }
+            }
+            else
             {
                 job.Action.Invoke();
-#if UNITY_EDITOR
-                if (_logLevel > 1) Debug.Log($"JobHandler | Выполнена задача : {job.Comment}");
-#endif
-            }
-            catch (Exception e)
-            {
-                if (_logLevel > 0) Debug.LogError($"ERROR ! {_prefix} | JobHandler | Ошибка при выполнении задачи! |" +
-                                                  
-#if UNITY_EDITOR
-                                                  $" Comment : {job.Comment}." +
-#endif
-                                                  
-                                                  $" Детали:\n{e}");
             }
         }
         
