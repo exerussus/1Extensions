@@ -5,11 +5,21 @@ namespace Exerussus._1Extensions
     public class ExerussusCore : MonoBehaviour
     {
         private static ExerussusCore _instance;
-        private static readonly object Lock = new object();
         private static event AwakeEvent OnAwake;
         private static event StartEvent OnStart;
         private static event UpdateEvent OnUpdate;
         
+        public static bool IsQuiting
+        {
+            get
+            {
+                Init();
+                return _instance._isQuiting;
+            }
+        }
+        
+        private bool _isQuiting;
+
         public static void AddOnAwake(AwakeEvent @event)
         {
             Init();
@@ -45,13 +55,14 @@ namespace Exerussus._1Extensions
 
         public static void Init()
         {
-            lock (Lock)
-            {
-                if (_instance != null) return;
+            if (_instance != null) return;
 
+            lock (_instance)
+            {
                 var go = new GameObject("[Exerussus Core]");
                 DontDestroyOnLoad(go);
                 _instance = go.AddComponent<ExerussusCore>();
+                Application.quitting += () => _instance._isQuiting = true; 
                 go.SetActive(true);
             }
         }
