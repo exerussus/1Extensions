@@ -4,6 +4,7 @@ namespace Exerussus._1Extensions
 {
     public class ExerussusCore : MonoBehaviour
     {
+        private static readonly object InstanceLock = new object();
         private static ExerussusCore _instance;
         private static event AwakeEvent OnAwake;
         private static event StartEvent OnStart;
@@ -57,7 +58,7 @@ namespace Exerussus._1Extensions
         {
             if (_instance != null) return;
 
-            lock (_instance)
+            lock (InstanceLock)
             {
                 var go = new GameObject("[Exerussus Core]");
                 DontDestroyOnLoad(go);
