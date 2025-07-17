@@ -19,6 +19,13 @@ namespace Exerussus._1Extensions.SmallFeatures
             _dict.Add(_freeId, new Sequence(delay));
             return _freeId;
         }
+        
+        /// <summary> Удаление секвенции по id. </summary>
+        /// <param name="id">Уникальный ID последовательности выданный после её создания.</param>
+        public void RemoveSequence(int id)
+        {
+            _dict.Remove(id);
+        }
 
         /// <summary> Изменяет базовую задержку между событиями. </summary>
         /// <param name="id">Уникальный ID последовательности выданный после её создания.</param>
@@ -150,7 +157,12 @@ namespace Exerussus._1Extensions.SmallFeatures
         private readonly int _id;
         private readonly ActionSequencer _sequencer;
         
-        
+        /// <summary> Удаление секвенции. После вызова дальнейшее использование текущего SequenceCommander будет невозможно. </summary>
+        public void RemoveSequence()
+        {
+            _sequencer.RemoveSequence(_id);
+        }
+
         /// <summary> Добавляет событие в последовательность с базовой задержкой. </summary>
         /// <param name="action">Событие.</param>
         public SequenceCommander AddToSequence(Action action)
@@ -174,8 +186,7 @@ namespace Exerussus._1Extensions.SmallFeatures
             _sequencer.AddToSequence(_id, delay, action);
             return this;
         }
-
-
+        
         /// <summary> Изменяет базовую задержку между событиями. </summary>
         /// <param name="delay">Задержка между событиями.</param>
         public SequenceCommander ChangeBaseDelay(float delay)
