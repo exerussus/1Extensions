@@ -6,7 +6,7 @@ using UnityEngine;
 namespace Exerussus._1Extensions.SmallFeatures
 {
     public abstract class Library<T> : ScriptableObject, ILibrary
-        where T : LibraryItem, new()
+        where T : ILibraryItem, new()
     {
         protected HashSet<string> _hashSet;
         protected Dictionary<string, T> _itemByTypeID;
@@ -141,16 +141,18 @@ namespace Exerussus._1Extensions.SmallFeatures
         }
     }
     
-    [Serializable]
-    public abstract class LibraryItem
+    public interface ILibraryItem
     {
         public abstract string TypeId { get; set; }
-        public long Id { get; private set; }
+        public long Id { get; protected set; }
 
-        public virtual void Initialize()
+        public void Initialize()
         {
             Id = TypeId.GetStableLongId();
+            OnInitialize();
         }
+        
+        public virtual void OnInitialize() {}
         public virtual void OnValidation() {}
     }
 
