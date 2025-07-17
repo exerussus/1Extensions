@@ -11,7 +11,7 @@ namespace Exerussus._1Extensions.SmallFeatures
         protected HashSet<string> _hashSet;
         protected Dictionary<string, T> _itemByTypeID;
         protected Dictionary<long, T> _itemByID;
-        public abstract List<T> Items { get; set; }
+        public abstract List<T> Items {  get; protected set; }
         public bool IsInitialized { get; protected set; }
         protected abstract string DefaultValue { get; }
         
