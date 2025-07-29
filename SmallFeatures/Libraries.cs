@@ -31,14 +31,14 @@ namespace Exerussus._1Extensions.SmallFeatures
         public virtual T GetOrDefault(string id)
         {
             if (TryGet(id, out var pack)) return pack;
-            Debug.LogWarning($"Libraries | {GetType().Name} | Не найден {id}, по умолчанию {DefaultValue}");
+            Debug.LogWarning($"Libraries | {GetType().Name} | Не найден {id}({id.GetStableLongId()}), по умолчанию {DefaultValue}");
             return Get(DefaultValue);
         }
          /// <summary> Use it runtime only. </summary>
         public virtual T GetOrDefault(long id)
         {
             if (TryGet(id, out var pack)) return pack;
-            Debug.LogWarning($"Libraries | {GetType().Name} | Не найден {id}, по умолчанию {DefaultValue}");
+            Debug.LogWarning($"Libraries | {GetType().Name} | Не найден {id.ToStringFromStableId()}({id}), по умолчанию {DefaultValue}");
             return Get(DefaultValue);
         }
          
