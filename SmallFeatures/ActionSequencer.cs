@@ -76,7 +76,24 @@ namespace Exerussus._1Extensions.SmallFeatures
         /// <returns>True, если все события выполнены.</returns>
         public bool IsDone(int id)
         {
-            return _dict[id].Count == 0;
+            var sequencer = _dict[id];
+            return sequencer.Count == 0 && sequencer.NextUpdateTime < Time.time;
+        }
+
+        /// <summary> Проверяет, есть ли задачи в очереди. </summary>
+        /// <param name="id">Уникальный ID последовательности выданный после её создания.</param>
+        /// <returns>True, если задачи есть.</returns>
+        public bool HasSequence(int id)
+        {
+            return _dict[id].Count > 0;
+        }
+
+        /// <summary> Проверяет, есть ли задержка после выполнения предыдущей задачи. </summary>
+        /// <param name="id">Уникальный ID последовательности выданный после её создания.</param>
+        /// <returns>True, если задержка есть.</returns>
+        public bool HasDelay(int id)
+        {
+            return _dict[id].NextUpdateTime > Time.time;
         }
 
         /// <summary> Проверка на блокировку. </summary>
@@ -198,6 +215,14 @@ namespace Exerussus._1Extensions.SmallFeatures
         /// <summary> Проверяет, закончилась ли последовательность. </summary>
         /// <returns>True, если все события выполнены.</returns>
         public bool IsDone() => _sequencer.IsDone(_id);
+
+        /// <summary> Проверяет, есть ли задержка после выполнения предыдущей задачи. </summary>
+        /// <returns>True, если задержка есть.</returns>
+        public bool HasDelay() => _sequencer.HasDelay(_id);
+
+        /// <summary> Проверяет, есть ли задачи в очереди. </summary>
+        /// <returns>True, если задачи есть.</returns>
+        public bool HasSequence() => _sequencer.HasSequence(_id);
         
         /// <summary> Очищает конкретную последовательность от событий. </summary>
         public SequenceCommander ClearSequence()
