@@ -30,7 +30,7 @@ namespace Exerussus._1Extensions.SmallFeatures
 #if UNITY_EDITOR
         
         [UnityEditor.InitializeOnLoad]
-        private class StaticCleaner
+        private static class StaticCleaner
         {
             static StaticCleaner()
             {
