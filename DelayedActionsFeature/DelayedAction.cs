@@ -1,6 +1,7 @@
 ﻿
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using Exerussus._1Extensions.LoopFeature;
 
 namespace Exerussus._1Extensions.DelayedActionsFeature
 {
@@ -13,5 +14,14 @@ namespace Exerussus._1Extensions.DelayedActionsFeature
         private static float _time;
         private static int _nextId = 1;
         private static readonly object IdLock = new();
+        private static bool _isInitialized = false;
+
+        private static void TryInitialize()
+        {
+            if (_isInitialized) return;
+            _isInitialized = true;
+            ExerussusLoopHelper.OnUpdate -= Update;
+            ExerussusLoopHelper.OnUpdate += Update;
+        }
     }
 }

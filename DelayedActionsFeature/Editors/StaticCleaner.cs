@@ -24,6 +24,7 @@ namespace Exerussus._1Extensions.DelayedActionsFeature
                     ToRelease.Clear();
                     _time = 0;
                     _nextId = 1;
+                    _isInitialized = false;
                 }
             }
         }

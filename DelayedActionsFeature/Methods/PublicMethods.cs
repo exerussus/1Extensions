@@ -8,6 +8,7 @@ namespace Exerussus._1Extensions.DelayedActionsFeature
         /// <summary> Создает билдер операции, которую необходимо запустить методом Run после настройки. </summary>
         public static Builder Create(float checkDelay, Action action)
         {
+            TryInitialize();
             return Builder.CreateBuilder(checkDelay, action);
         }
 
