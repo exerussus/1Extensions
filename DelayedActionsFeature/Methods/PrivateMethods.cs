@@ -130,7 +130,6 @@ namespace Exerussus._1Extensions.DelayedActionsFeature
 
         private static void Release(Operation operation)
         {
-            var id = operation.Id;
             DictInWork.Remove(operation.Id);
             operation.IsActive = true;
             operation.Id = 0;
