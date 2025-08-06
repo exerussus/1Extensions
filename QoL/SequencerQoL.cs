@@ -1,4 +1,6 @@
-﻿namespace Exerussus._1Extensions.SmallFeatures
+﻿using Exerussus._1Extensions.LoopFeature;
+
+namespace Exerussus._1Extensions.SmallFeatures
 {
     public static class SequencerQoL
     {
@@ -14,16 +16,12 @@
                 {
                     _actionSequencer = new();
                     _count = 0;
-                    ExerussusCore.AddOnUpdate(UpdateSub);
+                    ExerussusLoopHelper.OnUpdate -= _actionSequencer.Update;
+                    ExerussusLoopHelper.OnUpdate += _actionSequencer.Update;
                 }
                 _count++;
                 return _actionSequencer.CreateSequenceCommander(_count);
             }
-        }
-
-        private static void UpdateSub()
-        {
-            _actionSequencer.Update();
         }
     }
 }

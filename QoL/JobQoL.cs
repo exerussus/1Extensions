@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
+using Exerussus._1Extensions.LoopFeature;
 using UnityEngine;
 
 namespace Exerussus._1Extensions.SmallFeatures
@@ -12,8 +13,8 @@ namespace Exerussus._1Extensions.SmallFeatures
         private static void Initialize()
         {
             _jobHandler ??= new JobHandler("", logLevel: JobHandler.LogLevel.ErrorsOnly);
-            ExerussusCore.RemoveOnUpdate(_jobHandler.Update);
-            ExerussusCore.AddOnUpdate(_jobHandler.Update);
+            ExerussusLoopHelper.OnUpdate -= _jobHandler.Update;
+            ExerussusLoopHelper.OnUpdate += _jobHandler.Update;
         }
 
         public static void AddJob(Action action, string comment, float delay = 0)
