@@ -1,10 +1,10 @@
 ﻿
-namespace Exerussus._1Extensions.DelayedActionsFeature
+#if UNITY_EDITOR
+namespace Exerussus._1Extensions.ThreadGateFeature
 {
-    public static partial class DelayedAction
+    public static partial class ThreadGate
     {
         
-#if UNITY_EDITOR
         
         [UnityEditor.InitializeOnLoad]
         private static class StaticCleaner
@@ -18,16 +18,15 @@ namespace Exerussus._1Extensions.DelayedActionsFeature
             {
                 if (state == UnityEditor.PlayModeStateChange.ExitingPlayMode || state == UnityEditor.PlayModeStateChange.ExitingEditMode)
                 {
-                    Pool.Clear();
-                    DictInWork.Clear();
-                    ToCreate.Clear();
+                    ToWait.Clear();
                     ToRelease.Clear();
+                    ActiveBuffers.Clear();
                     _time = 0;
-                    _nextId = 1;
-                    _isInitialized = false;
+                    _freeJobIndex = 1;
+                    _freeBuilderIndex = 1;
                 }
             }
         }
-#endif
     }
 }
+#endif

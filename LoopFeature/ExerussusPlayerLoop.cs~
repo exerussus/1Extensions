@@ -18,9 +18,9 @@ namespace Exerussus._1Extensions.LoopFeature
         public struct ExerussusFixedUpdate { };
         public struct ExerussusPreUpdate { };
         public struct ExerussusUpdate { };
-        //public struct ExerussusPreLateUpdate { };
-        //public struct ExerussusPostLateUpdate { };
-        //public struct ExerussusTimeUpdate { };
+        public struct ExerussusPreLateUpdate { };
+        public struct ExerussusPostLateUpdate { };
+        public struct ExerussusTimeUpdate { };
     }
 
     public static class ExerussusLoopHelper
@@ -30,9 +30,9 @@ namespace Exerussus._1Extensions.LoopFeature
         public static event Action OnFixedUpdate;
         public static event Action OnPreUpdate;
         public static event Action OnUpdate;
-        //public static event Action OnPreLateUpdate;
-        //public static event Action OnPostLateUpdate;
-        //public static event Action OnTimeUpdate;
+        public static event Action OnPreLateUpdate;
+        public static event Action OnPostLateUpdate;
+        public static event Action OnTimeUpdate;
 
         static bool initialized;
 
@@ -60,9 +60,9 @@ namespace Exerussus._1Extensions.LoopFeature
             InsertLoop(newLoop, typeof(PlayerLoopType.FixedUpdate), typeof(ExerussusLoopRunners.ExerussusFixedUpdate), static () => OnFixedUpdate?.Invoke());
             InsertLoop(newLoop, typeof(PlayerLoopType.PreUpdate), typeof(ExerussusLoopRunners.ExerussusPreUpdate), static () => OnPreUpdate?.Invoke());
             InsertLoop(newLoop, typeof(PlayerLoopType.Update), typeof(ExerussusLoopRunners.ExerussusUpdate), static () => OnUpdate?.Invoke());
-            //InsertLoop(newLoop, typeof(PlayerLoopType.PreLateUpdate), typeof(ExerussusLoopRunners.ExerussusPreLateUpdate), static () => OnPreLateUpdate?.Invoke());
-            //InsertLoop(newLoop, typeof(PlayerLoopType.PostLateUpdate), typeof(ExerussusLoopRunners.ExerussusPostLateUpdate), static () => OnPostLateUpdate?.Invoke());
-            //InsertLoop(newLoop, typeof(PlayerLoopType.TimeUpdate), typeof(ExerussusLoopRunners.ExerussusTimeUpdate), static () => OnTimeUpdate?.Invoke());
+            InsertLoop(newLoop, typeof(PlayerLoopType.PreLateUpdate), typeof(ExerussusLoopRunners.ExerussusPreLateUpdate), static () => OnPreLateUpdate?.Invoke());
+            InsertLoop(newLoop, typeof(PlayerLoopType.PostLateUpdate), typeof(ExerussusLoopRunners.ExerussusPostLateUpdate), static () => OnPostLateUpdate?.Invoke());
+            InsertLoop(newLoop, typeof(PlayerLoopType.TimeUpdate), typeof(ExerussusLoopRunners.ExerussusTimeUpdate), static () => OnTimeUpdate?.Invoke());
 
             playerLoop.subSystemList = newLoop;
             PlayerLoop.SetPlayerLoop(playerLoop);

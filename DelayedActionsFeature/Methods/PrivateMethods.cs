@@ -35,6 +35,7 @@ namespace Exerussus._1Extensions.DelayedActionsFeature
             operation.Action = action;
             ToCreate.Add(operation.Id, operation);
         }
+        
         private static void UpdateRemovingOperations()
         {
             foreach (var id in ToRelease)

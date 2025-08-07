@@ -12,29 +12,29 @@ namespace Exerussus._1Extensions.SmallFeatures
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
         private static void Initialize()
         {
-            _jobHandler ??= new JobHandler("", logLevel: JobHandler.LogLevel.ErrorsOnly);
+            _jobHandler ??= new JobHandler (logLevel: JobHandler.LogLevel.Errors);
             ExerussusLoopHelper.OnUpdate -= _jobHandler.Update;
             ExerussusLoopHelper.OnUpdate += _jobHandler.Update;
         }
 
-        public static void AddJob(Action action, string comment, float delay = 0)
+        public static void AddJob(Action action, float delay = 0)
         {
-            _jobHandler.AddJob(action, comment, delay);
+            _jobHandler.AddJob(action, delay);
         }
 
-        public static void CreateJob(this Action action, string comment, float delay = 0)
+        public static void CreateJob(this Action action, float delay = 0)
         {
-            _jobHandler.AddJob(action, comment, delay);
+            _jobHandler.AddJob(action, delay);
         }
 
-        public static async Task AddJobAsync(Action action, string comment, float delay = 0, int timeoutMs = 10000)
+        public static async Task AddJobAsync(Action action, float delay = 0, int timeoutMs = 10000)
         {
-            await _jobHandler.AddJobAsync(action, comment, delay, timeoutMs);
+            await _jobHandler.AddJobAsync(action, delay, timeoutMs);
         }
 
-        public static async Task CreateJobAsync(this Action action, string comment, float delay = 0, int timeoutMs = 10000)
+        public static async Task CreateJobAsync(this Action action, float delay = 0, int timeoutMs = 10000)
         {
-            await _jobHandler.AddJobAsync(action, comment, delay, timeoutMs);
+            await _jobHandler.AddJobAsync(action, delay, timeoutMs);
         }
 
 #if UNITY_EDITOR

@@ -11,14 +11,12 @@ namespace Exerussus._1Extensions.SmallFeatures
         /// <param name="prefix">приписка к логам</param>
         /// <param name="logLevel">уровень логирования</param>
         /// <param name="isProtected"></param>
-        public JobHandler(string prefix, LogLevel logLevel, bool isProtected = true)
+        public JobHandler(LogLevel logLevel = LogLevel.None, bool isProtected = true)
         {
-            _prefix = prefix;
             _logLevel = (int)logLevel;
             _isProtected = isProtected;
         }
 
-        private readonly string _prefix;
         private readonly int _logLevel;
         private readonly List<Job> _jobQueue = new();
         private readonly List<AsyncJob> _asyncJobQueue = new();
@@ -26,30 +24,14 @@ namespace Exerussus._1Extensions.SmallFeatures
         private readonly bool _isProtected;
         private float _time;
         
-        public void AddJob(Action action, string comment, float delay = 0)
+        public void AddJob(Action action, float delay = 0)
         {
-#if UNITY_EDITOR
-            if (_logLevel > 1) Debug.Log($"{_prefix} | JobHandler | Принято в работу : {comment}");
-#endif
-            _jobQueue.Add(new Job(action, _time + delay
-#if UNITY_EDITOR
-                , comment: comment
-#endif
-                ));
-            
+            _jobQueue.Add(new Job(action, _time + delay));
         }
 
-        public async Task AddJobAsync(Action action, string comment, float delay = 0, int timeoutMs = 10000)
+        public async Task AddJobAsync(Action action, float delay = 0, int timeoutMs = 10000)
         {
-#if UNITY_EDITOR
-            if (_logLevel > 1) Debug.Log($"{_prefix} | JobHandler | Принято в работу : {comment}");
-#endif
-
-            var job = new AsyncJob(action, _time + delay
-#if UNITY_EDITOR
-                , comment: comment
-#endif
-            );
+            var job = new AsyncJob(action, _time + delay);
             
             _asyncJobQueue.Add(job);
 
@@ -107,20 +89,10 @@ namespace Exerussus._1Extensions.SmallFeatures
                 try
                 {
                     job.Action.Invoke();
-#if UNITY_EDITOR
-                    if (_logLevel > 1) Debug.Log($"JobHandler | Выполнена задача : {job.Comment}");
-#endif
                 }
                 catch (Exception e)
                 {
-                    if (_logLevel > 0)
-                        Debug.LogError($"ERROR ! {_prefix} | JobHandler | Ошибка при выполнении асинхронной задачи! |" +
-
-#if UNITY_EDITOR
-                                       $" Comment : {job.Comment}." +
-#endif
-
-                                       $" Детали:\n{e}");
+                    if (_logLevel > 0) Debug.LogError($"JobHandler ERROR! | Ошибка при выполнении асинхронной задачи! | Детали:\n{e}");
                 }
                 finally
                 {
@@ -143,24 +115,13 @@ namespace Exerussus._1Extensions.SmallFeatures
             
             if (_isProtected)
             {
-
                 try
                 {
                     job.Action.Invoke();
-#if UNITY_EDITOR
-                    if (_logLevel > 1) Debug.Log($"JobHandler | Выполнена задача : {job.Comment}");
-#endif
                 }
                 catch (Exception e)
                 {
-                    if (_logLevel > 0)
-                        Debug.LogError($"ERROR ! {_prefix} | JobHandler | Ошибка при выполнении задачи! |" +
-
-#if UNITY_EDITOR
-                                       $" Comment : {job.Comment}." +
-#endif
-
-                                       $" Детали:\n{e}");
+                    if (_logLevel > 0) Debug.LogError($"JobHandler ERROR! | Ошибка при выполнении задачи! | Детали:\n{e}");
                 }
             }
             else
@@ -172,51 +133,30 @@ namespace Exerussus._1Extensions.SmallFeatures
         public enum LogLevel
         {
             None = 0,
-            ErrorsOnly = 1,
-            All = 2,
+            Errors = 1,
         }
     }
     
     public class Job
     {
-        public Job(Action action, float endTime
-#if UNITY_EDITOR
-            , string comment = null
-#endif
-            )
+        public Job(Action action, float endTime)
         {
             EndTime = endTime;
             Action = action;
-#if UNITY_EDITOR
-            Comment = comment;
-#endif
         }
-        
-#if UNITY_EDITOR
-        public string Comment { get; set; }
-#endif
+
         public float EndTime { get; set; }
         public Action Action { get; set; }
     }
     
     public class AsyncJob
     {
-        public AsyncJob(Action action, float endTime
-#if UNITY_EDITOR
-            , string comment = null
-#endif
-            )
+        public AsyncJob(Action action, float endTime)
         {
             EndTime = endTime;
             Action = action;
-#if UNITY_EDITOR
-            Comment = comment;
-#endif
         }
         
-#if UNITY_EDITOR
-        public string Comment { get; set; }
-#endif
         public float EndTime { get; set; }
         public Action Action { get; set; }
         public bool IsDone { get; set; }
