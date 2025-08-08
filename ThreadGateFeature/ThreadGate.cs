@@ -30,14 +30,17 @@ namespace Exerussus._1Extensions.ThreadGateFeature
 
         private static void UpdateWaiting()
         {
-            foreach (var job in ToWait.Values)
+            lock (ToWait)
             {
-                if (ToRelease.Contains(job.Id)) continue;
-                
-                if (job.EndTime < _time)
+                foreach (var job in ToWait.Values)
                 {
-                    ExecuteJob(job);
-                    ToRelease.Add(job.Id);
+                    if (ToRelease.Contains(job.Id)) continue;
+
+                    if (job.EndTime < _time)
+                    {
+                        ExecuteJob(job);
+                        ToRelease.Add(job.Id);
+                    }
                 }
             }
         }
@@ -46,7 +49,8 @@ namespace Exerussus._1Extensions.ThreadGateFeature
         {
             foreach (var jobId in ToRelease)
             {
-                var job = ToWait.Pop(jobId);
+                Job job;
+                lock (ToWait) job = ToWait.Pop(jobId);
                 Job.Release(job);
             }
             
@@ -83,7 +87,7 @@ namespace Exerussus._1Extensions.ThreadGateFeature
             job.EndTime = _time + buffer.Delay;
             job.Action = buffer.Action;
             job.IsProtected = buffer.IsProtected;
-            ToWait.Add(job.Id, job);
+            lock (ToWait) ToWait.Add(job.Id, job);
         }
 
         private static bool TryCancel(int jobId)
