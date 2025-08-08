@@ -9,8 +9,10 @@ namespace Exerussus._1Extensions.ThreadGateFeature
 {
     public static partial class ThreadGate
     {
+        private static readonly Dictionary<int, Job> ToCreate = new();
         private static readonly Dictionary<int, Job> ToWait = new();
         private static readonly HashSet<int> ToRelease = new();
+        private static readonly object CreateLock = new();
         
         private static float _time = 0;
 
@@ -24,23 +26,34 @@ namespace Exerussus._1Extensions.ThreadGateFeature
         private static void Update()
         {
             _time = Time.time;
+            UpdateCreating();
             UpdateWaiting();
             UpdateReleasing();
         }
 
+        private static void UpdateCreating()
+        {
+            lock (CreateLock)
+            {
+                foreach (var job in ToCreate.Values)
+                {
+                    ToWait[job.Id] = job;
+                }
+                
+                ToCreate.Clear();
+            }
+        }
+
         private static void UpdateWaiting()
         {
-            lock (ToWait)
+            foreach (var job in ToWait.Values)
             {
-                foreach (var job in ToWait.Values)
-                {
-                    if (ToRelease.Contains(job.Id)) continue;
+                if (ToRelease.Contains(job.Id)) continue;
 
-                    if (job.EndTime < _time)
-                    {
-                        ExecuteJob(job);
-                        ToRelease.Add(job.Id);
-                    }
+                if (job.EndTime < _time)
+                {
+                    ExecuteJob(job);
+                    ToRelease.Add(job.Id);
                 }
             }
         }
@@ -49,8 +62,7 @@ namespace Exerussus._1Extensions.ThreadGateFeature
         {
             foreach (var jobId in ToRelease)
             {
-                Job job;
-                lock (ToWait) job = ToWait.Pop(jobId);
+                var job = ToWait.Pop(jobId);
                 Job.Release(job);
             }
             
@@ -87,7 +99,7 @@ namespace Exerussus._1Extensions.ThreadGateFeature
             job.EndTime = _time + buffer.Delay;
             job.Action = buffer.Action;
             job.IsProtected = buffer.IsProtected;
-            lock (ToWait) ToWait.Add(job.Id, job);
+            lock (CreateLock) ToCreate.Add(job.Id, job);
         }
 
         private static bool TryCancel(int jobId)
