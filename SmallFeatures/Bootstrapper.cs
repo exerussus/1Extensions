@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using Cysharp.Threading.Tasks;
 using Exerussus._1Extensions.Abstractions;
 using Exerussus._1Extensions.Scripts.Extensions;
+using Exerussus._1Extensions.ThreadGateFeature;
 using Sirenix.OdinInspector;
 using UnityEngine;
 using Object = UnityEngine.Object;
@@ -14,138 +16,87 @@ namespace Exerussus._1Extensions.SmallFeatures
 
         public bool safeMode = true;
         public bool destroyGameObjectOnDone = true;
-        public bool enableWarnings = true;
         public bool enableErrors = true;
-        public List<BootstrapStage> initializeQueue = new();
+        public List<BootstrapStage.Settings> initializeQueue = new();
         
-        [ReadOnly, FoldoutGroup("DEBUG")] public List<BootstrapStage> initializeQueueProcess = new();
-        [ReadOnly, FoldoutGroup("DEBUG"), ShowInInspector] private List<IInitializable> _current = new();
-        
-        private readonly HashSet<IInitializable> _tempNewInits = new();
-        private readonly HashSet<IInitializable> _timeoutObjects = new();
-        private readonly HashSet<IInitializable> _totalObjects = new();
+        [ReadOnly, FoldoutGroup("DEBUG")] public List<BootstrapStage.Runtime> initializeQueueProcess = new();
+        [ReadOnly, FoldoutGroup("DEBUG"), ShowInInspector] private List<InitializingObject> _current = new();
 
         private readonly object _lock = new();
         private bool _isStarted;
-        private float _awaitTimeout;
-        private int _initCount = 0;
-        
+
+        public event Action OnStarted;
         public event Action OnAllInitialized;
-        public event Action<int> OnStarted;
-        public event Action<(int objectsDone, int totalObjects, IInitializable initializable)> OnInitialized;
         public event Action<Exception> OnError;
-        public event Action<IInitializable> OnTimeout;
 
         public void Initialize()
         {
-            Run();
+            Run().Forget();
         }
         
         private void Awake()
         {
             if (startType != StartType.Awake) return; 
-            Run();
+            Run().Forget();
         }
 
         private void Start()
         {
             if (startType != StartType.Start) return;
-            Run();
+            Run().Forget();
         }
         
         public virtual void OnPreInitialize() {}
         public virtual void OnPostInitialize() {}
 
-        private void Run()
+        private async UniTask Run()
         {
             lock (_lock)
             {
                 if (_isStarted) return;
                 _isStarted = true;
-                OnPreInitialize();
-                
-                initializeQueueProcess = new List<BootstrapStage>(initializeQueue);
-
-                foreach (var bootstrapStage in initializeQueueProcess)
-                {
-                    if (bootstrapStage.objects is not { Count: > 0 }) continue;
-                    foreach (var obj in bootstrapStage.objects)
-                    {
-                        if (obj is IInitializable initializable) _totalObjects.Add(initializable);
-                    }
-                }
-                
-                if (TryDestroy()) return;
-                OnStarted?.Invoke(_totalObjects.Count);
-                Next();
-            }
-        }
-
-        private void Update()
-        {
-            var hasPending = false;
-            
-            for (var index = _current.Count - 1; index >= 0; index--)
-            {
-                var initializable = _current[index];
-                
-                if (initializable == null)
-                {
-                    _current.RemoveAt(index);
-                    continue;
-                }
-                
-                if (!initializable.IsInitialized)
-                {
-                    if (Time.time > _awaitTimeout && _timeoutObjects.Add(initializable))
-                    {
-                        if (enableWarnings) Debug.LogWarning($"[Bootstrapper] Timeout: {initializable}");
-                        OnTimeout?.Invoke(initializable);
-                    }
-
-                    hasPending = true;
-                    continue;
-                }
-
-                _initCount++;
-                OnInitialized?.Invoke((_initCount, _totalObjects.Count, initializable));
-                
-                _timeoutObjects.Remove(initializable);
-                _current.RemoveAt(index);
             }
             
-            if (hasPending) return;
-
-            _current.Clear();
-
+            OnPreInitialize();
+            
+            initializeQueueProcess.Clear();
+            
+            BootstrapStage.CreateSettings(initializeQueue, initializeQueueProcess);
+            
+            OnStarted?.Invoke();
             if (TryDestroy()) return;
-            Next();
+            await Next();
+            TryDestroy();
         }
 
-        private void Next()
+        private async UniTask Next()
         {
-            if (initializeQueueProcess.Count == 0) return;
-
-            var stage = initializeQueueProcess.PopFirst();
-            if (stage?.objects == null) return;
-
-            _awaitTimeout = stage.customTimeout > 0 ? Time.time + stage.customTimeout : float.MaxValue;
-
-            foreach (var obj in stage.objects)
+            while (initializeQueueProcess.Count != 0)
             {
-                if (obj is IInitializable initializable) _tempNewInits.Add(initializable);
-            }
+                var stage = initializeQueueProcess.PopFirst();
+                if (stage?.Objects == null)
+                {
+                    _current.Clear();
+                    continue;
+                }
 
-            foreach (var initializable in _tempNewInits) _current.Add(initializable);
-            _tempNewInits.Clear();
-            
-            foreach (var initializable in _current)
-            {
+                foreach (var initializable in stage.Objects) _current.Add(initializable);
+
+                if (_current.Count == 0) continue;
+
+                var tasks = new UniTask[_current.Count];
+
+                for (var index = 0; index < _current.Count; index++)
+                {
+                    var initializingObject = _current[index];
+                    tasks[index] = initializingObject.Task.Invoke();
+                }
+
                 if (safeMode)
                 {
                     try
                     {
-                        initializable.Initialize();
+                        await UniTask.WhenAll(tasks);
                     }
                     catch (Exception e)
                     {
@@ -155,8 +106,10 @@ namespace Exerussus._1Extensions.SmallFeatures
                 }
                 else
                 {
-                    initializable.Initialize();
+                    await UniTask.WhenAll(tasks);
                 }
+                
+                _current.Clear();
             }
         }
 
@@ -167,19 +120,56 @@ namespace Exerussus._1Extensions.SmallFeatures
                 OnAllInitialized?.Invoke();
                 OnPostInitialize();
                 Debug.Log("[Bootstrapper] All initialized.");
-                if (destroyGameObjectOnDone) Destroy(gameObject);
-                else Destroy(this);
+                ThreadGate.CreateJob(() =>
+                {
+                    if (destroyGameObjectOnDone) Destroy(gameObject);
+                    else Destroy(this);
+                }).WithDelay(3).Run();
                 return true;
             }
 
             return false;
         }
-        [Serializable]
-        public class BootstrapStage
+        
+        public static class BootstrapStage
         {
-            [FoldoutGroup("$name")] public string name;
-            [FoldoutGroup("$name")] public List<Object> objects = new();
-            [FoldoutGroup("$name")] public float customTimeout;
+            public class Runtime
+            {
+                public Runtime(Settings settings)
+                {
+                    if (settings == null) return;
+                    
+                    foreach (var obj in settings.objects)
+                    {
+                        if (obj == null) continue;
+                        if (obj is IInitializable initializable) Objects.Add(new InitializingObject(initializable));
+                        else if (obj is IInitializableAsync initializableAsync)
+                        {
+                            Debug.Log($"added : {initializableAsync.GetType().Name}");
+                            Objects.Add(new InitializingObject(initializableAsync));
+                        }
+                    }
+                }
+
+                public readonly List<InitializingObject> Objects = new();
+            }
+
+            [Serializable]
+            public class Settings
+            {
+                [FoldoutGroup("$name")] public string name;
+                [FoldoutGroup("$name")] public List<Object> objects = new();
+            }
+
+            public static void CreateSettings(List<Settings> settings, List<Runtime> initializeQueueProcess)
+            {
+                if (settings == null || initializeQueueProcess == null) return;
+                foreach (var setting in settings)
+                {
+                    if (setting == null) continue;
+                    initializeQueueProcess.Add(new Runtime(setting));
+                }
+            }
         }
 
         public enum StartType
@@ -187,6 +177,33 @@ namespace Exerussus._1Extensions.SmallFeatures
             None,
             Awake,
             Start,
+        }
+
+        public class InitializingObject
+        {
+            public InitializingObject(IInitializableAsync initializable)
+            {
+                Task = initializable.Initialize;
+                Type = initializable.GetType();
+            }
+
+            public InitializingObject(IInitializable initializable)
+            {
+                Task = ConvertToTask(initializable.Initialize);
+                Type = initializable.GetType();
+            }
+
+            public readonly Func<UniTask> Task;
+            public readonly Type Type;
+
+            private static Func<UniTask> ConvertToTask(Action action)
+            {
+                return () =>
+                {
+                    action();
+                    return UniTask.CompletedTask;
+                };
+            }
         }
     }
 }

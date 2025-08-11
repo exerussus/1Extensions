@@ -121,7 +121,9 @@ namespace Exerussus._1Extensions.ThreadGateFeature
 
         private static bool IsDone(int jobId)
         {
-            return IsValid(jobId) && !ToWait.ContainsKey(jobId);
+            bool hasInCreated;
+            lock (CreateLock) hasInCreated = ToCreate.ContainsKey(jobId); 
+            return IsValid(jobId) && !ToWait.ContainsKey(jobId) && !hasInCreated;
         }
     }
 }

@@ -1,4 +1,5 @@
-﻿using Exerussus._1Extensions.SmallFeatures;
+﻿using Cysharp.Threading.Tasks;
+using Exerussus._1Extensions.SmallFeatures;
 
 namespace Exerussus._1Extensions.Abstractions
 {
@@ -16,17 +17,25 @@ namespace Exerussus._1Extensions.Abstractions
     {
         public void PostInitialize();
     }
-    
+
     public interface IInitializable
     {
-        public bool IsInitialized { get; }
         public void Initialize();
     }
-    
+
+    public interface IInitializableAsync
+    {
+        public UniTask Initialize();
+    }
+
     public interface IInitializable<in T>
     {
-        public bool IsInitialized { get; }
         public void Initialize(T reference);
+    }
+
+    public interface IInitializableAsync<in T>
+    {
+        public UniTask Initialize(T reference);
     }
 
     public interface IBeforeInitializable<in T>

@@ -1,6 +1,8 @@
 ﻿using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
+using Cysharp.Threading.Tasks;
 using Exerussus._1Extensions.Async;
+using UnityEngine;
 
 namespace Exerussus._1Extensions.ThreadGateFeature
 {
@@ -39,11 +41,34 @@ namespace Exerussus._1Extensions.ThreadGateFeature
                 return ThreadGate.IsDone(Id);
             }
 
-            public async Task Wait(float checkInterval = 0.1f, float timeout = 0)
+            public async Task AsTask(float checkInterval = 0.1f, float timeout = 0)
             {
                 var id = Id;
-                if (timeout > 0) await TaskUtils.WaitUntilAsync(() => ThreadGate.IsDone(id), (int)(checkInterval * 1000), (int)(timeout * 1000));
-                else await TaskUtils.WaitUntilAsync(() => ThreadGate.IsDone(id), (int)(checkInterval * 1000));
+                var millisecondsDelay = (int)(checkInterval * 1000);
+                var timeoutMilliseconds = timeout <= 0 ?  int.MaxValue : (int)(timeout * 1000);
+                
+                while (!ThreadGate.IsDone(id))
+                {
+                    if (timeoutMilliseconds <= 0) return;
+                    
+                    await Task.Delay(millisecondsDelay);
+                    timeoutMilliseconds -= millisecondsDelay;
+                }
+            }
+            
+            public async UniTask AsUniTask(float checkInterval = 0.1f, float timeout = 0)
+            {
+                var id = Id;
+                var millisecondsDelay = (int)(checkInterval * 1000);
+                var timeoutMilliseconds = timeout <= 0 ?  int.MaxValue : (int)(timeout * 1000);
+                
+                while (!ThreadGate.IsDone(id))
+                {
+                    if (timeoutMilliseconds <= 0) return;
+                    
+                    await UniTask.Delay(millisecondsDelay);
+                    timeoutMilliseconds -= millisecondsDelay;
+                }
             }
         }
     }
