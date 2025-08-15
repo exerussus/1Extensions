@@ -34,8 +34,8 @@ namespace Exerussus._1Extensions.SmallFeatures
             var job = new AsyncJob(action, _time + delay);
             
             _asyncJobQueue.Add(job);
-
-            await TaskUtils.WaitUntilAsync(() => job.IsDone, 100, timeoutMs);
+            
+            await TaskUtils.WaitUntilCondition(() => job.IsDone, 100, timeoutMs);
             
             _asyncJobDone.Remove(job);
         }

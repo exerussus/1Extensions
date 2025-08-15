@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+using Cysharp.Threading.Tasks;
 
 namespace Exerussus._1Extensions.Async
 {
@@ -9,45 +8,76 @@ namespace Exerussus._1Extensions.Async
     {
         private const int DefaultCheckInterval = 100;
         
-        public static async Task WaitUntilAsync(Func<bool> condition)
+        /// <summary> Ждёт, пока условие станет true. </summary>
+        public static async UniTask WaitUntilCondition(this Func<bool> condition)
         {
             while (!condition())
             {
-                await Task.Delay(DefaultCheckInterval);
+                await UniTask.Delay(DefaultCheckInterval);
             }
         }
-        
-        public static async Task WaitUntilAsync(Func<bool> condition, int checkInterval)
+
+        /// <summary> Ждёт, пока условие станет true, с заданным интервалом проверки. </summary>
+        public static async UniTask WaitUntilCondition(this Func<bool> condition, int checkInterval)
         {
             while (!condition())
             {
-                await Task.Delay(checkInterval);
+                await UniTask.Delay(checkInterval);
             }
         }
-        
-        public static async Task WaitUntilAsync(Func<bool> condition, int checkInterval, int timeout)
+
+        /// <summary> Ждёт, пока условие станет true, с заданным интервалом и таймаутом. </summary>
+        public static async UniTask WaitUntilCondition(this Func<bool> condition, int checkInterval, int timeout)
         {
             while (!condition())
             {
                 if (timeout <= 0) return;
-                await Task.Delay(checkInterval);
+                await UniTask.Delay(checkInterval);
                 timeout -= checkInterval;
             }
         }
-        
-        public static async Task WaitUntilAsync(Func<bool>[] conditions)
+
+        /// <summary> Ждёт, пока все условия в массиве станут true. </summary>
+        public static async UniTask WaitUntilCondition(this Func<bool>[] conditions)
         {
-            while (!conditions.All(c => c()))
+            if (conditions == null || conditions.Length == 0) return;
+
+            while (true)
             {
-                await Task.Delay(DefaultCheckInterval);
+                var all = true;
+                for (int i = 0; i < conditions.Length; i++)
+                {
+                    if (!conditions[i]())
+                    {
+                        all = false;
+                        break;
+                    }
+                }
+
+                if (all) return;
+                await UniTask.Delay(DefaultCheckInterval);
             }
         }
-        
-        public static async Task WaitUntilAsync(List<Func<bool>> conditions)
+
+        /// <summary> Ждёт, пока все условия в списке станут true. </summary>
+        public static async UniTask WaitUntilCondition(this List<Func<bool>> conditions)
         {
-            while (!conditions.All(c => c()))
+            if (conditions == null || conditions.Count == 0) return;
+
+            while (true)
             {
-                await Task.Delay(DefaultCheckInterval);
+                var all = true;
+                for (int i = 0; i < conditions.Count; i++)
+                {
+                    if (!conditions[i]())
+                    {
+                        all = false;
+                        break;
+                    }
+                }
+
+                if (all) return;
+                await UniTask.Delay(DefaultCheckInterval);
             }
         }
     }
