@@ -148,6 +148,12 @@ namespace Exerussus._1Extensions.SmallFeatures
 
         public void Initialize()
         {
+            if (string.IsNullOrEmpty(TypeId))
+            {
+                Debug.LogError($"LibraryItem | {GetType().Name} | TypeId is empty");
+                return;
+            }
+
             Id = TypeId.GetStableLongId();
             OnInitialize();
         }
