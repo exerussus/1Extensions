@@ -17,7 +17,8 @@ namespace Exerussus._1Extensions.SmallFeatures
         public static long GetStableId(string input)
         {
             if (input == null) throw new ArgumentNullException(nameof(input));
-
+            if (input == "") return 0;
+            
             using var sha256 = SHA256.Create();
             var hash = sha256.ComputeHash(Encoding.UTF8.GetBytes(input));
 
