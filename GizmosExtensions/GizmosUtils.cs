@@ -6,7 +6,7 @@ namespace Exerussus._1Extensions.GizmosExtensions
 {
     public static class GizmosUtils
     {
-        private static Color[] _colors = new[]
+        private static readonly Color[] Colors = new[]
         {
             new Color(1, 0, 0, 1),
             new Color(1, 1, 0, 1),
@@ -21,6 +21,7 @@ namespace Exerussus._1Extensions.GizmosExtensions
             new Color(0.5f, 1, 0, 1),
             new Color(1, 0.5f, 1, 1),
         };
+        private static readonly Vector3 OneMinus = new Vector3(1, -1, 1);
         
 #if UNITY_EDITOR
         private static readonly GUIStyle TextStyle = new GUIStyle()
@@ -107,9 +108,29 @@ namespace Exerussus._1Extensions.GizmosExtensions
             Gizmos.color = prevColor;
         }
         
+        [Conditional("UNITY_EDITOR")]
+        public static void DrawArrow(Vector3 startPoint, Vector3 endPoint, Color color, float arrowHeadLength = 0.15f)
+        {
+            
+            var prevColor = Gizmos.color;
+            Gizmos.color = color;
+
+            Gizmos.DrawLine(startPoint, endPoint);
+            
+            var direction = (endPoint - startPoint).normalized;
+
+            var right = Quaternion.LookRotation(direction) * Quaternion.Euler(0, 170f, 0) * Vector3.one;
+            var left  = Quaternion.LookRotation(direction) * Quaternion.Euler(0, 170f, 0) * OneMinus;
+
+            Gizmos.DrawLine(endPoint, endPoint + right * arrowHeadLength);
+            Gizmos.DrawLine(endPoint, endPoint + left * arrowHeadLength);
+
+            Gizmos.color = prevColor;
+        }
+        
         public static Color GetColor(int index)
         {
-            return _colors[GetIndexInSize(index, _colors.Length)];
+            return Colors[GetIndexInSize(index, Colors.Length)];
         }
 
         private static int GetIndexInSize(int index, int size)
