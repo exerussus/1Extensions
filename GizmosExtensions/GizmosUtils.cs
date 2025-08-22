@@ -119,13 +119,22 @@ namespace Exerussus._1Extensions.GizmosExtensions
             
             var direction = (endPoint - startPoint).normalized;
 
-            var right = Quaternion.LookRotation(direction) * Quaternion.Euler(0, 170f, 0) * Vector3.one;
-            var left  = Quaternion.LookRotation(direction) * Quaternion.Euler(0, 170f, 0) * OneMinus;
+            var right = (Vector3)Rotate(direction, 170f);
+            var left = (Vector3)Rotate(direction, -170f);
 
             Gizmos.DrawLine(endPoint, endPoint + right * arrowHeadLength);
             Gizmos.DrawLine(endPoint, endPoint + left * arrowHeadLength);
 
             Gizmos.color = prevColor;
+        }
+        
+        private static Vector2 Rotate(Vector2 v, float degrees)
+        {
+            var rad = degrees * Mathf.Deg2Rad;
+            var cos = Mathf.Cos(rad);
+            var sin = Mathf.Sin(rad);
+
+            return new Vector2(v.x * cos - v.y * sin, v.x * sin + v.y * cos);
         }
         
         public static Color GetColor(int index)
