@@ -1,8 +1,6 @@
 ﻿using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using Cysharp.Threading.Tasks;
-using Exerussus._1Extensions.Async;
-using UnityEngine;
 
 namespace Exerussus._1Extensions.ThreadGateFeature
 {

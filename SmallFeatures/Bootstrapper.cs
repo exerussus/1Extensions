@@ -118,6 +118,9 @@ namespace Exerussus._1Extensions.SmallFeatures
             if (initializeQueueProcess.Count == 0)
             {
                 OnAllInitialized?.Invoke();
+                OnStarted = null;
+                OnAllInitialized = null;
+                OnError = null;
                 OnPostInitialize();
                 Debug.Log("[Bootstrapper] All initialized.");
                 ThreadGate.CreateJob(() =>
@@ -143,11 +146,7 @@ namespace Exerussus._1Extensions.SmallFeatures
                     {
                         if (obj == null) continue;
                         if (obj is IInitializable initializable) Objects.Add(new InitializingObject(initializable));
-                        else if (obj is IInitializableAsync initializableAsync)
-                        {
-                            Debug.Log($"added : {initializableAsync.GetType().Name}");
-                            Objects.Add(new InitializingObject(initializableAsync));
-                        }
+                        else if (obj is IInitializableAsync initializableAsync) Objects.Add(new InitializingObject(initializableAsync));
                     }
                 }
 
@@ -174,7 +173,7 @@ namespace Exerussus._1Extensions.SmallFeatures
 
         public enum StartType
         {
-            None,
+            Manual,
             Awake,
             Start,
         }
