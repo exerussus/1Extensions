@@ -80,10 +80,10 @@ namespace Exerussus._1Extensions.DelayedActionsFeature
 
                 if (operation.ConditionFunc())
                 {
-                    operation.Action.Invoke();
-                    
+                    var action = operation.Action;
                     if (operation.IsCycle) operation.NextCheckTime = _time + operation.CycleDelay;
                     else PrepareToRelease(operation.Id);
+                    action.Invoke();
                 }
                 else operation.NextCheckTime = _time + operation.Delay;
             }
