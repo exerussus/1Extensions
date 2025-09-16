@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Threading.Tasks;
+using Cysharp.Threading.Tasks;
 using UnityEngine;
 
 namespace Exerussus._1Extensions.Serialization
@@ -30,7 +31,7 @@ namespace Exerussus._1Extensions.Serialization
             }
         }
 
-        public static async Task SavePersistentAsync(object data, string saveName)
+        public static async UniTask SavePersistentAsync(object data, string saveName)
         {
             var fileName = data.GetType().Name;
             var path = Path.Combine(Application.persistentDataPath, saveName, fileName);
@@ -41,7 +42,7 @@ namespace Exerussus._1Extensions.Serialization
             await File.WriteAllTextAsync(path, json);
         }
         
-        public static async Task SavePersistentAsync(object data, string saveName, string fileName)
+        public static async UniTask SavePersistentAsync(object data, string saveName, string fileName)
         {
             var path = Path.Combine(Application.persistentDataPath, saveName, fileName);
             var directory = Path.GetDirectoryName(path);
@@ -51,25 +52,25 @@ namespace Exerussus._1Extensions.Serialization
             await File.WriteAllTextAsync(path, json);
         }
         
-        public static async Task<(bool result, T asset)> LoadPersistentAsync<T>(T data, string saveName)
+        public static async UniTask<(bool result, T asset)> LoadPersistentAsync<T>(T data, string saveName)
         {
             var result = await LoadPersistentAsync(typeof(T), saveName);
             return (result.result, (T)result.asset);
         }
         
-        public static async Task<(bool result, T asset)> LoadPersistentAsync<T>(string saveName)
+        public static async UniTask<(bool result, T asset)> LoadPersistentAsync<T>(string saveName)
         {
             var result = await LoadPersistentAsync(typeof(T), saveName);
             return (result.result, (T)result.asset);
         }
         
-        public static async Task<(bool result, T asset)> LoadPersistentAsync<T>(string saveName, string fileName)
+        public static async UniTask<(bool result, T asset)> LoadPersistentAsync<T>(string saveName, string fileName)
         {
             var result = await LoadPersistentAsync(typeof(T), saveName, fileName);
             return (result.result, (T)result.asset);
         }
         
-        public static async Task<(bool result, object asset)> LoadPersistentAsync(Type type, string saveName)
+        public static async UniTask<(bool result, object asset)> LoadPersistentAsync(Type type, string saveName)
         {
             var fileName = type.Name;
             var path = Path.Combine(Application.persistentDataPath, saveName, fileName);
@@ -93,7 +94,7 @@ namespace Exerussus._1Extensions.Serialization
             }
         }
         
-        public static async Task<(bool result, object asset)> LoadPersistentAsync(Type type, string saveName, string fileName)
+        public static async UniTask<(bool result, object asset)> LoadPersistentAsync(Type type, string saveName, string fileName)
         {
             var path = Path.Combine(Application.persistentDataPath, saveName, fileName);
             
@@ -170,7 +171,7 @@ namespace Exerussus._1Extensions.Serialization
             }
         }
         
-        public static async Task SaveStreamingAsync<T>(T data, string saveName)
+        public static async UniTask SaveStreamingAsync<T>(T data, string saveName)
         {
             var fileName = typeof(T).Name;
             var path = Path.Combine(Application.streamingAssetsPath, saveName, fileName);
@@ -181,7 +182,7 @@ namespace Exerussus._1Extensions.Serialization
             await File.WriteAllTextAsync(path, json);
         }
         
-        public static async Task<(bool result, T asset)> LoadStreamingAsync<T>(string saveName)
+        public static async UniTask<(bool result, T asset)> LoadStreamingAsync<T>(string saveName)
         {
             var fileName = typeof(T).Name;
             var path = Path.Combine(Application.streamingAssetsPath, saveName, fileName);

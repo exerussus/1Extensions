@@ -1,5 +1,6 @@
 ﻿
 using System.Runtime.CompilerServices;
+using Cysharp.Threading.Tasks;
 
 namespace Exerussus._1Extensions.DelayedActionsFeature
 {
@@ -68,6 +69,20 @@ namespace Exerussus._1Extensions.DelayedActionsFeature
             public void Cancel()
             {
                 DelayedAction.PrepareToRelease(Id);
+            }
+            
+            public async UniTask AsUniTask(float checkInterval = 0.1f, float timeout = 0)
+            {
+                var millisecondsDelay = (int)(checkInterval * 1000);
+                var timeoutMilliseconds = timeout <= 0 ?  int.MaxValue : (int)(timeout * 1000);
+                
+                while (IsValid())
+                {
+                    if (timeoutMilliseconds <= 0) return;
+                    
+                    await UniTask.Delay(millisecondsDelay);
+                    timeoutMilliseconds -= millisecondsDelay;
+                }
             }
         }
     }
