@@ -1,6 +1,5 @@
 ﻿using System;
 using System.IO;
-using System.Threading.Tasks;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
 
@@ -8,9 +7,12 @@ namespace Exerussus._1Extensions.Serialization
 {
     public static class AssetSerializer
     {
+        private static readonly string PersistentDataPath = Application.persistentDataPath;
+        private static readonly string StreamingAssetsPath = Application.streamingAssetsPath;
+        
         public static void DeletePersistentFolderContents(string saveName, bool debugLog = false)
         {
-            var path = Path.Combine(Application.persistentDataPath, saveName);
+            var path = Path.Combine(PersistentDataPath, saveName);
         
             if (!Directory.Exists(path))
             {
@@ -34,7 +36,7 @@ namespace Exerussus._1Extensions.Serialization
         public static async UniTask SavePersistentAsync(object data, string saveName)
         {
             var fileName = data.GetType().Name;
-            var path = Path.Combine(Application.persistentDataPath, saveName, fileName);
+            var path = Path.Combine(PersistentDataPath, saveName, fileName);
             var directory = Path.GetDirectoryName(path);
             if (!Directory.Exists(directory)) Directory.CreateDirectory(directory);
 
@@ -44,7 +46,7 @@ namespace Exerussus._1Extensions.Serialization
         
         public static async UniTask SavePersistentAsync(object data, string saveName, string fileName)
         {
-            var path = Path.Combine(Application.persistentDataPath, saveName, fileName);
+            var path = Path.Combine(PersistentDataPath, saveName, fileName);
             var directory = Path.GetDirectoryName(path);
             if (!Directory.Exists(directory)) Directory.CreateDirectory(directory);
 
@@ -73,7 +75,7 @@ namespace Exerussus._1Extensions.Serialization
         public static async UniTask<(bool result, object asset)> LoadPersistentAsync(Type type, string saveName)
         {
             var fileName = type.Name;
-            var path = Path.Combine(Application.persistentDataPath, saveName, fileName);
+            var path = Path.Combine(PersistentDataPath, saveName, fileName);
             
             if (!File.Exists(path))
             {
@@ -96,7 +98,7 @@ namespace Exerussus._1Extensions.Serialization
         
         public static async UniTask<(bool result, object asset)> LoadPersistentAsync(Type type, string saveName, string fileName)
         {
-            var path = Path.Combine(Application.persistentDataPath, saveName, fileName);
+            var path = Path.Combine(PersistentDataPath, saveName, fileName);
             
             if (!File.Exists(path))
             {
@@ -120,7 +122,7 @@ namespace Exerussus._1Extensions.Serialization
         public static void SavePersistent(object data, string saveName)
         {
             var fileName = data.GetType().Name;
-            var path = Path.Combine(Application.persistentDataPath, saveName, fileName);
+            var path = Path.Combine(PersistentDataPath, saveName, fileName);
             var directory = Path.GetDirectoryName(path);
             if (!Directory.Exists(directory)) Directory.CreateDirectory(directory);
 
@@ -150,7 +152,7 @@ namespace Exerussus._1Extensions.Serialization
 
         public static (bool result, T asset) LoadPersistent<T>(string saveName, string fileName)
         {
-            var path = Path.Combine(Application.persistentDataPath, saveName, fileName);
+            var path = Path.Combine(PersistentDataPath, saveName, fileName);
             
             if (!File.Exists(path))
             {
@@ -174,7 +176,7 @@ namespace Exerussus._1Extensions.Serialization
         public static async UniTask SaveStreamingAsync<T>(T data, string saveName)
         {
             var fileName = typeof(T).Name;
-            var path = Path.Combine(Application.streamingAssetsPath, saveName, fileName);
+            var path = Path.Combine(StreamingAssetsPath, saveName, fileName);
             var directory = Path.GetDirectoryName(path);
             if (!Directory.Exists(directory)) Directory.CreateDirectory(directory);
 
@@ -185,7 +187,7 @@ namespace Exerussus._1Extensions.Serialization
         public static async UniTask<(bool result, T asset)> LoadStreamingAsync<T>(string saveName)
         {
             var fileName = typeof(T).Name;
-            var path = Path.Combine(Application.streamingAssetsPath, saveName, fileName);
+            var path = Path.Combine(StreamingAssetsPath, saveName, fileName);
             
             if (!File.Exists(path))
             {
@@ -209,7 +211,7 @@ namespace Exerussus._1Extensions.Serialization
         public static void SaveStreaming(object data, string saveName)
         {
             var fileName = data.GetType().Name;
-            var path = Path.Combine(Application.streamingAssetsPath, saveName, fileName);
+            var path = Path.Combine(StreamingAssetsPath, saveName, fileName);
             var directory = Path.GetDirectoryName(path);
             if (!Directory.Exists(directory)) Directory.CreateDirectory(directory);
 
@@ -226,7 +228,7 @@ namespace Exerussus._1Extensions.Serialization
         public static (bool result, object asset) LoadStreaming(Type type, string saveName)
         {
             var fileName = type.Name;
-            var path = Path.Combine(Application.streamingAssetsPath, saveName, fileName);
+            var path = Path.Combine(StreamingAssetsPath, saveName, fileName);
             
             if (!File.Exists(path))
             {
