@@ -56,17 +56,20 @@ namespace Exerussus._1Extensions.SmallFeatures
                 if (_isStarted) return;
                 _isStarted = true;
             }
-            
-            OnPreInitialize();
+
+            await ThreadGate.CreateJob(OnPreInitialize).Run().AsUniTask();
             
             initializeQueueProcess.Clear();
             
             BootstrapStage.CreateSettings(initializeQueue, initializeQueueProcess);
+
+            await ThreadGate.CreateJob(() => OnStarted?.Invoke()).Run().AsUniTask();
             
-            OnStarted?.Invoke();
-            if (TryDestroy()) return;
+            var destroyResult = await TryDestroy();
+            
+            if (destroyResult) return;
             await Next();
-            TryDestroy();
+            await TryDestroy();
         }
 
         private async UniTask Next()
@@ -88,8 +91,9 @@ namespace Exerussus._1Extensions.SmallFeatures
 
                 for (var index = 0; index < _current.Count; index++)
                 {
-                    var initializingObject = _current[index];
-                    tasks[index] = initializingObject.Task.Invoke();
+                    var indexOfCurrent = index;
+                    var initializingObject = _current[indexOfCurrent];
+                    await ThreadGate.CreateJob(() => tasks[indexOfCurrent] = initializingObject.Task.Invoke()).Run().AsUniTask();
                 }
 
                 if (safeMode)
@@ -101,7 +105,7 @@ namespace Exerussus._1Extensions.SmallFeatures
                     catch (Exception e)
                     {
                         if (enableErrors) Debug.LogError(e);
-                        OnError?.Invoke(e);
+                        await ThreadGate.CreateJob(() => OnError?.Invoke(e)).Run().AsUniTask();
                     }
                 }
                 else
@@ -113,15 +117,15 @@ namespace Exerussus._1Extensions.SmallFeatures
             }
         }
 
-        private bool TryDestroy()
+        private async UniTask<bool> TryDestroy()
         {
             if (initializeQueueProcess.Count == 0)
             {
-                OnAllInitialized?.Invoke();
+                await ThreadGate.CreateJob(() => OnAllInitialized?.Invoke()).Run().AsUniTask();
                 OnStarted = null;
                 OnAllInitialized = null;
                 OnError = null;
-                OnPostInitialize();
+                await ThreadGate.CreateJob(OnPostInitialize).Run().AsUniTask();
                 Debug.Log("[Bootstrapper] All initialized.");
                 ThreadGate.CreateJob(() =>
                 {
