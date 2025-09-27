@@ -91,9 +91,8 @@ namespace Exerussus._1Extensions.SmallFeatures
 
                 for (var index = 0; index < _current.Count; index++)
                 {
-                    var indexOfCurrent = index;
-                    var initializingObject = _current[indexOfCurrent];
-                    await ThreadGate.CreateJob(() => tasks[indexOfCurrent] = initializingObject.Task.Invoke()).Run().AsUniTask();
+                    var initializingObject = _current[index];
+                    tasks[index] = ThreadGate.CreateJob(() => initializingObject.Task.Invoke()).Run().AsUniTask();
                 }
 
                 if (safeMode)
