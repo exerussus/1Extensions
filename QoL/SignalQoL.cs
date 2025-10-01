@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Runtime.CompilerServices;
-using System.Threading.Tasks;
 using Exerussus._1Extensions.SignalSystem;
 using UnityEngine;
 
@@ -22,24 +21,6 @@ namespace Exerussus._1Extensions.SmallFeatures
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void RegistryRaise<T>() where T : struct => Instance.RegistryRaise<T>();
-
-        public static async Task<TContext> RegistryRaiseAsync<TData, TContext>(TData data, int delay = 100, int timeout = 10000)
-            where TData : struct, ISignalWithAsyncContext<TContext>
-            where TContext : AsyncSignalContext, new() =>
-            await Instance.RegistryRaiseAsync<TData, TContext>(data, delay, timeout);
-
-        public static async Task<ResultContext> RegistryRaiseAsync<TData>(TData data, int delay = 100, int timeout = 10000)
-            where TData : struct, ISignalWithAsyncContext<ResultContext> =>
-            await Instance.RegistryRaiseAsync(data, delay, timeout);
-
-        public static async Task<TContext> RegistryRaiseAsync<TData, TContext>(int delay = 100, int timeout = 10000)
-            where TData : struct, ISignalWithAsyncContext<TContext>
-            where TContext : AsyncSignalContext, new() =>
-            await Instance.RegistryRaiseAsync<TData, TContext>(delay, timeout);
-
-        public static async Task<ResultContext> RegistryRaiseAsync<TData>(int delay = 100, int timeout = 10000)
-            where TData : struct, ISignalWithAsyncContext<ResultContext> =>
-            await Instance.RegistryRaiseAsync<TData>(delay, timeout);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void RegistryRaise<T>(ref T data) where T : struct => Instance.RegistryRaise(ref data);

@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Threading.Tasks;
 using Exerussus._1Extensions.Scripts.Extensions;
 using Exerussus._1Extensions.SmallFeatures;
 using UnityEngine;
@@ -16,15 +15,21 @@ namespace Exerussus._1Extensions.SignalSystem
         
         private bool IsLogEnabled { get; set; }
 
-        private Dictionary<Type, object> _listeners = new Dictionary<Type, object>();
-        private Dictionary<Type, object> _shotListeners = new Dictionary<Type, object>();
-        private Dictionary<Type, object> _shotLstnrWithIds = new Dictionary<Type, object>();
-        private Dictionary<Type, object> _cancelableListeners = new();
-        private Dictionary<Type, object> _longListeners = new();
+        private readonly Dictionary<Type, object> _listeners = new();
+        private readonly Dictionary<Type, object> _shotListeners = new();
+        private readonly Dictionary<Type, object> _shotListenersWithIds = new();
+        private readonly Dictionary<Type, object> _cancelableListeners = new();
+        private readonly Dictionary<Type, object> _longListeners = new();
+#if UNITY_EDITOR
+        internal readonly long UniqId = Guid.NewGuid().ToString().GetStableLongId();
+#endif
         
         /// <summary> Вызывает сигнал. </summary>
         public void RegistryRaise<T>(T data) where T : struct
         {
+#if UNITY_EDITOR
+            Editor.SignalManager.RegisterSignal<T>(this);
+#endif
             var type = typeof(T);
             if (IsLogEnabled) Debug.Log($"{type}");
 
@@ -34,6 +39,9 @@ namespace Exerussus._1Extensions.SignalSystem
         /// <summary> Вызывает сигнал без аргументов. </summary>
         public void RegistryRaise<T>() where T : struct
         {
+#if UNITY_EDITOR
+            Editor.SignalManager.RegisterSignal<T>(this);
+#endif
             var type = typeof(T);
             var data = new T();
             if (IsLogEnabled) Debug.Log($"{type}");
@@ -44,6 +52,9 @@ namespace Exerussus._1Extensions.SignalSystem
         /// <summary> Вызывает сигнал с фильтрацией по long id. </summary>
         public void RegistryRaiseFilter<T>(long id, T data) where T : struct
         {
+#if UNITY_EDITOR
+            Editor.SignalManager.RegisterSignal<T>(this);
+#endif
             var type = typeof(T);
             if (IsLogEnabled) Debug.Log($"{type}");
 
@@ -78,143 +89,11 @@ namespace Exerussus._1Extensions.SignalSystem
                 }
             }
 
-            if (_shotLstnrWithIds.TryPop(type, out var shotActionIdList))
+            if (_shotListenersWithIds.TryPop(type, out var shotActionIdList))
             {
                 var actions = (Dictionary<string, Action<T>>)shotActionIdList;
                 foreach (var action in actions.Values) action.Invoke(data);
             }
-        }
-        
-        /// <summary> Регистрирует сигнал содержащий контекст для работы в асинхронном режиме. </summary>
-        /// <param name="data"> Структура наследник IAsyncSignal содержащая SignalContext. </param>
-        /// <param name="delay"> Задержка в миллисекундах. </param>
-        /// <param name="timeout"> Таймаут в миллисекундах. </param>
-        /// <returns> Возвращает контекст структуры при изменении в ней SignalRequestState. </returns>
-        public async Task<TContext> RegistryRaiseAsync<TData, TContext>(TData data, int delay = 100, int timeout = 10000) 
-            where TData : struct, ISignalWithAsyncContext<TContext>
-            where TContext : AsyncSignalContext, new()
-        {
-            var type = typeof(TData);
-            if (data.Context == null) data.Context = new TContext();
-            data.Context.State = AsyncSignalState.Awaiting;
-            if (IsLogEnabled) Debug.Log($"{type}");
-            
-            FindAndInvokeAction(ref data, type);
-
-            var endTime = DateTime.Now.Millisecond + timeout;
-            while (data.Context.State == AsyncSignalState.Awaiting)
-            {
-                if (DateTime.Now.Millisecond > endTime)
-                {
-                    data.Context.State = AsyncSignalState.Timeout;
-                    break;
-                }
-                await Task.Delay(delay);
-            }
-    
-            return data.Context;
-        }
-        
-        /// <summary> Регистрирует сигнал содержащий контекст для работы в асинхронном режиме. </summary>
-        /// <param name="data"> Структура наследник IAsyncSignal содержащая SignalContext. </param>
-        /// <param name="delay"> Задержка в миллисекундах. </param>
-        /// <param name="timeout"> Таймаут в миллисекундах. </param>
-        /// <returns> Возвращает контекст структуры при изменении в ней SignalRequestState. </returns>
-        public async Task<ResultContext> RegistryRaiseAsync<TData>(TData data, int delay = 100, int timeout = 10000) 
-            where TData : struct, ISignalWithAsyncContext<ResultContext>
-        {
-            var type = typeof(TData);
-            if (data.Context == null) data.Context = new ResultContext();
-            data.Context.State = AsyncSignalState.Awaiting;
-            if (IsLogEnabled) Debug.Log($"{type}");
-            
-            FindAndInvokeAction(ref data, type);
-
-            var endTime = DateTime.Now.Millisecond + timeout;
-            while (data.Context.State == AsyncSignalState.Awaiting)
-            {
-                if (DateTime.Now.Millisecond > endTime)
-                {
-                    data.Context.State = AsyncSignalState.Timeout;
-                    break;
-                }
-                await Task.Delay(delay);
-            }
-    
-            return data.Context;
-        }
-        
-        /// <summary> Регистрирует сигнал содержащий контекст для работы в асинхронном режиме. </summary>
-        /// <param name="data"> Структура наследник IAsyncSignal содержащая SignalContext. </param>
-        /// <param name="delay"> Задержка в миллисекундах. </param>
-        /// <param name="timeout"> Таймаут в миллисекундах. </param>
-        /// <returns> Возвращает контекст структуры при изменении в ней SignalRequestState. </returns>
-        public async Task<TContext> RegistryRaiseAsync<TData, TContext>(int delay = 100, int timeout = 10000) 
-            where TData : struct, ISignalWithAsyncContext<TContext>
-            where TContext : AsyncSignalContext, new()
-        {
-            var type = typeof(TData);
-            var data = new TData();
-            if (data.Context == null) data.Context = new TContext();
-            data.Context.State = AsyncSignalState.Awaiting;
-            if (IsLogEnabled) Debug.Log($"{type}");
-            
-            FindAndInvokeAction(ref data, type);
-
-            var endTime = DateTime.Now.Millisecond + timeout;
-            while (data.Context.State == AsyncSignalState.Awaiting)
-            {
-                if (DateTime.Now.Millisecond > endTime)
-                {
-                    data.Context.State = AsyncSignalState.Timeout;
-                    break;
-                }
-                await Task.Delay(delay);
-            }
-    
-            return data.Context;
-        }
-        
-        /// <summary> Регистрирует сигнал содержащий контекст для работы в асинхронном режиме. </summary>
-        /// <param name="data"> Структура наследник IAsyncSignal содержащая SignalContext. </param>
-        /// <param name="delay"> Задержка в миллисекундах. </param>
-        /// <param name="timeout"> Таймаут в миллисекундах. </param>
-        /// <returns> Возвращает контекст структуры при изменении в ней SignalRequestState. </returns>
-        public async Task<ResultContext> RegistryRaiseAsync<TData>(int delay = 100, int timeout = 10000) where TData : struct, ISignalWithAsyncContext<ResultContext>
-        {
-            var type = typeof(TData);
-            var data = new TData();
-            if (data.Context == null) data.Context = new ResultContext();
-            Tracer.Ping($"Created new context for {typeof(TData).Name} | hash : {data.Context.GetHashCode()}");
-            data.Context.State = AsyncSignalState.Awaiting;
-            if (IsLogEnabled) Debug.Log($"{type}");
-            
-            FindAndInvokeAction(ref data, type);
-
-            var endTime = DateTime.Now.Millisecond + timeout;
-            while (data.Context.State == AsyncSignalState.Awaiting)
-            {
-                if (DateTime.Now.Millisecond > endTime)
-                {
-                    data.Context.State = AsyncSignalState.Timeout;
-                    break;
-                }
-                
-                #if UNITY_EDITOR
-                
-                if (!UnityEditor.EditorApplication.isPlaying)
-                {
-                    data.Context.State = AsyncSignalState.Timeout;
-                    break;
-                }
-                
-                #endif
-                
-                Tracer.Ping($"{typeof(TData).Name} not ready. State : {data.Context.State.ToString()}");
-                await Task.Delay(delay);
-            }
-    
-            return data.Context;
         }
         
         /// <summary>
@@ -222,6 +101,9 @@ namespace Exerussus._1Extensions.SignalSystem
         /// </summary>
         public void RegistryRaise<T>(ref T data) where T : struct
         {
+#if UNITY_EDITOR
+            Editor.SignalManager.RegisterSignal<T>(this);
+#endif
             var type = typeof(T);
             if (IsLogEnabled) Debug.Log($"{type}");
             
@@ -272,7 +154,7 @@ namespace Exerussus._1Extensions.SignalSystem
         public void SubscribeShot<T>(string id, Action<T> action) where T : struct
         {
             var type = typeof(T);
-            if (!_shotLstnrWithIds.TryGetValue(type, out var actionDict) || actionDict is not Dictionary<string, Action<T>> dict) _shotLstnrWithIds[type] = dict = new Dictionary<string, Action<T>>();
+            if (!_shotListenersWithIds.TryGetValue(type, out var actionDict) || actionDict is not Dictionary<string, Action<T>> dict) _shotListenersWithIds[type] = dict = new Dictionary<string, Action<T>>();
             dict[id] = action;
         }
 
@@ -309,6 +191,9 @@ namespace Exerussus._1Extensions.SignalSystem
         
         public void RaiseCancelableSignal<TData, TContext>(TData data) where TData : struct, ISignalWithContext<TContext> where TContext : SignalContext, ICancelableSignal
         {
+#if UNITY_EDITOR
+            Editor.SignalManager.RegisterSignal<TData>(this);
+#endif
             var type = typeof(TData);
             if (_cancelableListeners.ContainsKey(type) && _cancelableListeners[type] is List<Action<TData>> list)
             {
@@ -320,66 +205,6 @@ namespace Exerussus._1Extensions.SignalSystem
                 }
             }
         }
-    }
-
-    public enum AsyncSignalState
-    {
-        Awaiting,
-        Success,
-        Fail,
-        Timeout
-    }
-
-    public abstract class AsyncSignalContext
-    {
-        private AsyncSignalState _state = AsyncSignalState.Awaiting;
-
-        public AsyncSignalState State
-        {
-            get => _state;
-            set
-            {
-                //Tracer.Ping($"{GetType().Name} CONTEXT STATE CHANGED : {_state} => {value}");
-                _state = value;
-            }
-        }
-
-        public void Done()
-        {
-            lock (this)
-            {
-                State = AsyncSignalState.Success;
-                //Tracer.Ping($"{GetType().Name} CONTEXT DONE");
-            }
-        }
-    }
-
-    public class ResultContext : AsyncSignalContext
-    {
-        public Dictionary<string, object> InputParameters { get; private set; } = new();
-        public Dictionary<string, object> OutputParameters { get; private set; } = new();
-    }
-
-    public class PackedObject
-    {
-        public PackedObject() { }
-
-        public PackedObject(object o) { Object = o; }
-
-        public object Object { get; set; }
-    }
-
-    public class PackedObject<T>
-    {
-        public PackedObject() { }
-
-        public PackedObject(T o) { Object = o; }
-        public T Object { get; set; }
-    }
-
-    public interface ISignalWithAsyncContext<T> where T : AsyncSignalContext
-    {
-        public T Context { get; set; }
     }
 
     public interface ISignalWithContext<T> where T : SignalContext
