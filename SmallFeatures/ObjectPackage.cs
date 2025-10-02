@@ -14,7 +14,7 @@ namespace Exerussus._1Extensions.SmallFeatures
         {
             const int checkInterval = 100;
             
-            while (!package.Value || !ct.IsCancellationRequested)
+            while (!package.Value || !ct.IsCancellationRequested || timeout > 0)
             {
                 if (timeout <= 0) return;
                 await UniTask.Delay(checkInterval, cancellationToken: ct);
