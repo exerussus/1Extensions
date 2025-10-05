@@ -16,6 +16,7 @@ namespace Exerussus._1Extensions.SignalSystem
         private bool IsLogEnabled { get; set; }
 
         private readonly Dictionary<Type, object> _listeners = new();
+        private readonly Dictionary<Type, object> _affectors = new();
         private readonly Dictionary<Type, object> _shotListeners = new();
         private readonly Dictionary<Type, object> _shotListenersWithIds = new();
         private readonly Dictionary<Type, object> _cancelableListeners = new();
@@ -25,7 +26,7 @@ namespace Exerussus._1Extensions.SignalSystem
 #endif
         
         /// <summary> Вызывает сигнал. </summary>
-        public void RegistryRaise<T>(T data) where T : struct
+        public void RegistryRaise<T>(T data = default) where T : struct
         {
 #if UNITY_EDITOR
             Editor.SignalManager.RegisterSignal<T>(this);
@@ -36,18 +37,140 @@ namespace Exerussus._1Extensions.SignalSystem
             FindAndInvokeAction(ref data, type);
         }
 
+        #region AFFECTOR
+        
         /// <summary> Вызывает сигнал без аргументов. </summary>
-        public void RegistryRaise<T>() where T : struct
+        public (bool isFound, TResult result) RegistryAffect<TAffector, TResult>(TAffector data = default) 
+            where TAffector : struct, IAffector<TResult>
         {
-#if UNITY_EDITOR
-            Editor.SignalManager.RegisterSignal<T>(this);
-#endif
-            var type = typeof(T);
-            var data = new T();
+            var type = typeof(TAffector);
             if (IsLogEnabled) Debug.Log($"{type}");
+            
+            if (_affectors.TryGetValue(type, out var actionList))
+            {
+                var actions = (List<Func<TAffector, TResult>>)actionList;
 
-            FindAndInvokeAction(ref data, type);
+                foreach (var t in actions)
+                {
+                    var result = t.Invoke(data);
+                    if (result != null) return (true, result);
+                }
+            }
+            
+            return (false, default);
         }
+        
+        /// <summary> Вызывает сигнал без аргументов. </summary>
+        public (bool isFound, List<TResult> result) RegistryAffectMany<TAffector, TResult>(TAffector data = default) 
+            where TAffector : struct, IAffector<TResult>
+        {
+            var type = typeof(TAffector);
+            if (IsLogEnabled) Debug.Log($"{type}");
+            
+            if (_affectors.TryGetValue(type, out var actionList))
+            {
+                var result = new List<TResult>();
+                var actions = (List<Func<TAffector, TResult>>)actionList;
+                foreach (var t in actions)
+                {
+                    var resultItem = t.Invoke(data);
+                    if (resultItem != null) result.Add(resultItem);
+                }
+                return (result.Count > 0, result);
+            }
+            
+            return (false, null);
+        }
+        
+        /// <summary> Вызывает сигнал без аргументов. </summary>
+        public bool RegistryAffectMany<TAffector, TResult>(TAffector data, out List<TResult> result) 
+            where TAffector : struct, IAffector<TResult>
+        {
+            var type = typeof(TAffector);
+            if (IsLogEnabled) Debug.Log($"{type}");
+            
+            if (_affectors.TryGetValue(type, out var actionList))
+            {
+                var actions = (List<Func<TAffector, TResult>>)actionList;
+                if (actions.Count > 0) result = new List<TResult>();
+                else
+                {
+                    result = null;
+                    return false;
+                }
+                
+                foreach (var t in actions)
+                {
+                    var resultItem = t.Invoke(data);
+                    if (resultItem != null) result.Add(resultItem);
+                }
+                return result.Count > 0;
+            }
+            
+            result = null;
+            return false;
+        }
+        
+        /// <summary> Вызывает сигнал без аргументов. </summary>
+        public bool RegistryAffect<TAffector, TResult>(TAffector data, out TResult result) 
+            where TAffector : struct, IAffector<TResult>
+        {
+            var type = typeof(TAffector);
+            if (IsLogEnabled) Debug.Log($"{type}");
+            
+            if (_affectors.TryGetValue(type, out var actionList))
+            {
+                var actions = (List<Func<TAffector, TResult>>)actionList;
+                foreach (var f in actions)
+                {
+                    result = f.Invoke(data);
+                    if (result != null) return true;
+                }
+            }
+            result = default;
+            return false;
+        }
+        
+        /// <summary> Вызывает сигнал без аргументов. </summary>
+        public bool RegistryAffect<TAffector, TResult>(out TResult result) 
+            where TAffector : struct, IAffector<TResult>
+        {
+            var type = typeof(TAffector);
+            if (IsLogEnabled) Debug.Log($"{type}");
+            
+            if (_affectors.TryGetValue(type, out var actionList))
+            {
+                var actions = (List<Func<TAffector, TResult>>)actionList;
+                foreach (var f in actions)
+                {
+                    result = f.Invoke(default);
+                    if (result != null) return true;
+                }
+            }
+            result = default;
+            return false;
+        }
+
+        public void Subscribe<TAffector, TResult>(Func<TAffector, TResult> action) where TAffector : struct, IAffector<TResult>
+        {
+            var type = typeof(TAffector);
+            if (!_affectors.TryGetValue(type, out var actionList) || actionList is not List<Func<TAffector, TResult>> list) _affectors[type] = list = new List<Func<TAffector, TResult>>();
+            list.Add(action);
+        }
+        
+        public void Unsubscribe<TAffector, TResult>(Func<TAffector, TResult> action) where TAffector : struct, IAffector<TResult>
+        {
+            var type = typeof(TAffector);
+            if (_affectors.TryGetValue(type, out var actionList) && actionList is List<Func<TAffector, TResult>> list)
+            {
+                list.Remove(action);
+            }
+        }
+
+        #endregion
+
+        #region Signal
+
         
         /// <summary> Вызывает сигнал с фильтрацией по long id. </summary>
         public void RegistryRaiseFilter<T>(long id, T data) where T : struct
@@ -205,6 +328,8 @@ namespace Exerussus._1Extensions.SignalSystem
                 }
             }
         }
+
+        #endregion
     }
 
     public interface ISignalWithContext<T> where T : SignalContext
@@ -215,6 +340,18 @@ namespace Exerussus._1Extensions.SignalSystem
     public abstract class SignalContext
     {
         
+    }
+
+    public interface IMatcher<TRequest, TResponse>
+    {
+            
+    }
+    
+    
+        
+    public interface IAffector<TResponse>
+    {
+            
     }
 
     public interface ICancelableSignal
