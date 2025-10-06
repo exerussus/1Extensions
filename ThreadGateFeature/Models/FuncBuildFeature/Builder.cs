@@ -36,11 +36,13 @@ namespace Exerussus._1Extensions.ThreadGateFeature
                         if (!_isInit)
                         {
                             _isInit = true;
+                            #if UNITY_EDITOR
                             EditorDispose += () =>
                             {
                                 _isInit = false;
                                 _isUpdating = false;
                             };
+                            #endif
                         }
                         
                         if (!_isUpdating)
