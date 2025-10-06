@@ -174,12 +174,11 @@ namespace Exerussus._1Extensions.SignalSystem
         #endregion
 
         #region ASYNC
-
         
         public async UniTask<(bool success, T data)> RaiseAsync<T>(T data) where T : AsyncSignal
         {
 #if UNITY_EDITOR
-            Editor.SignalManager.RegisterSignal<T>(this);
+            ThreadGate.CreateJob(() => Editor.SignalManager.RegisterSignal<T>(this)).Run();
 #endif
             var type = typeof(T);
             if (IsLogEnabled) Debug.Log($"{type}");
