@@ -8,7 +8,7 @@ namespace Exerussus._1Extensions.SignalSystem.Editor
 {
     internal static class SignalManager
     {
-        public static void RegisterSignal<T>(Signal signal) where T : struct
+        public static void RegisterSignal<T>(Signal signal)
         {
             if (!_signals.TryGetValue(signal.UniqId, out var statistic))
             {
