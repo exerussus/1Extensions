@@ -176,21 +176,14 @@ namespace Exerussus._1Extensions.SignalSystem
         #region ASYNC
 
         
-        public T RaiseAsync<T>(T data) where T : AsyncSignal
+        public async UniTask<(bool success, T data)> RaiseAsync<T>(T data) where T : AsyncSignal
         {
 #if UNITY_EDITOR
             Editor.SignalManager.RegisterSignal<T>(this);
 #endif
             var type = typeof(T);
             if (IsLogEnabled) Debug.Log($"{type}");
-
-            ThreadGate.CreateJob(() => RunAsync(data, type)).Run();
             
-            return data;
-        }
-
-        private async UniTask<T> RunAsync<T>(T data, Type type) where T : AsyncSignal
-        {
             if (_listenersAsync.TryGetValue(type, out var actionList))
             {
                 var actions = (List<Func<T, UniTask>>)actionList;
@@ -198,20 +191,18 @@ namespace Exerussus._1Extensions.SignalSystem
                 if (actions.Count == 0)
                 {
                     data.Done(false);
-                    return data;
+                    return (false, data);
                 }
                 
                 var tasks = new UniTask[actions.Count];
                 for (var index = actions.Count - 1; index >= 0; index--) tasks[index] = actions[index].Invoke(data);
                 await UniTask.WhenAll(tasks);
                 data.Done(true);
+                return (true, data);
             }
-            else
-            {
-                data.Done(false);
-            }
-            
-            return data;
+
+            data.Done(false);
+            return (false, data);
         }
         
         public void SubscribeAsync<T>(Func<T, UniTask> action) where T : AsyncSignal
@@ -417,7 +408,7 @@ namespace Exerussus._1Extensions.SignalSystem
         public bool IsCanceled { get; private set; }
         private int _timeout;
         private int _timer;
-        private const int Delay = 50;
+        //private const int Delay = 50;
         
         internal void Done(bool isSuccess)
         {
@@ -431,25 +422,25 @@ namespace Exerussus._1Extensions.SignalSystem
             IsCanceled = true;
         }
         
-        public async UniTask<bool> Await(int timeout = -1)
-        {
-            _timeout = timeout;
-            
-            while (!IsDone && !IsCanceled)
-            {
-                if (_timeout > 0)
-                {
-                    _timer += Delay;
-                    if (_timer >= _timeout)
-                    {
-                        Cancel();
-                        return false;
-                    }
-                }
-                await UniTask.Delay(Delay);
-            }
-            return IsSuccess;
-        }
+        // public async UniTask<bool> Await(int timeout = -1)
+        // {
+        //     _timeout = timeout;
+        //     
+        //     while (!IsDone && !IsCanceled)
+        //     {
+        //         if (_timeout > 0)
+        //         {
+        //             _timer += Delay;
+        //             if (_timer >= _timeout)
+        //             {
+        //                 Cancel();
+        //                 return false;
+        //             }
+        //         }
+        //         await UniTask.Delay(Delay);
+        //     }
+        //     return IsSuccess;
+        // }
     }
         
     public interface IAffector<TResponse>
