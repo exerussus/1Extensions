@@ -176,7 +176,7 @@ namespace Exerussus._1Extensions.SignalSystem
         #region ASYNC
 
         
-        public T CreateAsync<T>(T data) where T : AsyncSignal
+        public T RaiseAsync<T>(T data) where T : AsyncSignal
         {
 #if UNITY_EDITOR
             Editor.SignalManager.RegisterSignal<T>(this);
@@ -189,7 +189,7 @@ namespace Exerussus._1Extensions.SignalSystem
             return data;
         }
 
-        private async UniTask RunAsync<T>(T data, Type type) where T : AsyncSignal
+        private async UniTask<T> RunAsync<T>(T data, Type type) where T : AsyncSignal
         {
             if (_listenersAsync.TryGetValue(type, out var actionList))
             {
@@ -198,7 +198,7 @@ namespace Exerussus._1Extensions.SignalSystem
                 if (actions.Count == 0)
                 {
                     data.Done(false);
-                    return;
+                    return data;
                 }
                 
                 var tasks = new UniTask[actions.Count];
@@ -210,6 +210,8 @@ namespace Exerussus._1Extensions.SignalSystem
             {
                 data.Done(false);
             }
+            
+            return data;
         }
         
         public void SubscribeAsync<T>(Func<T, UniTask> action) where T : AsyncSignal
