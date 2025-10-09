@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Security.Cryptography;
 using System.Text;
+using UnityEngine;
 
 namespace Exerussus._1Extensions.SmallFeatures
 {
@@ -16,7 +17,12 @@ namespace Exerussus._1Extensions.SmallFeatures
         /// </summary>
         public static long GetStableId(string input)
         {
-            if (input == null) throw new ArgumentNullException(nameof(input));
+            if (input == null)
+            {
+                Debug.LogError("StringToStableLongId.GetStableId | input == null");
+                return 0;
+            }
+            
             if (input == "") return 0;
             
             using var sha256 = SHA256.Create();
@@ -31,7 +37,7 @@ namespace Exerussus._1Extensions.SmallFeatures
         public static long GetStableLongId(this string input)
         {
             var result = GetStableId(input);
-            _dictionary[result] = input;
+            if (result != 0) _dictionary[result] = input;
             return result;
         }
         
