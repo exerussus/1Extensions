@@ -43,6 +43,25 @@ namespace Exerussus._1Extensions.ReflectionHelper
             throw new InvalidOperationException(
                 $"Не удалось установить значение свойства '{property.Name}' — отсутствует сеттер и бэкенд-поле.");
         }
+
+        public static Action<object> CreateSetPropertyAction(object target, string propertyName)
+        {            
+            if (target == null) throw new ArgumentNullException(nameof(target));
+            var type = target.GetType();
+            var property = type.GetProperty(propertyName, BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
+            if (property == null) throw new ArgumentException($"Свойство '{propertyName}' не найдено в типе {type.FullName}.");
+            var backingField = type.GetField($"<{property.Name}>k__BackingField", BindingFlags.Instance | BindingFlags.NonPublic);
+            if (backingField != null)
+            {
+                return value => backingField.SetValue(target, value);
+            }
+            var setMethod = property.GetSetMethod(true);
+            if (setMethod != null)
+            {
+                return value => setMethod.Invoke(target, new [] { value });
+            }
+            throw new InvalidOperationException($"Не удалось создать делегат, '{property.Name}' — отсутствует сеттер и бэкенд-поле.");
+        }
     }
 
 }
