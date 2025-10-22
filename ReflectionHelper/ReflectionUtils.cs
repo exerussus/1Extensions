@@ -44,7 +44,7 @@ namespace Exerussus._1Extensions.ReflectionHelper
                 $"Не удалось установить значение свойства '{property.Name}' — отсутствует сеттер и бэкенд-поле.");
         }
 
-        public static Action<object> CreateSetPropertyAction(object target, string propertyName)
+        public static Action<T> CreateSetPropertyAction<T>(object target, string propertyName)
         {            
             if (target == null) throw new ArgumentNullException(nameof(target));
             var type = target.GetType();
@@ -58,7 +58,7 @@ namespace Exerussus._1Extensions.ReflectionHelper
             var setMethod = property.GetSetMethod(true);
             if (setMethod != null)
             {
-                return value => setMethod.Invoke(target, new [] { value });
+                return value => setMethod.Invoke(target, new object[] { value });
             }
             throw new InvalidOperationException($"Не удалось создать делегат, '{property.Name}' — отсутствует сеттер и бэкенд-поле.");
         }
