@@ -1,4 +1,5 @@
 ﻿using System.Runtime.CompilerServices;
+using System.Threading;
 using System.Threading.Tasks;
 using Cysharp.Threading.Tasks;
 using Exerussus._1Extensions.Scripts.Extensions;
@@ -50,9 +51,10 @@ namespace Exerussus._1Extensions.ThreadGateFeature
 
                     while (!ThreadGate.FuncBuilding<T>.IsDone(id))
                     {
+                        if (_cts.Token.IsCancellationRequested) return default;
                         if (timeoutMilliseconds <= 0) return default;
 
-                        await Task.Delay(millisecondsDelay);
+                        await Task.Delay(millisecondsDelay, cancellationToken: _cts.Token);
                         timeoutMilliseconds -= millisecondsDelay;
                     }
 
@@ -68,9 +70,10 @@ namespace Exerussus._1Extensions.ThreadGateFeature
 
                     while (!ThreadGate.FuncBuilding<T>.IsDone(id))
                     {
+                        if (_cts.Token.IsCancellationRequested) return default;
                         if (timeoutMilliseconds <= 0) return default;
 
-                        await UniTask.Delay(millisecondsDelay);
+                        await UniTask.Delay(millisecondsDelay, cancellationToken: _cts.Token);
                         timeoutMilliseconds -= millisecondsDelay;
                     }
                     
