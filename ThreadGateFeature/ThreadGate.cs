@@ -1,5 +1,6 @@
 ﻿
 using System;
+using System.Threading;
 using Exerussus._1Extensions.LoopFeature;
 using UnityEngine;
 
@@ -9,6 +10,8 @@ namespace Exerussus._1Extensions.ThreadGateFeature
     {
         internal static float Time = 0;
         private static Action _funcBuildingUpdate;
+        private static CancellationTokenSource _cts = new();
+
 #if UNITY_EDITOR
         private static Action EditorDispose;        
 #endif
@@ -35,6 +38,14 @@ namespace Exerussus._1Extensions.ThreadGateFeature
             Time = UnityEngine.Time.time;
             ActionBuilding.UpdateActionBuilding();
             _funcBuildingUpdate?.Invoke();
+        }
+        
+        private static void Dispose()
+        {
+            ExerussusLoopHelper.OnUpdate -= Update;
+            _cts.Cancel();
+            _cts.Dispose();
+            _cts = new();
         }
     }
 }

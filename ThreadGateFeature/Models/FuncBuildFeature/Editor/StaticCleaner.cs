@@ -1,12 +1,9 @@
-﻿using System.Threading;
-
+﻿
 #if UNITY_EDITOR
 namespace Exerussus._1Extensions.ThreadGateFeature
 {
     public static partial class ThreadGate
     {
-        private static CancellationTokenSource _cts = new();
-        
         public static partial class FuncBuilding<T>
         {
             [UnityEditor.InitializeOnLoad]
@@ -21,7 +18,6 @@ namespace Exerussus._1Extensions.ThreadGateFeature
                 {
                     if (state == UnityEditor.PlayModeStateChange.ExitingPlayMode || state == UnityEditor.PlayModeStateChange.ExitingEditMode)
                     {
-                        _cts.Cancel();
                         ToWait.Clear();
                         ToRelease.Clear();
                         ActiveBuffers.Clear();
@@ -31,7 +27,6 @@ namespace Exerussus._1Extensions.ThreadGateFeature
                         _funcBuildingUpdate = null;
                         EditorDispose?.Invoke();
                         EditorDispose = null;
-                        _cts = new();
                     }
                 }
             }

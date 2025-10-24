@@ -24,6 +24,7 @@ namespace Exerussus._1Extensions.ThreadGateFeature
                         Time = 0;
                         _freeJobIndex = 1;
                         _freeBuilderIndex = 1;
+                        Dispose();
                     }
                 }
             }
