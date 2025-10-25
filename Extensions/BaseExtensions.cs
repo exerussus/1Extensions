@@ -180,6 +180,20 @@ namespace Exerussus._1Extensions.Scripts.Extensions
         }
         
         /// <summary>
+        /// Извлекает элемент из хэш-сета по указанному индексу и удаляет его из списка.
+        /// </summary>
+        /// <param name="collection">Список, из которого нужно извлечь элемент.</param>
+        /// <param name="index">Индекс элемента, который нужно извлечь.</param>
+        /// <returns>Извлеченный элемент.</returns>
+        public static T PopRandom<T>(this HashSet<T> collection)
+        {
+            var index = Random.Range(0, collection.Count);
+            var item = collection.ElementAt(index);
+            collection.Remove(item);
+            return item;
+        }
+        
+        /// <summary>
         /// Извлекает первый элемент из списка и удаляет его из списка.
         /// </summary>
         /// <param name="collection">Список, из которого нужно извлечь первый элемент.</param>
