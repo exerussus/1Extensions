@@ -15,9 +15,9 @@ namespace Exerussus._1Extensions.ThreadGateFeature
             internal static void UpdateActionBuilding()
             {
                 Time = UnityEngine.Time.time;
+                UpdateReleasing();
                 UpdateCreating();
                 UpdateWaiting();
-                UpdateReleasing();
             }
 
             private static void UpdateCreating()
@@ -41,8 +41,8 @@ namespace Exerussus._1Extensions.ThreadGateFeature
 
                     if (job.EndTime < Time)
                     {
-                        ExecuteJob(job);
                         ToRelease.Add(job.Id);
+                        ExecuteJob(job);
                     }
                 }
             }

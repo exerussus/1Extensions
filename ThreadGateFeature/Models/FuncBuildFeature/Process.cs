@@ -15,9 +15,9 @@ namespace Exerussus._1Extensions.ThreadGateFeature
             
             private static void UpdateFuncBuilding()
             {
+                UpdateReleasing();
                 UpdateCreating();
                 UpdateWaiting();
-                UpdateReleasing();
 
                 lock (CreateLock)
                 {
@@ -50,8 +50,8 @@ namespace Exerussus._1Extensions.ThreadGateFeature
 
                     if (job.EndTime < Time)
                     {
-                        ExecuteJob(job);
                         ToRelease.Add(job.Id);
+                        ExecuteJob(job);
                     }
                 }
             }
