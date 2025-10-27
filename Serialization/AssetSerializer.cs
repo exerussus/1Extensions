@@ -51,13 +51,13 @@ namespace Exerussus._1Extensions.Serialization
         /// <summary>
         /// Асинхронно сохраняет объект в PersistentDataPath.
         /// </summary>
-        public static async UniTask SavePersistentAsync(object data, string saveName)
+        public static async UniTask SavePersistentAsync<T>(T data, string saveName)
         {
             var fileName = data.GetType().Name;
             await SavePersistentAsync(data, saveName, fileName);
         }
 
-        public static async UniTask SavePersistentAsync(object data, string saveName, string fileName)
+        public static async UniTask SavePersistentAsync<T>(T data, string saveName, string fileName)
         {
             var path = Path.Combine(PersistentDataPath, saveName, fileName);
             var directory = Path.GetDirectoryName(path);
@@ -96,7 +96,7 @@ namespace Exerussus._1Extensions.Serialization
             }
         }
 
-        public static void SavePersistent(object data, string saveName)
+        public static void SavePersistent<T>(T data, string saveName)
         {
             var fileName = data.GetType().Name;
             var path = Path.Combine(PersistentDataPath, saveName, fileName);
@@ -188,7 +188,7 @@ namespace Exerussus._1Extensions.Serialization
             }
         }
 
-        public static void SaveStreaming(object data, string saveName)
+        public static void SaveStreaming<T>(T data, string saveName)
         {
             var fileName = data.GetType().Name;
             var path = Path.Combine(StreamingAssetsPath, saveName, fileName);
