@@ -150,6 +150,27 @@ namespace Exerussus._1Extensions.Serialization
             }
         }
 
+        public static string SerializeToJson<T>(T data)
+        {
+            if (data == null) return "{}";
+            return JsonConvert.SerializeObject(data, JsonSettings);
+        }
+        
+        public static bool TryDeserializeJson<T>(string json, out T result)
+        {
+            try
+            {
+                result = JsonConvert.DeserializeObject<T>(json, JsonSettings);
+                return result != null;
+            }
+            catch (Exception e)
+            {
+                Debug.LogError($"Не удалось десериализовать json! json:\n\n{json}\n\nError Trace: \n\n{e.Message}");
+                result = default;
+                return false;
+            }
+        }
+
         /// <summary>
         /// Асинхронное сохранение данных в StreamingAssets.
         /// </summary>
