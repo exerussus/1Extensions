@@ -10,7 +10,7 @@ namespace Exerussus._1Extensions.SmallFeatures
     {
         private readonly Dictionary<string, ItemWrapper> _itemByTypeID = new();
         private readonly Dictionary<long, ItemWrapper> _itemByID = new();
-        public abstract List<T> Items {  get; protected set; }
+        public abstract IReadOnlyList<T> Items {  get; protected set; }
         public bool IsInitialized { get; protected set; }
         
          /// <summary> Use it runtime only. </summary>
@@ -75,6 +75,12 @@ namespace Exerussus._1Extensions.SmallFeatures
             return _itemByID.ContainsKey(itemId);
         }
 
+        public virtual List<string> GetAllTypeIds()
+        {
+            Initialize();
+            return new List<string>(_itemByTypeID.Keys);
+        }
+
         public void Clear()
         {
             IsInitialized = false;
@@ -116,11 +122,10 @@ namespace Exerussus._1Extensions.SmallFeatures
 
         public virtual void Initialize()
         {
-            #if !UNITY_EDITOR
             if (IsInitialized) return;
-            #endif
-
+            
             UpdateDictionary();
+            
             foreach (var itemWrapper in _itemByTypeID.Values) itemWrapper.Item.Initialize();
             
             IsInitialized = true;
