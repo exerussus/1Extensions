@@ -1,4 +1,4 @@
-﻿using System;
+﻿
 using System.Collections.Generic;
 using Exerussus._1Extensions.Abstractions;
 using UnityEngine;
@@ -8,38 +8,35 @@ namespace Exerussus._1Extensions.SmallFeatures
     public abstract class Library<T> : ScriptableObject, ILibrary
         where T : ILibraryItem, new()
     {
-        protected HashSet<string> _hashSet;
-        protected Dictionary<string, T> _itemByTypeID;
-        protected Dictionary<long, T> _itemByID;
+        private readonly Dictionary<string, ItemWrapper> _itemByTypeID = new();
+        private readonly Dictionary<long, ItemWrapper> _itemByID = new();
         public abstract List<T> Items {  get; protected set; }
         public bool IsInitialized { get; protected set; }
-        protected abstract string DefaultValue { get; }
         
          /// <summary> Use it runtime only. </summary>
-        public virtual bool TryGet(string id, out T val)
+        public virtual bool TryGet(string id, out T value)
         {
-            return _itemByTypeID.TryGetValue(id, out val);
+            if (_itemByTypeID.TryGetValue(id, out var wrapper))
+            {
+                value = wrapper.Item;
+                return true;
+            }
+            
+            value = default;
+            return false;
         }
          
          /// <summary> Use it runtime only. </summary>
-        public virtual bool TryGet(long id, out T val)
+        public virtual bool TryGet(long id, out T value)
         {
-            return _itemByID.TryGetValue(id, out val);
-        }
-         
-         /// <summary> Use it runtime only. </summary>
-        public virtual T GetOrDefault(string id)
-        {
-            if (TryGet(id, out var pack)) return pack;
-            Debug.LogWarning($"Libraries | {GetType().Name} | Не найден {id}({id.GetStableLongId()}), по умолчанию {DefaultValue}");
-            return Get(DefaultValue);
-        }
-         /// <summary> Use it runtime only. </summary>
-        public virtual T GetOrDefault(long id)
-        {
-            if (TryGet(id, out var pack)) return pack;
-            Debug.LogWarning($"Libraries | {GetType().Name} | Не найден {id.ToStringFromStableId()}({id}), по умолчанию {DefaultValue}");
-            return Get(DefaultValue);
+            if (_itemByID.TryGetValue(id, out var wrapper))
+            {
+                value = wrapper.Item;
+                return true;
+            }
+            
+            value = default;
+            return false;
         }
          
         /// <summary> Возвращает значение, если найден ID, либо возвращает дефолтное значение. </summary>
@@ -59,13 +56,13 @@ namespace Exerussus._1Extensions.SmallFeatures
         /// <summary> Use it runtime only. </summary>
         public virtual T Get(string id)
         {
-            return _itemByTypeID[id];
+            return _itemByTypeID[id].Item;
         }
          
         /// <summary> Use it runtime only. </summary>
         public virtual T Get(long id)
         {
-            return _itemByID[id];
+            return _itemByID[id].Item;
         }
 
         public virtual bool ContainsID(string itemId)
@@ -86,47 +83,46 @@ namespace Exerussus._1Extensions.SmallFeatures
         }
 
         /// <summary> Use it on validation only. </summary>
-        public virtual T GetByIDIterations(string id)
+        public virtual bool TryGetByIDIterations(string id, out T value)
         {
             Initialize();
             if (_itemByTypeID.ContainsKey(id))
             {
-                return _itemByTypeID[id];
+                value = _itemByTypeID[id].Item;
+                return true;
             }
-
-            throw new Exception($"Cannot find library item in library : <<{GetType().Name}>> by index : <<{id}>>.");
+            
+            value = default;
+            return false;
         }
         
         public void UpdateDictionary()
         {
-            _itemByTypeID = new();
-            _itemByID = new();
+            _itemByTypeID.Clear();
+            _itemByID.Clear();
+            
             foreach (var gameItem in Items)
             {
-                _itemByTypeID[gameItem.TypeId] = gameItem;
-                var stableLong = gameItem.TypeId.GetStableLongId();
-                _itemByID[stableLong] = gameItem;
+                if (_itemByTypeID.ContainsKey(gameItem.TypeId))
+                {
+                    Debug.LogError($"Library item with type id : <<{gameItem.TypeId}>> already exists in library : <<{GetType().Name}>>.", this);
+                    continue;
+                }
+                var wrapper = new ItemWrapper(gameItem);
+                _itemByTypeID[wrapper.Item.TypeId] = wrapper;
+                _itemByID[wrapper.Id] = wrapper;
             }
         }
 
         public virtual void Initialize()
         {
             #if !UNITY_EDITOR
-                if (IsInitialized) return;
+            if (IsInitialized) return;
             #endif
+
+            UpdateDictionary();
+            foreach (var itemWrapper in _itemByTypeID.Values) itemWrapper.Item.Initialize();
             
-            _itemByTypeID = new Dictionary<string, T>();
-            _itemByID = new Dictionary<long, T>();
-            _hashSet = new HashSet<string>();
-
-            foreach (var item in Items)
-            {
-                item.Initialize();
-                _itemByTypeID[item.TypeId] = item;
-                _itemByID[item.Id] = item;
-                _hashSet.Add(item.TypeId);
-            }
-
             IsInitialized = true;
         }
 
@@ -139,12 +135,23 @@ namespace Exerussus._1Extensions.SmallFeatures
             OnValidation();
             foreach (var item in Items) item.OnValidation();
         }
+
+        private class ItemWrapper
+        {
+            public ItemWrapper(T item)
+            {
+                Item = item;
+                Id = item.TypeId.GetStableLongId();
+            }
+
+            public long Id;
+            public T Item;
+        }
     }
     
     public interface ILibraryItem
     {
-        public abstract string TypeId { get; set; }
-        public long Id { get; protected set; }
+        public string TypeId { get; }
 
         public void Initialize()
         {
@@ -154,7 +161,6 @@ namespace Exerussus._1Extensions.SmallFeatures
                 return;
             }
 
-            Id = TypeId.GetStableLongId();
             OnInitialize();
         }
         
