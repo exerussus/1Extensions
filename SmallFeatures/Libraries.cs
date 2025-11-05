@@ -10,7 +10,7 @@ namespace Exerussus._1Extensions.SmallFeatures
     {
         private readonly Dictionary<string, ItemWrapper> _itemByTypeID = new();
         private readonly Dictionary<long, ItemWrapper> _itemByID = new();
-        public abstract IReadOnlyList<T> Items {  get; protected set; }
+        public abstract IReadOnlyList<T> Items {  get; }
         public bool IsInitialized { get; protected set; }
         
          /// <summary> Use it runtime only. </summary>
