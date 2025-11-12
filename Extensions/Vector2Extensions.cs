@@ -135,6 +135,19 @@ namespace Exerussus._1Extensions.Scripts.Extensions
         }
         
         /// <summary>
+        /// Возвращает случайную точку между двумя точками.
+        /// </summary>
+        /// <param name="firstPosition">Первая точка.</param>
+        /// <param name="secondPosition">Вторая точка.</param>
+        /// <returns>Случайная точка внутри квадрата.</returns>
+        public static Vector2 GetRandomPointWith(this Vector2 firstPosition, Vector2 secondPosition)
+        {
+            var x = Random.Range(firstPosition.x, secondPosition.x);
+            var y = Random.Range(firstPosition.y, secondPosition.y);
+            return new Vector2(x, y);
+        }
+        
+        /// <summary>
         /// Возвращает вектор со смещением.
         /// </summary>
         /// <param name="vector">Вектор.</param>
