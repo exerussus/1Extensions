@@ -28,10 +28,10 @@ namespace Exerussus._1Extensions.ThreadGateFeature
             return ActionBuilding.Builder.Create(action);
         }
 
-        public static FuncBuilding<T>.Builder CreateJob<T>(Func<T> action)
-        {
-            return FuncBuilding<T>.Builder.Create(action);
-        }
+        // public static FuncBuilding<T>.Builder CreateJob<T>(Func<T> action)
+        // {
+        //     return FuncBuilding<T>.Builder.Create(action);
+        // }
 
         private static void Update()
         {

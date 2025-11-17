@@ -1,5 +1,4 @@
-﻿
-using System;
+﻿using System;
 using System.IO;
 using System.Runtime.Serialization.Formatters.Binary;
 using Newtonsoft.Json;
@@ -9,6 +8,14 @@ namespace Exerussus._1Extensions.Serialization
 {
     public static class SerializationUtils
     {
+        /// <summary> Глобальные настройки JSON для корректной сериализации полиморфных структур. </summary>
+        private static readonly JsonSerializerSettings JsonSettings = new JsonSerializerSettings
+        {
+            TypeNameHandling = TypeNameHandling.Auto,
+            TypeNameAssemblyFormatHandling = TypeNameAssemblyFormatHandling.Simple,
+            Formatting = Formatting.Indented,
+        };
+
         /// <summary> Сериализует объект в JSON или бинарные данные. </summary>
         public static bool TrySerialize(this object value, out SerializationData data, bool forceReflected = false)
         {
@@ -38,16 +45,16 @@ namespace Exerussus._1Extensions.Serialization
 
             if (forceReflected)
             {
-                using (MemoryStream stream = new MemoryStream())
-                {
-                    var formatter = new BinaryFormatter();
-                    formatter.Serialize(stream, value);
-                    data.binaryData = stream.ToArray();
-                }
+                using var stream = new MemoryStream();
+#pragma warning disable SYSLIB0011
+                var formatter = new BinaryFormatter();
+                formatter.Serialize(stream, value);
+#pragma warning restore SYSLIB0011
+                data.binaryData = stream.ToArray();
             }
             else
             {
-                data.jsonData = JsonConvert.SerializeObject(value, Formatting.Indented);
+                data.jsonData = JsonConvert.SerializeObject(value, JsonSettings);
             }
 
             return data;
@@ -61,15 +68,15 @@ namespace Exerussus._1Extensions.Serialization
 
             if (forceReflected)
             {
-                using (MemoryStream stream = new MemoryStream(data.binaryData))
-                {
-                    var formatter = new BinaryFormatter();
-                    return (T)formatter.Deserialize(stream);
-                }
+                using var stream = new MemoryStream(data.binaryData);
+#pragma warning disable SYSLIB0011
+                var formatter = new BinaryFormatter();
+                return (T)formatter.Deserialize(stream);
+#pragma warning restore SYSLIB0011
             }
             else
             {
-                return JsonConvert.DeserializeObject<T>(data.jsonData);
+                return JsonConvert.DeserializeObject<T>(data.jsonData, JsonSettings);
             }
         }
     }
