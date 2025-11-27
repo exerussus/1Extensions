@@ -39,20 +39,6 @@ namespace Exerussus._1Extensions.SmallFeatures
             return false;
         }
          
-        /// <summary> Возвращает значение, если найден ID, либо возвращает дефолтное значение. </summary>
-        public virtual T GetOrDefault(string id, string defaultValue)
-        {
-            if (TryGet(id, out var pack)) return pack;
-            return Get(defaultValue);
-        }
-         
-        /// <summary> Возвращает значение, если найден ID, либо возвращает дефолтное значение. </summary>
-        public virtual T GetOrDefault(long id, long defaultValue)
-        {
-            if (TryGet(id, out var pack)) return pack;
-            return Get(defaultValue);
-        }
-         
         /// <summary> Use it runtime only. </summary>
         public virtual T Get(string id)
         {
@@ -88,6 +74,7 @@ namespace Exerussus._1Extensions.SmallFeatures
             _itemByID.Clear();
         }
 
+#if UNITY_EDITOR
         /// <summary> Use it on validation only. </summary>
         public virtual bool TryGetByIDIterations(string id, out T value)
         {
@@ -101,6 +88,7 @@ namespace Exerussus._1Extensions.SmallFeatures
             value = default;
             return false;
         }
+#endif
         
         public void UpdateDictionary()
         {
@@ -120,10 +108,14 @@ namespace Exerussus._1Extensions.SmallFeatures
             }
         }
 
-        public virtual void Initialize()
+        public void Initialize()
         {
-            if (IsInitialized) return;
-            
+            if (IsInitialized && _itemByTypeID.Count > 0) return;
+            InitializeForce();
+        }
+
+        public virtual void InitializeForce()
+        {
             UpdateDictionary();
             
             foreach (var itemWrapper in _itemByTypeID.Values) itemWrapper.Item.Initialize();
